@@ -107,7 +107,29 @@ p {
   padding-top: calc(80px + 2rem); /* Account for fixed navbar */
 }
 
-.hero::before {
+/* Diagonal cut background */
+.hero-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.hero-left {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000000;
+  /* Remove sharp clip-path and use gradient mask instead */
+  mask: linear-gradient(135deg, black 0%, black 60%, transparent 100%);
+  -webkit-mask: linear-gradient(135deg, black 0%, black 60%, transparent 100%);
+}
+
+.hero-left::before {
   content: "";
   position: absolute;
   top: 0;
@@ -115,11 +137,73 @@ p {
   right: 0;
   bottom: 0;
   background: radial-gradient(
-    circle at 50% 50%,
+    circle at 30% 50%,
     rgba(255, 70, 85, 0.1) 0%,
     transparent 50%
   );
   pointer-events: none;
+}
+
+.hero-right {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Remove sharp clip-path and use gradient mask instead */
+  mask: linear-gradient(135deg, transparent 0%, transparent 40%, black 100%);
+  -webkit-mask: linear-gradient(
+    135deg,
+    transparent 0%,
+    transparent 40%,
+    black 100%
+  );
+  overflow: hidden;
+  z-index: 2;
+}
+
+.hero-right::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  /* Fade effect that will now be visible */
+  background: linear-gradient(
+    90deg,
+    rgba(15, 25, 35, 0.8) 0%,
+    rgba(15, 25, 35, 0.6) 20%,
+    rgba(15, 25, 35, 0.4) 40%,
+    rgba(15, 25, 35, 0.2) 60%,
+    rgba(15, 25, 35, 0) 80%
+  );
+  z-index: 3;
+}
+
+.slideshow-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  left: 20%;
+}
+
+.slideshow-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+.slideshow-image.active {
+  opacity: 1;
 }
 
 .hero::after {
@@ -135,6 +219,7 @@ p {
     transparent 50%
   );
   pointer-events: none;
+  z-index: 4;
 }
 
 .hero-content {
@@ -142,7 +227,7 @@ p {
   width: 100%;
   text-align: center;
   position: relative;
-  z-index: 2;
+  z-index: 3;
 }
 
 .hero-title {
@@ -386,6 +471,15 @@ p {
     padding: 1rem;
   }
 
+  /* Adjust diagonal cut for mobile - still corner to corner */
+  .hero-left {
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+  }
+
+  .hero-right {
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  }
+
   .hero-buttons {
     flex-direction: column;
     align-items: center;
@@ -418,6 +512,15 @@ p {
 }
 
 @media (max-width: 480px) {
+  /* Adjust diagonal cut for very small screens - still corner to corner */
+  .hero-left {
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+  }
+
+  .hero-right {
+    clip-path: polygon(100% 0, 100% 100%, 0 100%);
+  }
+
   .feature-icon {
     font-size: 2.5rem;
   }
