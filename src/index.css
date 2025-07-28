@@ -41,6 +41,34 @@ body {
   overflow-x: hidden;
 }
 
+/* Loading Animation */
+.loading-animation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 9999;
+  display: flex;
+  pointer-events: none;
+}
+
+.loading-strip {
+  flex: 1;
+  height: 100%;
+  transform: translateY(0);
+  animation: slideOut 0.8s ease-in-out forwards;
+}
+
+@keyframes slideOut {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-100%);
+  }
+}
+
 /* Typography */
 h1,
 h2,
