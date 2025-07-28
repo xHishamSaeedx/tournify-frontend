@@ -287,7 +287,7 @@ p {
 /* About Section Styles */
 .about {
   padding: 6rem 2rem;
-  background: var(--background);
+  background: #000000;
   position: relative;
   overflow: hidden;
 }
