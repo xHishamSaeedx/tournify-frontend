@@ -1,0 +1,19 @@
+/* App-level styles only */
+.App {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Additional hero section enhancements */
+.hero-title {
+  text-shadow: 0 0 30px rgba(255, 70, 85, 0.3);
+}
+
+.hero-subtitle {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Glow effect for accent elements */
+.stat-number {
+  text-shadow: 0 0 10px rgba(255, 70, 85, 0.5);
+}
