@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "./Button";
 import { NAV_ITEMS, NAVBAR_CONTENT } from "../constants/data";
+import { useAuth } from "../contexts/AuthContext";
 
 // Navbar Component - Single Responsibility Principle
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
   // Handle scroll effect
   useEffect(() => {
@@ -23,6 +27,26 @@ const Navbar = () => {
 
   const closeMenu = () => {
     setIsMenuOpen(false);
+  };
+
+  const handleSignIn = () => {
+    navigate('/login');
+    closeMenu();
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate('/');
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+    closeMenu();
+  };
+
+  const handleProfile = () => {
+    navigate('/profile');
+    closeMenu();
   };
 
   return (
@@ -50,12 +74,37 @@ const Navbar = () => {
 
         {/* Desktop CTA Buttons */}
         <div className="navbar-actions desktop-actions">
-          <Button variant="secondary" className="nav-btn">
-            {NAVBAR_CONTENT.signInButton}
-          </Button>
-          <Button variant="primary" className="nav-btn">
-            {NAVBAR_CONTENT.getStartedButton}
-          </Button>
+          {user ? (
+            <>
+              <Button 
+                variant="secondary" 
+                className="nav-btn"
+                onClick={handleProfile}
+              >
+                Profile
+              </Button>
+              <Button 
+                variant="primary" 
+                className="nav-btn"
+                onClick={handleSignOut}
+              >
+                Sign Out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button 
+                variant="secondary" 
+                className="nav-btn"
+                onClick={handleSignIn}
+              >
+                {NAVBAR_CONTENT.signInButton}
+              </Button>
+              <Button variant="primary" className="nav-btn">
+                {NAVBAR_CONTENT.getStartedButton}
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -85,12 +134,37 @@ const Navbar = () => {
             ))}
           </ul>
           <div className="mobile-actions">
-            <Button variant="secondary" className="mobile-nav-btn">
-              {NAVBAR_CONTENT.signInButton}
-            </Button>
-            <Button variant="primary" className="mobile-nav-btn">
-              {NAVBAR_CONTENT.getStartedButton}
-            </Button>
+            {user ? (
+              <>
+                <Button 
+                  variant="secondary" 
+                  className="mobile-nav-btn"
+                  onClick={handleProfile}
+                >
+                  Profile
+                </Button>
+                <Button 
+                  variant="primary" 
+                  className="mobile-nav-btn"
+                  onClick={handleSignOut}
+                >
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button 
+                  variant="secondary" 
+                  className="mobile-nav-btn"
+                  onClick={handleSignIn}
+                >
+                  {NAVBAR_CONTENT.signInButton}
+                </Button>
+                <Button variant="primary" className="mobile-nav-btn">
+                  {NAVBAR_CONTENT.getStartedButton}
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </div>
