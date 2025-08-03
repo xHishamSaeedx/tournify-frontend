@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import BackButton from './BackButton';
 
 function UserProfile() {
   const { user, signOut } = useAuth();
@@ -16,32 +17,39 @@ function UserProfile() {
     }
   };
 
+  const getInitials = (email) => {
+    if (!email) return 'U';
+    return email.charAt(0).toUpperCase();
+  };
+
   return (
-    <div className="bg-white shadow rounded-lg p-6 max-w-sm mx-auto">
-      <div className="flex items-center space-x-4">
-        {user.user_metadata?.avatar_url && (
-          <img
-            className="h-12 w-12 rounded-full"
-            src={user.user_metadata.avatar_url}
-            alt="Profile"
-          />
-        )}
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-gray-900 truncate">
-            {user.user_metadata?.full_name || user.email}
-          </p>
-          <p className="text-sm text-gray-500 truncate">
-            {user.email}
-          </p>
+    <div className="profile-page">
+      <div className="profile-container">
+        <BackButton />
+        <div className="profile-card">
+          <div className="profile-header">
+            <div className="profile-avatar-large">
+              {getInitials(user.email)}
+            </div>
+            <div className="profile-info">
+              <h1 className="profile-name">
+                {user.user_metadata?.full_name || user.email}
+              </h1>
+              <p className="profile-email">{user.email}</p>
+              <p className="profile-role">Player</p>
+            </div>
+          </div>
+          
+          <div className="profile-actions">
+            <button
+              onClick={handleSignOut}
+              className="signout-button"
+            >
+              <span className="signout-icon">🚪</span>
+              <span className="signout-text">Sign Out</span>
+            </button>
+          </div>
         </div>
-      </div>
-      <div className="mt-4">
-        <button
-          onClick={handleSignOut}
-          className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Sign Out
-        </button>
       </div>
     </div>
   );

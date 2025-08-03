@@ -8,6 +8,8 @@ import RefreshScreen from "./components/RefreshScreen";
 import Login from "./components/Login";
 import AuthHandler from "./components/AuthHandler";
 import UserProfile from "./components/UserProfile";
+import PlayerForm from "./components/PlayerForm";
+import BackButton from "./components/BackButton";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./contexts/AuthContext";
 
@@ -24,6 +26,35 @@ const App = () => {
             <Route path="/profile" element={
               <ProtectedRoute>
                 <UserProfile />
+              </ProtectedRoute>
+            } />
+            <Route path="/player-form" element={
+              <ProtectedRoute>
+                <PlayerForm />
+              </ProtectedRoute>
+            } />
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <div className="settings-page">
+                  <Navbar />
+                  <div className="settings-container">
+                    <BackButton />
+                    <h1>Settings</h1>
+                    <p>Settings page coming soon...</p>
+                  </div>
+                </div>
+              </ProtectedRoute>
+            } />
+            <Route path="/my-tournaments" element={
+              <ProtectedRoute>
+                <div className="my-tournaments-page">
+                  <Navbar />
+                  <div className="tournaments-container">
+                    <BackButton />
+                    <h1>My Tournaments</h1>
+                    <p>My tournaments page coming soon...</p>
+                  </div>
+                </div>
               </ProtectedRoute>
             } />
             <Route path="/" element={

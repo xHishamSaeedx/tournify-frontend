@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Button from "./Button";
-import { NAV_ITEMS, NAVBAR_CONTENT } from "../constants/data";
-import { useAuth } from "../contexts/AuthContext";
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import Button from './Button';
 
-// Navbar Component - Single Responsibility Principle
 const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const profileDropdownRef = useRef(null);
 
   // Handle scroll effect
   useEffect(() => {
@@ -17,91 +17,180 @@ const Navbar = () => {
       setIsScrolled(window.scrollY > 50);
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
+  // Handle click outside dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
+        setIsProfileDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
-  const closeMenu = () => {
-    setIsMenuOpen(false);
+  const toggleProfileDropdown = () => {
+    setIsProfileDropdownOpen(!isProfileDropdownOpen);
   };
 
-  const handleSignIn = () => {
-    navigate('/login');
-    closeMenu();
+  const handleProfile = () => {
+    navigate('/profile');
+    setIsProfileDropdownOpen(false);
+    setIsMobileMenuOpen(false);
+  };
+
+  const handlePlayerForm = () => {
+    navigate('/player-form');
+    setIsProfileDropdownOpen(false);
+    setIsMobileMenuOpen(false);
+  };
+
+  const handleSettings = () => {
+    navigate('/settings');
+    setIsProfileDropdownOpen(false);
+    setIsMobileMenuOpen(false);
+  };
+
+  const handleMyTournaments = () => {
+    navigate('/my-tournaments');
+    setIsProfileDropdownOpen(false);
+    setIsMobileMenuOpen(false);
   };
 
   const handleSignOut = async () => {
     try {
       await signOut();
-      navigate('/');
+      setIsProfileDropdownOpen(false);
+      setIsMobileMenuOpen(false);
     } catch (error) {
       console.error('Error signing out:', error);
     }
-    closeMenu();
   };
 
-  const handleProfile = () => {
-    navigate('/profile');
-    closeMenu();
+  const getInitials = (email) => {
+    if (!email) return 'U';
+    return email.charAt(0).toUpperCase();
   };
 
   return (
-    <nav className={`navbar ${isScrolled ? "navbar-scrolled" : ""}`}>
+    <nav className={`navbar ${isScrolled ? 'navbar-scrolled' : ''}`}>
       <div className="navbar-container">
         {/* Logo */}
         <div className="navbar-logo">
-          <a href="#home" className="logo-link">
-            <span className="logo-text">{NAVBAR_CONTENT.logo}</span>
+          <a href="/" className="logo-link">
+            <span className="logo-text">Tournify</span>
           </a>
         </div>
 
-        {/* Desktop Navigation */}
+        {/* Desktop Menu */}
         <div className="navbar-menu desktop-menu">
           <ul className="nav-list">
-            {NAV_ITEMS.map((item, index) => (
-              <li key={index} className="nav-item">
-                <a href={item.href} className="nav-link" onClick={closeMenu}>
-                  {item.label}
-                </a>
-              </li>
-            ))}
+            <li className="nav-item">
+              <a href="#about" className="nav-link">About</a>
+            </li>
+            <li className="nav-item">
+              <a href="#features" className="nav-link">Features</a>
+            </li>
+            <li className="nav-item">
+              <a href="#contact" className="nav-link">Contact</a>
+            </li>
           </ul>
         </div>
 
-        {/* Desktop CTA Buttons */}
+        {/* Desktop Actions */}
         <div className="navbar-actions desktop-actions">
           {user ? (
             <>
-              <Button 
-                variant="secondary" 
-                className="nav-btn"
-                onClick={handleProfile}
-              >
-                Profile
-              </Button>
-              <Button 
-                variant="primary" 
-                className="nav-btn"
-                onClick={handleSignOut}
-              >
-                Sign Out
-              </Button>
+              <div className="profile-dropdown-container" ref={profileDropdownRef}>
+                <Button
+                  variant="secondary"
+                  className="nav-btn profile-btn"
+                  onClick={toggleProfileDropdown}
+                >
+                  <span className="profile-avatar">{getInitials(user.email)}</span>
+                  <span className="profile-text">Profile</span>
+                  <span className={`dropdown-arrow ${isProfileDropdownOpen ? 'open' : ''}`}>▼</span>
+                </Button>
+
+                {isProfileDropdownOpen && (
+                  <div className="profile-dropdown">
+                    <div className="dropdown-header">
+                      <div className="user-info">
+                        <div className="user-avatar">{getInitials(user.email)}</div>
+                        <div className="user-details">
+                          <div className="user-name">{user.email}</div>
+                          <div className="user-role">Player</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="dropdown-menu">
+                      <div className="dropdown-item-group">
+                        <button
+                          className="dropdown-item"
+                          onClick={handleProfile}
+                        >
+                          <span className="item-icon">👤</span>
+                          <span className="item-text">View Profile</span>
+                          <span className="submenu-arrow">▶</span>
+                        </button>
+                        <div className="submenu">
+                          <button
+                            className="submenu-item"
+                            onClick={handlePlayerForm}
+                          >
+                            <span className="item-icon">🎮</span>
+                            <span className="item-text">Player Form</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <button
+                        className="dropdown-item"
+                        onClick={handleMyTournaments}
+                      >
+                        <span className="item-icon">🏆</span>
+                        <span className="item-text">My Tournaments</span>
+                      </button>
+
+                      <button
+                        className="dropdown-item"
+                        onClick={handleSettings}
+                      >
+                        <span className="item-icon">⚙️</span>
+                        <span className="item-text">Settings</span>
+                      </button>
+
+                      <div className="dropdown-divider"></div>
+
+                      <button
+                        className="dropdown-item signout-item"
+                        onClick={handleSignOut}
+                      >
+                        <span className="item-icon">🚪</span>
+                        <span className="item-text">Sign Out</span>
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </>
           ) : (
             <>
-              <Button 
-                variant="secondary" 
+              <Button
+                variant="secondary"
                 className="nav-btn"
-                onClick={handleSignIn}
+                onClick={() => navigate('/login')}
               >
-                {NAVBAR_CONTENT.signInButton}
-              </Button>
-              <Button variant="primary" className="nav-btn">
-                {NAVBAR_CONTENT.getStartedButton}
+                Sign In
               </Button>
             </>
           )}
@@ -109,64 +198,99 @@ const Navbar = () => {
 
         {/* Mobile Menu Button */}
         <button
-          className={`mobile-menu-btn ${isMenuOpen ? "active" : ""}`}
-          onClick={toggleMenu}
-          aria-label="Toggle menu"
+          className={`mobile-menu-btn ${isMobileMenuOpen ? 'active' : ''}`}
+          onClick={toggleMobileMenu}
+          aria-label="Toggle mobile menu"
         >
           <span className="hamburger-line"></span>
           <span className="hamburger-line"></span>
           <span className="hamburger-line"></span>
         </button>
+      </div>
 
-        {/* Mobile Navigation */}
-        <div className={`mobile-menu ${isMenuOpen ? "active" : ""}`}>
-          <ul className="mobile-nav-list">
-            {NAV_ITEMS.map((item, index) => (
-              <li key={index} className="mobile-nav-item">
-                <a
-                  href={item.href}
-                  className="mobile-nav-link"
-                  onClick={closeMenu}
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-          <div className="mobile-actions">
-            {user ? (
-              <>
-                <Button 
-                  variant="secondary" 
-                  className="mobile-nav-btn"
-                  onClick={handleProfile}
-                >
-                  Profile
-                </Button>
-                <Button 
-                  variant="primary" 
-                  className="mobile-nav-btn"
-                  onClick={handleSignOut}
-                >
-                  Sign Out
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button 
-                  variant="secondary" 
-                  className="mobile-nav-btn"
-                  onClick={handleSignIn}
-                >
-                  {NAVBAR_CONTENT.signInButton}
-                </Button>
-                <Button variant="primary" className="mobile-nav-btn">
-                  {NAVBAR_CONTENT.getStartedButton}
-                </Button>
-              </>
-            )}
-          </div>
+      {/* Mobile Menu */}
+      <div className={`mobile-menu ${isMobileMenuOpen ? 'active' : ''}`}>
+        <div className="mobile-nav-list">
+          <li className="mobile-nav-item">
+            <a href="#about" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+              About
+            </a>
+          </li>
+          <li className="mobile-nav-item">
+            <a href="#features" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+              Features
+            </a>
+          </li>
+          <li className="mobile-nav-item">
+            <a href="#contact" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+              Contact
+            </a>
+          </li>
         </div>
+
+        {user && (
+          <div className="mobile-profile-section">
+            <div className="mobile-user-info">
+              <div className="mobile-user-avatar">{getInitials(user.email)}</div>
+              <div className="mobile-user-details">
+                <div className="mobile-user-name">{user.email}</div>
+                <div className="mobile-user-role">Player</div>
+              </div>
+            </div>
+            <div className="mobile-profile-actions">
+              <Button
+                variant="secondary"
+                className="mobile-nav-btn"
+                onClick={handleProfile}
+              >
+                👤 View Profile
+              </Button>
+              <Button
+                variant="secondary"
+                className="mobile-nav-btn"
+                onClick={handlePlayerForm}
+              >
+                🎮 Player Form
+              </Button>
+              <Button
+                variant="secondary"
+                className="mobile-nav-btn"
+                onClick={handleMyTournaments}
+              >
+                🏆 My Tournaments
+              </Button>
+              <Button
+                variant="secondary"
+                className="mobile-nav-btn"
+                onClick={handleSettings}
+              >
+                ⚙️ Settings
+              </Button>
+              <Button
+                variant="primary"
+                className="mobile-nav-btn"
+                onClick={handleSignOut}
+              >
+                🚪 Sign Out
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {!user && (
+          <div className="mobile-actions">
+            <Button
+              variant="primary"
+              className="mobile-nav-btn"
+              onClick={() => {
+                navigate('/login');
+                setIsMobileMenuOpen(false);
+              }}
+            >
+              Sign In
+            </Button>
+          </div>
+        )}
       </div>
     </nav>
   );
