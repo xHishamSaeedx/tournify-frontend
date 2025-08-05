@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import supabase from '../supabaseClient';
+import api from '../utils/api';
 import BackButton from './BackButton';
 
 // Import images for background
@@ -38,29 +38,21 @@ const PlayerForm = () => {
     const checkExistingPlayer = async () => {
       if (user) {
         try {
-          const { data, error } = await supabase
-            .from('players')
-            .select('*')
-            .eq('player_id', user.id)
-            .single();
-
-          if (error && error.code !== 'PGRST116') { // PGRST116 is "not found"
-            console.error('Error checking existing player:', error);
-            return;
-          }
-
-          if (data) {
-            setExistingPlayer(data);
+          const response = await api.getPlayer(user.id);
+          
+          if (response.success && response.data) {
+            setExistingPlayer(response.data);
             setFormData({
-              display_name: data.display_name || '',
-              username: data.username || '',
-              DOB: data.DOB || '',
-              valo_id: data.valo_id || '',
-              VPA: data.VPA || ''
+              display_name: response.data.display_name || '',
+              username: response.data.username || '',
+              DOB: response.data.DOB || '',
+              valo_id: response.data.valo_id || '',
+              VPA: response.data.VPA || ''
             });
           }
         } catch (error) {
-          console.error('Error checking existing player:', error);
+          // Player not found or other error - this is expected for new users
+          console.log('No existing player found or error:', error.message);
         }
       }
     };
@@ -101,26 +93,23 @@ const PlayerForm = () => {
       
       if (existingPlayer) {
         // Update existing player
-        const { data, error } = await supabase
-          .from('players')
-          .update(playerData)
-          .eq('player_id', user.id)
-          .select()
-          .single();
-
-        if (error) throw error;
-        result = data;
+        const response = await api.updatePlayer(user.id, playerData);
+        
+        if (!response.success) {
+          throw new Error(response.error || 'Failed to update player');
+        }
+        
+        result = response.data;
         setMessage('Player information updated successfully!');
       } else {
         // Insert new player
-        const { data, error } = await supabase
-          .from('players')
-          .insert(playerData)
-          .select()
-          .single();
-
-        if (error) throw error;
-        result = data;
+        const response = await api.createPlayer(playerData);
+        
+        if (!response.success) {
+          throw new Error(response.error || 'Failed to create player');
+        }
+        
+        result = response.data;
         setExistingPlayer(result);
         setMessage('Player information saved successfully!');
       }

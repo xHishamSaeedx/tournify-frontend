@@ -9,9 +9,12 @@ export const getAuthHeaders = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     
     if (!session?.access_token) {
+      console.log('❌ No authentication token available');
       throw new Error('No authentication token available');
     }
 
+    console.log('🔐 Token available:', `${session.access_token.substring(0, 20)}...`);
+    
     return {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${session.access_token}`,
@@ -27,6 +30,9 @@ export const authenticatedApiCall = async (endpoint, options = {}) => {
   try {
     const headers = await getAuthHeaders();
     
+    console.log('🚀 Making API call to:', `${API_BASE_URL}${endpoint}`);
+    console.log('📋 Headers being sent:', headers);
+    
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
       headers: {
@@ -35,12 +41,17 @@ export const authenticatedApiCall = async (endpoint, options = {}) => {
       },
     });
 
+    console.log('📡 Response status:', response.status);
+    
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
+      console.error('❌ API call failed:', errorData);
       throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
     }
 
-    return await response.json();
+    const data = await response.json();
+    console.log('✅ API call successful:', data);
+    return data;
   } catch (error) {
     console.error(`API call failed for ${endpoint}:`, error);
     throw error;
@@ -96,6 +107,21 @@ export const api = {
     body: JSON.stringify(data),
   }),
   deleteMatch: (id) => authenticatedApiCall(`/api/matches/${id}`, {
+    method: 'DELETE',
+  }),
+
+  // Player endpoints
+  getPlayers: () => authenticatedApiCall('/api/players'),
+  getPlayer: (id) => authenticatedApiCall(`/api/players/${id}`),
+  createPlayer: (data) => authenticatedApiCall('/api/players', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+  updatePlayer: (id, data) => authenticatedApiCall(`/api/players/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+  deletePlayer: (id) => authenticatedApiCall(`/api/players/${id}`, {
     method: 'DELETE',
   }),
 };
