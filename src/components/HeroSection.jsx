@@ -23,6 +23,16 @@ const HeroSection = () => {
     return () => clearInterval(interval);
   }, [images.length]);
 
+  const handleBrowseGames = () => {
+    const gamesSection = document.getElementById('games');
+    if (gamesSection) {
+      gamesSection.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'start'
+      });
+    }
+  };
+
   return (
     <section className="hero">
       {/* Diagonal cut background */}
@@ -48,8 +58,7 @@ const HeroSection = () => {
         <p className="hero-subtitle">{HERO_CONTENT.subtitle}</p>
 
         <div className="hero-buttons">
-          <Button variant="primary">{HERO_CONTENT.primaryButton}</Button>
-          <Button variant="secondary">{HERO_CONTENT.secondaryButton}</Button>
+          <Button variant="primary" onClick={handleBrowseGames}>Browse Games</Button>
         </div>
 
         <div className="hero-stats">

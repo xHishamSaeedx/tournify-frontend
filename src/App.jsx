@@ -4,6 +4,9 @@ import "./App.css";
 import Navbar from "./components/Navbar";
 import HeroSection from "./components/HeroSection";
 import AboutSection from "./components/AboutSection";
+import GamesSection from "./components/GamesSection";
+import InfoSection from "./components/InfoSection";
+import BuyCredits from "./components/BuyCredits";
 import RefreshScreen from "./components/RefreshScreen";
 import Login from "./components/Login";
 import AuthHandler from "./components/AuthHandler";
@@ -62,7 +65,10 @@ const App = () => {
                 <RefreshScreen />
                 <Navbar />
                 <HeroSection />
+                <GamesSection />
                 <AboutSection />
+                <InfoSection />
+                <BuyCredits />
               </>
             } />
           </Routes>

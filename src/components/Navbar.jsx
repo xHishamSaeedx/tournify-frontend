@@ -94,13 +94,13 @@ const Navbar = () => {
         <div className="navbar-menu desktop-menu">
           <ul className="nav-list">
             <li className="nav-item">
-              <a href="#about" className="nav-link">About</a>
+              <a href="#info" className="nav-link">About</a>
             </li>
             <li className="nav-item">
               <a href="#features" className="nav-link">Features</a>
             </li>
             <li className="nav-item">
-              <a href="#contact" className="nav-link">Contact</a>
+              <a href="#credits" className="nav-link">Buy Credits</a>
             </li>
           </ul>
         </div>
@@ -208,25 +208,25 @@ const Navbar = () => {
         </button>
       </div>
 
-      {/* Mobile Menu */}
-      <div className={`mobile-menu ${isMobileMenuOpen ? 'active' : ''}`}>
-        <div className="mobile-nav-list">
-          <li className="mobile-nav-item">
-            <a href="#about" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>
-              About
-            </a>
-          </li>
-          <li className="mobile-nav-item">
-            <a href="#features" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>
-              Features
-            </a>
-          </li>
-          <li className="mobile-nav-item">
-            <a href="#contact" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>
-              Contact
-            </a>
-          </li>
-        </div>
+              {/* Mobile Menu */}
+        <div className={`mobile-menu ${isMobileMenuOpen ? 'active' : ''}`}>
+          <div className="mobile-nav-list">
+            <li className="mobile-nav-item">
+              <a href="#info" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+                About
+              </a>
+            </li>
+            <li className="mobile-nav-item">
+              <a href="#features" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+                Features
+              </a>
+            </li>
+            <li className="mobile-nav-item">
+              <a href="#credits" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>
+                Buy Credits
+              </a>
+            </li>
+          </div>
 
         {user && (
           <div className="mobile-profile-section">
