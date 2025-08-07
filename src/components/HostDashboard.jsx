@@ -98,8 +98,8 @@ const HostDashboard = () => {
                     </div>
                     
                     <div className="form-group">
-                      <label>Entry Fee (Credits)</label>
-                      <input type="number" placeholder="Enter entry fee in credits" />
+                      <label>Entry Fee ($)</label>
+                      <input type="number" placeholder="Enter entry fee in dollars" />
                     </div>
                     
                     <div className="form-actions">

@@ -6,7 +6,7 @@ import HeroSection from "./components/HeroSection";
 import AboutSection from "./components/AboutSection";
 import GamesSection from "./components/GamesSection";
 import InfoSection from "./components/InfoSection";
-import BuyCredits from "./components/BuyCredits";
+
 import RefreshScreen from "./components/RefreshScreen";
 import Login from "./components/Login";
 import AuthHandler from "./components/AuthHandler";
@@ -24,75 +24,74 @@ const App = () => {
   return (
     <AuthProvider>
       <UserRolesProvider>
-      <Router>
-        <div className="App">
-          <AuthHandler />
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route
-              path="/profile"
-              element={
-                <ProtectedRoute>
-                  <UserProfile />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/player-form"
-              element={
-                <ProtectedRoute>
-                  <PlayerForm />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <ProtectedRoute>
-                  <div className="settings-page">
-                    <Navbar />
-                    <div className="settings-container">
-                      <BackButton />
-                      <h1>Settings</h1>
-                      <p>Settings page coming soon...</p>
+        <Router>
+          <div className="App">
+            <AuthHandler />
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <UserProfile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/player-form"
+                element={
+                  <ProtectedRoute>
+                    <PlayerForm />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute>
+                    <div className="settings-page">
+                      <Navbar />
+                      <div className="settings-container">
+                        <BackButton />
+                        <h1>Settings</h1>
+                        <p>Settings page coming soon...</p>
+                      </div>
                     </div>
-                  </div>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/my-tournaments"
-              element={
-                <ProtectedRoute>
-                  <div className="my-tournaments-page">
-                    <Navbar />
-                    <div className="tournaments-container">
-                      <BackButton />
-                      <h1>My Tournaments</h1>
-                      <p>My tournaments page coming soon...</p>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/my-tournaments"
+                element={
+                  <ProtectedRoute>
+                    <div className="my-tournaments-page">
+                      <Navbar />
+                      <div className="tournaments-container">
+                        <BackButton />
+                        <h1>My Tournaments</h1>
+                        <p>My tournaments page coming soon...</p>
+                      </div>
                     </div>
-                  </div>
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/valorant" element={<ValorantPage />} />
-            <Route
-              path="/"
-              element={
-                <>
-                  <RefreshScreen />
-                  <Navbar />
-                  <HeroSection />
-                  <GamesSection />
-                  <AboutSection />
-                  <InfoSection />
-                  <BuyCredits />
-                </>
-              }
-            />
-          </Routes>
-        </div>
-      </Router>
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/valorant" element={<ValorantPage />} />
+              <Route
+                path="/"
+                element={
+                  <>
+                    <RefreshScreen />
+                    <Navbar />
+                    <HeroSection />
+                    <GamesSection />
+                    <AboutSection />
+                    <InfoSection />
+                  </>
+                }
+              />
+            </Routes>
+          </div>
+        </Router>
       </UserRolesProvider>
     </AuthProvider>
   );

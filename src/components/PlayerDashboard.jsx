@@ -35,32 +35,24 @@ const PlayerDashboard = () => {
     console.log("Claim money clicked");
   };
 
-  const handleApplyForHost = async (e) => {
-    e.preventDefault();
+  const handleApplyForHost = () => {
     if (!user) {
       alert("Please sign in to apply for host role");
       return;
     }
 
     setIsSubmitting(true);
-    try {
-      const result = await setUserRole(user.id, user.email, "host");
-      if (result.success) {
-        alert(
-          "Application submitted successfully! An admin will review your application."
-        );
-      } else {
-        alert("Failed to submit application. Please try again.");
-      }
-    } catch (error) {
-      alert("Error submitting application. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+    // Redirect to external application page
+    // Replace with your actual application URL
+    window.open(
+      "https://your-application-website.com/host-application",
+      "_blank"
+    );
 
-  const handleShowCredits = () => {
-    console.log("Show credits clicked");
+    // Reset the submitting state after a short delay
+    setTimeout(() => {
+      setIsSubmitting(false);
+    }, 1000);
   };
 
   return (
@@ -197,102 +189,35 @@ const PlayerDashboard = () => {
                 </p>
               </div>
             </div>
-            <div className="form-container-modern">
-              <form onSubmit={handleApplyForHost} className="modern-form-ultra">
-                <div className="form-grid-modern">
-                  <div className="form-group-modern">
-                    <label className="form-label">Experience Level</label>
-                    <div className="select-wrapper">
-                      <select required className="form-select">
-                        <option value="">Select your experience</option>
-                        <option value="beginner">Beginner</option>
-                        <option value="intermediate">Intermediate</option>
-                        <option value="advanced">Advanced</option>
-                        <option value="professional">Professional</option>
-                      </select>
-                      <div className="select-arrow">▼</div>
-                    </div>
-                  </div>
-                  <div className="form-group-modern">
-                    <label className="form-label">Tournament Experience</label>
-                    <textarea
-                      placeholder="Describe your experience organizing tournaments..."
-                      required
-                      rows="4"
-                      className="form-textarea"
-                    ></textarea>
-                  </div>
+            <div className="host-info-container-modern">
+              <div className="host-benefits-simple">
+                <div className="benefit-simple">
+                  <span className="benefit-icon-simple">🎯</span>
+                  <span>Create Tournaments</span>
                 </div>
-                <div className="form-group-modern">
-                  <label className="form-label">Motivation</label>
-                  <textarea
-                    placeholder="Why do you want to become a host?"
-                    required
-                    rows="4"
-                    className="form-textarea"
-                  ></textarea>
+                <div className="benefit-simple">
+                  <span className="benefit-icon-simple">💼</span>
+                  <span>Earn Revenue</span>
                 </div>
+                <div className="benefit-simple">
+                  <span className="benefit-icon-simple">👥</span>
+                  <span>Build Community</span>
+                </div>
+              </div>
+              <div className="host-cta-simple">
                 <Button
                   variant="primary"
-                  type="submit"
+                  onClick={handleApplyForHost}
                   disabled={isSubmitting}
-                  className="submit-button-modern"
+                  className="apply-button-modern"
                 >
                   <span className="button-text">
-                    {isSubmitting ? "Submitting..." : "Submit Application"}
+                    {isSubmitting ? "Redirecting..." : "Apply to Become Host"}
                   </span>
                   <span className="button-icon">
-                    {isSubmitting ? "⏳" : "📤"}
+                    {isSubmitting ? "⏳" : "🚀"}
                   </span>
                 </Button>
-              </form>
-            </div>
-          </div>
-        </section>
-
-        {/* Credits Section */}
-        <section
-          className="dashboard-section-ultra-modern credits-section"
-          data-section="credits"
-        >
-          <div className="section-background-modern">
-            <div className="section-pattern"></div>
-            <div className="section-glow"></div>
-          </div>
-          <div className="section-content-modern">
-            <div className="section-header-modern">
-              <div className="section-icon-modern">
-                <div className="icon-bg">💎</div>
-              </div>
-              <div className="section-text">
-                <h2 className="section-title">Account Credits</h2>
-                <p className="section-description">
-                  Manage your credits and unlock premium tournament features
-                </p>
-              </div>
-            </div>
-            <div className="credits-preview-modern">
-              <div className="credits-card-modern">
-                <div className="credits-header">
-                  <div className="credits-icon">💎</div>
-                  <div className="credits-title">Current Balance</div>
-                </div>
-                <div className="credits-amount-modern">1,250</div>
-                <div className="credits-label">Credits</div>
-                <div className="credits-description">
-                  Use credits to join premium tournaments and unlock special
-                  features
-                </div>
-                <div className="credits-actions">
-                  <Button
-                    variant="primary"
-                    onClick={handleShowCredits}
-                    className="credits-button"
-                  >
-                    <span className="button-text">Manage Credits</span>
-                    <span className="button-icon">⚙️</span>
-                  </Button>
-                </div>
               </div>
             </div>
           </div>

@@ -840,15 +840,76 @@
 /* Form Section */
 .form-section .section-content-modern {
   grid-template-columns: 1fr 1fr;
+  direction: rtl; /* Right-to-left direction to flip the layout */
 }
 
-.form-container-modern {
+.form-section .section-content-modern > * {
+  direction: ltr; /* Reset direction for child elements */
+}
+
+.host-info-container-modern {
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid var(--border-color);
   border-radius: var(--border-radius-large);
   padding: 2.5rem;
   backdrop-filter: blur(20px);
   box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.host-benefits-simple {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.benefit-simple {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--border-radius-medium);
+  transition: all 0.3s ease;
+}
+
+.benefit-simple:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.benefit-icon-simple {
+  font-size: 1.25rem;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--gradient-primary);
+  border-radius: var(--border-radius-small);
+  flex-shrink: 0;
+}
+
+.benefit-simple span:last-child {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.host-cta-simple {
+  text-align: center;
+}
+
+.apply-button-modern {
+  width: 100%;
+  background: var(--gradient-primary);
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
 .modern-form-ultra {
@@ -927,88 +988,12 @@
   margin-top: 1rem;
 }
 
-/* Credits Section */
-.credits-section .section-content-modern {
-  grid-template-columns: 1fr 1fr;
-}
-
-.credits-preview-modern {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.credits-card-modern {
-  background: rgba(168, 85, 247, 0.1);
-  border: 2px solid rgba(168, 85, 247, 0.3);
-  border-radius: var(--border-radius-large);
-  padding: 3rem;
-  text-align: center;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-  max-width: 400px;
-  width: 100%;
-  transition: var(--transition);
-}
-
-.credits-card-modern:hover {
-  transform: translateY(-5px);
-  border-color: var(--purple-color);
-  box-shadow: 0 30px 60px rgba(168, 85, 247, 0.2);
-}
-
-.credits-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.credits-icon {
-  font-size: 2.5rem;
-}
-
-.credits-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--purple-color);
-}
-
-.credits-amount-modern {
-  font-size: 4rem;
-  font-weight: 900;
-  color: var(--purple-color);
-  margin: 1rem 0;
-  text-shadow: 0 0 20px rgba(168, 85, 247, 0.5);
-}
-
-.credits-label {
-  font-size: 1.2rem;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 1rem;
-}
-
-.credits-description {
-  color: var(--text-secondary);
-  margin: 1rem 0 2rem;
-  font-size: 1rem;
-  line-height: 1.5;
-}
-
-.credits-button {
-  width: 100%;
-  background: var(--gradient-purple);
-}
-
 /* Responsive Design */
 @media (max-width: 1200px) {
   .hero-container {
     grid-template-columns: 1fr;
     gap: 3rem;
-  text-align: center;
+    text-align: center;
   }
 
   .section-content-modern {
@@ -1032,7 +1017,7 @@
 
 @media (max-width: 768px) {
   .hero-title {
-  font-size: 2.5rem;
+    font-size: 2.5rem;
   }
 
   .hero-stats {
@@ -1041,13 +1026,13 @@
   }
 
   .hero-actions {
-  flex-direction: column;
+    flex-direction: column;
     gap: 1rem;
   }
 
   .hero-button {
     min-width: 100%;
-  justify-content: center;
+    justify-content: center;
   }
 
   .section-title {
@@ -1066,8 +1051,7 @@
     font-size: 2rem;
   }
 
-  .claim-amount,
-  .credits-amount-modern {
+  .claim-amount {
     font-size: 2.5rem;
   }
 }
@@ -1085,8 +1069,11 @@
     padding: 1.5rem;
   }
 
-  .claim-card-modern,
-  .credits-card-modern {
+  .claim-card-modern {
+    padding: 2rem;
+  }
+
+  .host-info-container-modern {
     padding: 2rem;
   }
 }
@@ -1396,6 +1383,20 @@
   position: relative;
   z-index: 1;
   padding: 4rem 2rem;
+}
+
+/* Flip Manage Tournaments Section */
+.admin-dashboard-ultra-modern
+  [data-section="tournaments"]
+  .section-content-modern {
+  direction: rtl; /* Right-to-left direction to flip the layout */
+}
+
+.admin-dashboard-ultra-modern
+  [data-section="tournaments"]
+  .section-content-modern
+  > * {
+  direction: ltr; /* Reset direction for child elements */
 }
 
 .admin-dashboard-ultra-modern .dashboard-section-ultra-modern {

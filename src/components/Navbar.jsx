@@ -99,9 +99,7 @@ const Navbar = () => {
             <li className="nav-item">
               <a href="#features" className="nav-link">Features</a>
             </li>
-            <li className="nav-item">
-              <a href="#credits" className="nav-link">Buy Credits</a>
-            </li>
+
           </ul>
         </div>
 
@@ -221,11 +219,7 @@ const Navbar = () => {
                 Features
               </a>
             </li>
-            <li className="mobile-nav-item">
-              <a href="#credits" className="mobile-nav-link" onClick={() => setIsMobileMenuOpen(false)}>
-                Buy Credits
-              </a>
-            </li>
+
           </div>
 
         {user && (
