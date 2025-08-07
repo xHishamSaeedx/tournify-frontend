@@ -1,7 +1,16 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "./Button";
 
 const GamesSection = () => {
+  const navigate = useNavigate();
+
+  const handleJoinTournaments = (gameName) => {
+    if (gameName === "Valorant") {
+      navigate("/valorant");
+    }
+  };
+
   const games = [
     {
       id: 1,
@@ -10,7 +19,7 @@ const GamesSection = () => {
       description: "Tactical shooter tournaments with strategic gameplay",
       status: "Active",
       players: "15.2K",
-      tournaments: "342"
+      tournaments: "342",
     },
     {
       id: 2,
@@ -19,7 +28,7 @@ const GamesSection = () => {
       description: "Battle royale tournaments for mobile gamers",
       status: "Coming Soon",
       players: "8.7K",
-      tournaments: "156"
+      tournaments: "156",
     },
     {
       id: 3,
@@ -28,7 +37,7 @@ const GamesSection = () => {
       description: "Mobile battle royale competitive events",
       status: "Coming Soon",
       players: "12.1K",
-      tournaments: "203"
+      tournaments: "203",
     },
     {
       id: 4,
@@ -37,8 +46,8 @@ const GamesSection = () => {
       description: "Classic tactical shooter tournaments",
       status: "Coming Soon",
       players: "9.8K",
-      tournaments: "178"
-    }
+      tournaments: "178",
+    },
   ];
 
   return (
@@ -47,7 +56,8 @@ const GamesSection = () => {
         <div className="games-header">
           <h2 className="games-title">Available Games</h2>
           <p className="games-subtitle">
-            Join tournaments across multiple popular games and compete with players worldwide
+            Join tournaments across multiple popular games and compete with
+            players worldwide
           </p>
         </div>
 
@@ -58,14 +68,18 @@ const GamesSection = () => {
                 <div className="game-icon">{game.icon}</div>
                 <div className="game-info">
                   <h3 className="game-name">{game.name}</h3>
-                  <span className={`game-status ${game.status.toLowerCase().replace(' ', '-')}`}>
+                  <span
+                    className={`game-status ${game.status
+                      .toLowerCase()
+                      .replace(" ", "-")}`}
+                  >
                     {game.status}
                   </span>
                 </div>
               </div>
-              
+
               <p className="game-description">{game.description}</p>
-              
+
               <div className="game-stats">
                 <div className="game-stat">
                   <span className="stat-label">Players</span>
@@ -77,10 +91,11 @@ const GamesSection = () => {
                 </div>
               </div>
 
-              <Button 
+              <Button
                 variant={game.status === "Active" ? "primary" : "secondary"}
                 className="game-button"
                 disabled={game.status !== "Active"}
+                onClick={() => handleJoinTournaments(game.name)}
               >
                 {game.status === "Active" ? "Join Tournaments" : "Coming Soon"}
               </Button>

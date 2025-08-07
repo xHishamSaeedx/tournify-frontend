@@ -17,3 +17,16 @@
 .stat-number {
   text-shadow: 0 0 10px rgba(255, 70, 85, 0.5);
 }
+
+/* Valorant page styles */
+.valorant-page {
+  position: relative;
+  min-height: 100vh;
+}
+
+.valorant-page .back-button {
+  position: absolute;
+  top: 100px;
+  left: 20px;
+  z-index: 10;
+}
