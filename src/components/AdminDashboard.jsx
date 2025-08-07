@@ -1,303 +1,244 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import Button from "./Button";
-import { setUserRole, getAllHosts } from "../utils/userRoles";
-import { useAuth } from "../contexts/AuthContext";
 
 const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState("browse");
-  const [showCreateHostForm, setShowCreateHostForm] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { user } = useAuth();
+  // Animated background effect
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      const { clientX, clientY } = e;
+      const x = (clientX / window.innerWidth) * 100;
+      const y = (clientY / window.innerHeight) * 100;
 
-  const tabs = [
-    { id: "browse", label: "Browse All Tournaments", icon: "🏆" },
-    { id: "create-hosts", label: "Create Hosts", icon: "👑" },
-  ];
+      document.documentElement.style.setProperty("--mouse-x", `${x}%`);
+      document.documentElement.style.setProperty("--mouse-y", `${y}%`);
+    };
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case "browse":
-        return (
-          <div className="tab-content">
-            <div className="admin-controls">
-              <h3>All Tournaments</h3>
-              <div className="filters">
-                <select placeholder="Filter by status">
-                  <option>All Status</option>
-                  <option>Active</option>
-                  <option>Completed</option>
-                  <option>Draft</option>
-                </select>
-                <select placeholder="Filter by game">
-                  <option>All Games</option>
-                  <option>Valorant</option>
-                  <option>CS:GO</option>
-                  <option>League of Legends</option>
-                </select>
-                <Button variant="secondary">Apply Filters</Button>
-              </div>
-            </div>
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, []);
 
-            <div className="tournaments-grid">
-              <div className="tournament-card">
-                <div className="tournament-header">
-                  <h4>Valorant Championship 2024</h4>
-                  <span className="status active">Active</span>
-                </div>
-                <div className="tournament-details">
-                  <p>
-                    <strong>Host:</strong> John Doe
-                  </p>
-                  <p>
-                    <strong>Prize Pool:</strong> $10,000
-                  </p>
-                  <p>
-                    <strong>Players:</strong> 128/128
-                  </p>
-                  <p>
-                    <strong>Start Date:</strong> Dec 15, 2024
-                  </p>
-                </div>
-                <div className="tournament-actions">
-                  <Button variant="primary">View Details</Button>
-                  <Button variant="secondary">Edit</Button>
-                  <Button variant="outline">Suspend</Button>
-                </div>
-              </div>
+  const handleManageHosts = () => {
+    console.log("Manage hosts clicked");
+  };
 
-              <div className="tournament-card">
-                <div className="tournament-header">
-                  <h4>Weekly Valorant Cup</h4>
-                  <span className="status completed">Completed</span>
-                </div>
-                <div className="tournament-details">
-                  <p>
-                    <strong>Host:</strong> Jane Smith
-                  </p>
-                  <p>
-                    <strong>Prize Pool:</strong> $2,000
-                  </p>
-                  <p>
-                    <strong>Players:</strong> 64/64
-                  </p>
-                  <p>
-                    <strong>Start Date:</strong> Dec 1, 2024
-                  </p>
-                </div>
-                <div className="tournament-actions">
-                  <Button variant="primary">View Results</Button>
-                  <Button variant="secondary">Analytics</Button>
-                </div>
-              </div>
-
-              <div className="tournament-card">
-                <div className="tournament-header">
-                  <h4>Valorant Pro League</h4>
-                  <span className="status draft">Draft</span>
-                </div>
-                <div className="tournament-details">
-                  <p>
-                    <strong>Host:</strong> Mike Johnson
-                  </p>
-                  <p>
-                    <strong>Prize Pool:</strong> $5,000
-                  </p>
-                  <p>
-                    <strong>Players:</strong> 0/32
-                  </p>
-                  <p>
-                    <strong>Start Date:</strong> Jan 15, 2025
-                  </p>
-                </div>
-                <div className="tournament-actions">
-                  <Button variant="primary">Review</Button>
-                  <Button variant="secondary">Approve</Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case "create-hosts":
-        return (
-          <div className="tab-content">
-            <div className="create-host-section">
-              <div className="section-header">
-                <h3>Manage Hosts</h3>
-                <Button
-                  variant="primary"
-                  onClick={() => setShowCreateHostForm(!showCreateHostForm)}
-                >
-                  {showCreateHostForm ? "Cancel" : "Create New Host"}
-                </Button>
-              </div>
-
-              {showCreateHostForm && (
-                <div className="create-host-form">
-                  <form
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-                      if (!user) {
-                        alert("Please sign in to create hosts");
-                        return;
-                      }
-
-                      setIsSubmitting(true);
-                      try {
-                        // Here you would typically create the host role
-                        // For now, we'll just show a success message
-                        setTimeout(() => {
-                          alert("Host created successfully!");
-                          setShowCreateHostForm(false);
-                          setIsSubmitting(false);
-                        }, 1000);
-                      } catch (error) {
-                        alert("Error creating host. Please try again.");
-                        setIsSubmitting(false);
-                      }
-                    }}
-                  >
-                    <div className="form-row">
-                      <div className="form-group">
-                        <label>User Email</label>
-                        <input type="email" placeholder="Enter user email" />
-                      </div>
-                      <div className="form-group">
-                        <label>User ID</label>
-                        <input type="text" placeholder="Enter user ID" />
-                      </div>
-                    </div>
-
-                    <div className="form-group">
-                      <label>Role</label>
-                      <select>
-                        <option value="host">Host</option>
-                        <option value="admin">Admin</option>
-                      </select>
-                    </div>
-
-                    <div className="form-group">
-                      <label>Reason for Promotion</label>
-                      <textarea
-                        placeholder="Explain why this user should be promoted..."
-                        rows="3"
-                      ></textarea>
-                    </div>
-
-                    <div className="form-actions">
-                      <Button
-                        variant="secondary"
-                        onClick={() => setShowCreateHostForm(false)}
-                        type="button"
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        variant="primary"
-                        type="submit"
-                        disabled={isSubmitting}
-                      >
-                        {isSubmitting ? "Creating..." : "Create Host"}
-                      </Button>
-                    </div>
-                  </form>
-                </div>
-              )}
-
-              <div className="hosts-list">
-                <h4>Current Hosts</h4>
-                <div className="hosts-grid">
-                  <div className="host-card">
-                    <div className="host-info">
-                      <h5>John Doe</h5>
-                      <p>john.doe@example.com</p>
-                      <span className="role host">Host</span>
-                    </div>
-                    <div className="host-stats">
-                      <p>
-                        <strong>Tournaments Created:</strong> 5
-                      </p>
-                      <p>
-                        <strong>Active Tournaments:</strong> 2
-                      </p>
-                    </div>
-                    <div className="host-actions">
-                      <Button variant="secondary">View Profile</Button>
-                      <Button variant="outline">Remove Host</Button>
-                    </div>
-                  </div>
-
-                  <div className="host-card">
-                    <div className="host-info">
-                      <h5>Jane Smith</h5>
-                      <p>jane.smith@example.com</p>
-                      <span className="role host">Host</span>
-                    </div>
-                    <div className="host-stats">
-                      <p>
-                        <strong>Tournaments Created:</strong> 3
-                      </p>
-                      <p>
-                        <strong>Active Tournaments:</strong> 1
-                      </p>
-                    </div>
-                    <div className="host-actions">
-                      <Button variant="secondary">View Profile</Button>
-                      <Button variant="outline">Remove Host</Button>
-                    </div>
-                  </div>
-
-                  <div className="host-card">
-                    <div className="host-info">
-                      <h5>Mike Johnson</h5>
-                      <p>mike.johnson@example.com</p>
-                      <span className="role admin">Admin</span>
-                    </div>
-                    <div className="host-stats">
-                      <p>
-                        <strong>Tournaments Created:</strong> 8
-                      </p>
-                      <p>
-                        <strong>Active Tournaments:</strong> 3
-                      </p>
-                    </div>
-                    <div className="host-actions">
-                      <Button variant="secondary">View Profile</Button>
-                      <Button variant="outline">Remove Admin</Button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      default:
-        return null;
-    }
+  const handleManageTournaments = () => {
+    console.log("Manage tournaments clicked");
   };
 
   return (
-    <div className="admin-dashboard">
-      <div className="dashboard-header">
-        <h2>Admin Dashboard</h2>
-        <p>Manage tournaments and user roles</p>
+    <div className="admin-dashboard-ultra-modern">
+      {/* Animated Background */}
+      <div className="dashboard-bg-animation">
+        <div className="floating-shapes">
+          <div className="shape shape-1"></div>
+          <div className="shape shape-2"></div>
+          <div className="shape shape-3"></div>
+          <div className="shape shape-4"></div>
+        </div>
+        <div className="gradient-overlay"></div>
       </div>
 
-      <div className="dashboard-tabs">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            className={`tab-button ${activeTab === tab.id ? "active" : ""}`}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            <span className="tab-icon">{tab.icon}</span>
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      {/* Hero Section */}
+      <section className="dashboard-hero-modern">
+        <div className="hero-container">
+          <div className="hero-content-modern">
+            <div className="hero-badge">
+              <span className="badge-icon">👑</span>
+              <span className="badge-text">Admin Dashboard</span>
+            </div>
+            <h1 className="hero-title">
+              <span className="title-line">Platform</span>
+              <span className="title-highlight">Administration</span>
+            </h1>
+            <p className="hero-subtitle">
+              Manage hosts, tournaments, and platform operations with
+              comprehensive administrative tools
+            </p>
+            <div className="hero-stats">
+              <div className="stat-item">
+                <span className="stat-number">15</span>
+                <span className="stat-label">Active Hosts</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-number">342</span>
+                <span className="stat-label">Total Tournaments</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-number">99.8%</span>
+                <span className="stat-label">Platform Uptime</span>
+              </div>
+            </div>
+          </div>
+          <div className="hero-visual">
+            <div className="floating-card card-1">
+              <div className="card-content">
+                <div className="card-icon">👑</div>
+                <div className="card-title">Admin Control</div>
+                <div className="card-value">Full Access</div>
+              </div>
+            </div>
+            <div className="floating-card card-2">
+              <div className="card-content">
+                <div className="card-icon">⚡</div>
+                <div className="card-title">Platform Stats</div>
+                <div className="card-value">15.2K Users</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-      <div className="dashboard-content">{renderTabContent()}</div>
+      {/* Main Dashboard Sections */}
+      <div className="dashboard-sections-container">
+        {/* Manage Hosts Section */}
+        <section
+          className="dashboard-section-ultra-modern"
+          data-section="hosts"
+        >
+          <div className="section-background-modern">
+            <div className="section-pattern"></div>
+            <div className="section-glow"></div>
+          </div>
+          <div className="section-content-modern">
+            <div className="section-header-modern">
+              <div className="section-icon-modern">
+                <div className="icon-bg">👑</div>
+              </div>
+              <div className="section-content-wrapper">
+                <div className="section-text">
+                  <h2 className="section-title">Manage Hosts</h2>
+                  <p className="section-description">
+                    Create new hosts, manage existing host accounts, and oversee
+                    tournament creation permissions
+                  </p>
+                </div>
+                <div className="section-action">
+                  <Button
+                    variant="primary"
+                    onClick={handleManageHosts}
+                    className="section-button"
+                  >
+                    <span className="button-text">Manage Hosts</span>
+                    <span className="button-icon">👑</span>
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <div className="section-features-modern">
+              <div className="features-grid">
+                <div className="feature-card-modern">
+                  <div className="feature-icon-modern">
+                    <div className="icon-bg">➕</div>
+                  </div>
+                  <div className="feature-content">
+                    <h3>Create New Hosts</h3>
+                    <p>
+                      Promote users to host role with full tournament creation
+                      privileges
+                    </p>
+                  </div>
+                </div>
+                <div className="feature-card-modern">
+                  <div className="feature-icon-modern">
+                    <div className="icon-bg">📊</div>
+                  </div>
+                  <div className="feature-content">
+                    <h3>Host Analytics</h3>
+                    <p>
+                      Monitor host performance, tournament success rates, and
+                      activity metrics
+                    </p>
+                  </div>
+                </div>
+                <div className="feature-card-modern">
+                  <div className="feature-icon-modern">
+                    <div className="icon-bg">🛡️</div>
+                  </div>
+                  <div className="feature-content">
+                    <h3>Role Management</h3>
+                    <p>Review, approve, or revoke host permissions as needed</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Manage Tournaments Section */}
+        <section
+          className="dashboard-section-ultra-modern"
+          data-section="tournaments"
+        >
+          <div className="section-background-modern">
+            <div className="section-pattern"></div>
+            <div className="section-glow"></div>
+          </div>
+          <div className="section-content-modern">
+            <div className="section-header-modern">
+              <div className="section-icon-modern">
+                <div className="icon-bg">🏆</div>
+              </div>
+              <div className="section-content-wrapper">
+                <div className="section-text">
+                  <h2 className="section-title">Manage Tournaments</h2>
+                  <p className="section-description">
+                    Oversee all tournaments, review submissions, and ensure
+                    platform quality standards
+                  </p>
+                </div>
+                <div className="section-action">
+                  <Button
+                    variant="primary"
+                    onClick={handleManageTournaments}
+                    className="section-button"
+                  >
+                    <span className="button-text">Manage Tournaments</span>
+                    <span className="button-icon">🏆</span>
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <div className="section-features-modern">
+              <div className="features-grid">
+                <div className="feature-card-modern">
+                  <div className="feature-icon-modern">
+                    <div className="icon-bg">📋</div>
+                  </div>
+                  <div className="feature-content">
+                    <h3>Tournament Review</h3>
+                    <p>
+                      Review and approve new tournament submissions from hosts
+                    </p>
+                  </div>
+                </div>
+                <div className="feature-card-modern">
+                  <div className="feature-icon-modern">
+                    <div className="icon-bg">📈</div>
+                  </div>
+                  <div className="feature-content">
+                    <h3>Platform Analytics</h3>
+                    <p>
+                      Monitor tournament performance, user engagement, and
+                      success metrics
+                    </p>
+                  </div>
+                </div>
+                <div className="feature-card-modern">
+                  <div className="feature-icon-modern">
+                    <div className="icon-bg">⚙️</div>
+                  </div>
+                  <div className="feature-content">
+                    <h3>Quality Control</h3>
+                    <p>
+                      Ensure tournaments meet platform standards and guidelines
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 };

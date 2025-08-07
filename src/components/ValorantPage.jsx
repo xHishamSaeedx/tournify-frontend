@@ -33,7 +33,7 @@ const ValorantPage = () => {
       <div className="valorant-page">
         <BackButton />
         <ValorantHeroSection />
-        
+
         {/* Role-based dashboard */}
         <div className="dashboard-section">
           {!user ? (
@@ -46,11 +46,9 @@ const ValorantPage = () => {
             </div>
           ) : isAdmin ? (
             <AdminDashboard />
-          ) : isHost ? (
-            <HostDashboard />
-          ) : (
+          ) : isPlayer ? (
             <PlayerDashboard />
-          )}
+          ) : null}
         </div>
       </div>
     </>

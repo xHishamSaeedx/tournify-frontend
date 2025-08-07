@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Button from "./Button";
+import { useUserRoles } from "../contexts/UserRolesContext";
 
 // Import images
 import omenImage from "/assets/yoru.avif";
@@ -11,6 +12,7 @@ import jettImage2 from "/assets/jett.avif";
 // Valorant Hero Section Component
 const ValorantHeroSection = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { isPlayer, isHost, isAdmin } = useUserRoles();
 
   const images = [omenImage, trioImage, vyseImage, jettImage, jettImage2];
 
@@ -22,17 +24,42 @@ const ValorantHeroSection = () => {
     return () => clearInterval(interval);
   }, [images.length]);
 
-  const handleJoinTournaments = () => {
-    // TODO: Navigate to Valorant tournaments page
-    console.log("Join Valorant tournaments clicked");
-  };
-
   const valorantStats = [
     { number: "342", label: "Active Tournaments" },
     { number: "15.2K", label: "Players Registered" },
     { number: "$45.8K", label: "Prize Pools" },
     { number: "99.2%", label: "Success Rate" },
   ];
+
+  const handleBrowseTournaments = () => {
+    // TODO: Navigate to browse tournaments page
+    console.log("Browse tournaments clicked");
+  };
+
+  const handleMyTournaments = () => {
+    // TODO: Navigate to my tournaments page
+    console.log("My tournaments clicked");
+  };
+
+  const handleCreateTournament = () => {
+    // TODO: Navigate to create tournament page
+    console.log("Create tournament clicked");
+  };
+
+  const handleMyCreatedTournaments = () => {
+    // TODO: Navigate to my created tournaments page
+    console.log("My created tournaments clicked");
+  };
+
+  const handleCreateHosts = () => {
+    // TODO: Navigate to create hosts page
+    console.log("Create hosts clicked");
+  };
+
+  const handleBrowseAllTournaments = () => {
+    // TODO: Navigate to browse all tournaments page
+    console.log("Browse all tournaments clicked");
+  };
 
   return (
     <section className="hero">
@@ -62,11 +89,68 @@ const ValorantHeroSection = () => {
           tournament management.
         </p>
 
-        <div className="hero-buttons">
-          <Button variant="primary" onClick={handleJoinTournaments}>
-            Join Tournaments
-          </Button>
-        </div>
+        {isPlayer && (
+          <div className="hero-actions animate-fade-in-up">
+            <Button
+              variant="primary"
+              onClick={handleBrowseTournaments}
+              className="hero-button primary animate-slide-in-left"
+            >
+              <span className="button-text">Browse Tournaments</span>
+              <span className="button-icon">🏆</span>
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={handleMyTournaments}
+              className="hero-button secondary animate-slide-in-right"
+            >
+              <span className="button-text">My Tournaments</span>
+              <span className="button-icon">🎮</span>
+            </Button>
+          </div>
+        )}
+
+        {isHost && (
+          <div className="hero-actions animate-fade-in-up">
+            <Button
+              variant="primary"
+              onClick={handleCreateTournament}
+              className="hero-button primary animate-slide-in-left"
+            >
+              <span className="button-text">Create Tournament</span>
+              <span className="button-icon">⚡</span>
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={handleMyCreatedTournaments}
+              className="hero-button secondary animate-slide-in-right"
+            >
+              <span className="button-text">My Created Tournaments</span>
+              <span className="button-icon">🏗️</span>
+            </Button>
+          </div>
+        )}
+
+        {isAdmin && (
+          <div className="hero-actions animate-fade-in-up">
+            <Button
+              variant="primary"
+              onClick={handleCreateHosts}
+              className="hero-button primary animate-slide-in-left"
+            >
+              <span className="button-text">Create Hosts</span>
+              <span className="button-icon">👑</span>
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={handleBrowseAllTournaments}
+              className="hero-button secondary animate-slide-in-right"
+            >
+              <span className="button-text">Browse All Tournaments</span>
+              <span className="button-icon">📊</span>
+            </Button>
+          </div>
+        )}
 
         <div className="hero-stats">
           {valorantStats.map((stat, index) => (
