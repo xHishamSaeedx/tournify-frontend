@@ -1815,3 +1815,39 @@
     font-size: 1.8rem;
   }
 }
+
+/* Game Context Badge Styles */
+.game-context-badge {
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  animation: pulse 2s infinite;
+}
+
+.game-context-icon {
+  margin-right: 0.5rem;
+  font-size: 1rem;
+}
+
+.game-context-text {
+  font-size: 0.9rem;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 25px rgba(102, 126, 234, 0.5);
+  }
+  100% {
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  }
+}

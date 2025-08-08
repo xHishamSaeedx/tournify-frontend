@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../contexts/AuthContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import supabase from "../supabaseClient";
 import Button from "./Button";
 import "./AdminManageHosts.css";
 
 const AdminManageHosts = () => {
-  const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [currentHosts, setCurrentHosts] = useState([]);
@@ -17,6 +15,10 @@ const AdminManageHosts = () => {
 
   // Get game from location state or default to null
   const game = location.state?.game || null;
+
+  // Debug: Log the game context
+  console.log("🔍 AdminManageHosts - Game context:", game);
+  console.log("🔍 AdminManageHosts - Location state:", location.state);
 
   const backendUrl =
     import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
@@ -53,8 +55,8 @@ const AdminManageHosts = () => {
       const result = await response.json();
       if (result.success) {
         // Filter hosts by game if game is specified
-        const hosts = game 
-          ? result.data.filter(host => host.game === game)
+        const hosts = game
+          ? result.data.filter((host) => host.game === game)
           : result.data;
         setCurrentHosts(hosts);
       } else {
@@ -89,8 +91,8 @@ const AdminManageHosts = () => {
       const result = await response.json();
       if (result.success) {
         // Filter applications by game if game is specified
-        const applications = game 
-          ? result.data.filter(app => app.game === game)
+        const applications = game
+          ? result.data.filter((app) => app.game === game)
           : result.data;
         setPendingApplications(applications);
       } else {
@@ -135,9 +137,9 @@ const AdminManageHosts = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             applicationId,
-            game: game // Pass the game to the backend
+            game: game, // Pass the game to the backend
           }),
         }
       );
@@ -259,10 +261,10 @@ const AdminManageHosts = () => {
 
   // Get game-specific title
   const getGameTitle = () => {
-    if (game === 'valorant') {
-      return 'Valorant';
+    if (game === "valorant") {
+      return "Valorant";
     }
-    return 'All Games';
+    return "All Games";
   };
 
   if (loading) {
@@ -290,6 +292,17 @@ const AdminManageHosts = () => {
 
   return (
     <div className="admin-manage-hosts">
+      {/* Animated Background */}
+      <div className="admin-bg-animation">
+        <div className="admin-floating-shapes">
+          <div className="admin-shape admin-shape-1"></div>
+          <div className="admin-shape admin-shape-2"></div>
+          <div className="admin-shape admin-shape-3"></div>
+          <div className="admin-shape admin-shape-4"></div>
+        </div>
+        <div className="admin-gradient-overlay"></div>
+      </div>
+
       <div className="admin-header">
         <div className="header-top">
           <Button
@@ -301,14 +314,24 @@ const AdminManageHosts = () => {
           </Button>
         </div>
         <h1>🏆 Admin - Manage {getGameTitle()} Hosts</h1>
-        <p>Manage current {getGameTitle().toLowerCase()} hosts and review pending applications</p>
+        <p>
+          Manage current {getGameTitle().toLowerCase()} hosts and review pending
+          applications
+        </p>
+        {game && (
+          <div className="game-indicator">
+            <span className="game-badge">🎮 {getGameTitle()}</span>
+          </div>
+        )}
       </div>
 
       <div className="admin-content">
         {/* Current Hosts Section */}
         <div className="section-container">
           <div className="section-header">
-            <h2>👥 Current {getGameTitle()} Hosts ({currentHosts.length})</h2>
+            <h2>
+              👥 Current {getGameTitle()} Hosts ({currentHosts.length})
+            </h2>
             <Button
               variant="secondary"
               onClick={() => fetchCurrentHosts()}
@@ -336,7 +359,7 @@ const AdminManageHosts = () => {
                   {currentHosts.map((host) => (
                     <tr key={host.user_id} className="host-row">
                       <td className="host-email">{host.user_email}</td>
-                      <td className="host-game">{host.game || 'N/A'}</td>
+                      <td className="host-game">{host.game || "N/A"}</td>
                       <td className="host-actions">
                         <Button
                           variant="danger"
@@ -365,7 +388,10 @@ const AdminManageHosts = () => {
         {/* Pending Applications Section */}
         <div className="section-container">
           <div className="section-header">
-            <h2>📝 Pending {getGameTitle()} Applications ({pendingApplications.length})</h2>
+            <h2>
+              📝 Pending {getGameTitle()} Applications (
+              {pendingApplications.length})
+            </h2>
             <Button
               variant="secondary"
               onClick={() => fetchPendingApplications()}
@@ -380,91 +406,99 @@ const AdminManageHosts = () => {
               <p>No pending {getGameTitle().toLowerCase()} applications.</p>
             </div>
           ) : (
-            <div className="applications-grid">
-              {pendingApplications.map((application) => (
-                <div key={application.id} className="application-card">
-                  <div className="application-header">
-                    <div className="applicant-email">
-                      {application.user_email}
-                    </div>
-                    <div className="application-date">
-                      Applied: {formatDate(application.created_at)}
-                    </div>
-                  </div>
-
-                  <div className="application-content">
-                    {application.youtube_channel && (
-                      <div className="application-field">
-                        <label>YouTube Channel:</label>
-                        <a
-                          href={application.youtube_channel}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="youtube-link"
-                        >
-                          {application.youtube_channel}
-                        </a>
-                      </div>
-                    )}
-
-                    <div className="application-field">
-                      <label>Experience:</label>
-                      <div className="field-content">
-                        {application.experience}
-                      </div>
-                    </div>
-
-                    <div className="application-field">
-                      <label>Motivation:</label>
-                      <div className="field-content">
-                        {application.motivation}
-                      </div>
-                    </div>
-
-                    {application.game && (
-                      <div className="application-field">
-                        <label>Game:</label>
+            <div className="applications-table-container">
+              <table className="applications-table">
+                <thead>
+                  <tr>
+                    <th>Email</th>
+                    <th>Game</th>
+                    <th>Applied Date</th>
+                    <th>YouTube Channel</th>
+                    <th>Experience</th>
+                    <th>Motivation</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pendingApplications.map((application) => (
+                    <tr key={application.id} className="application-row">
+                      <td className="applicant-email">
+                        {application.user_email}
+                      </td>
+                      <td className="application-game">
+                        {application.game || "N/A"}
+                      </td>
+                      <td className="application-date">
+                        {formatDate(application.created_at)}
+                      </td>
+                      <td className="application-youtube">
+                        {application.youtube_channel ? (
+                          <a
+                            href={application.youtube_channel}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="youtube-link"
+                          >
+                            View Channel
+                          </a>
+                        ) : (
+                          "N/A"
+                        )}
+                      </td>
+                      <td className="application-experience">
                         <div className="field-content">
-                          {application.game}
+                          {application.experience}
                         </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="application-actions">
-                    <Button
-                      variant="success"
-                      onClick={() => handleApproveApplication(application.id)}
-                      disabled={actionLoading[`approve-${application.id}`]}
-                      className="approve-button"
-                    >
-                      {actionLoading[`approve-${application.id}`] ? (
-                        <>
-                          <span className="loading-spinner"></span>
-                          Approving...
-                        </>
-                      ) : (
-                        <>✅ Approve</>
-                      )}
-                    </Button>
-                    <Button
-                      variant="danger"
-                      onClick={() => handleRejectApplication(application.id)}
-                      disabled={actionLoading[`reject-${application.id}`]}
-                      className="reject-button"
-                    >
-                      {actionLoading[`reject-${application.id}`] ? (
-                        <>
-                          <span className="loading-spinner"></span>
-                          Rejecting...
-                        </>
-                      ) : (
-                        <>❌ Reject</>
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                      </td>
+                      <td className="application-motivation">
+                        <div className="field-content">
+                          {application.motivation}
+                        </div>
+                      </td>
+                      <td className="application-actions">
+                        <div className="action-buttons">
+                          <Button
+                            variant="success"
+                            onClick={() =>
+                              handleApproveApplication(application.id)
+                            }
+                            disabled={
+                              actionLoading[`approve-${application.id}`]
+                            }
+                            className="approve-button"
+                          >
+                            {actionLoading[`approve-${application.id}`] ? (
+                              <>
+                                <span className="loading-spinner"></span>
+                                Approving...
+                              </>
+                            ) : (
+                              <>✅ Approve</>
+                            )}
+                          </Button>
+                          <Button
+                            variant="danger"
+                            onClick={() =>
+                              handleRejectApplication(application.id)
+                            }
+                            disabled={actionLoading[`reject-${application.id}`]}
+                            className="reject-button"
+                          >
+                            {actionLoading[`reject-${application.id}`] ? (
+                              <>
+                                <span className="loading-spinner"></span>
+                                Rejecting...
+                              </>
+                            ) : (
+                              <>❌ Reject</>
+                            )}
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>

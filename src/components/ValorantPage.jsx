@@ -74,4 +74,7 @@ const ValorantPage = () => {
   );
 };
 
+// Debug: Log when ValorantPage renders with admin
+console.log("🔍 ValorantPage - Rendering admin dashboard with game: valorant");
+
 export default ValorantPage;
