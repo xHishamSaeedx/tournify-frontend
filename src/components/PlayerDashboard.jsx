@@ -4,7 +4,7 @@ import { setUserRole } from "../utils/userRoles";
 import { useAuth } from "../contexts/AuthContext";
 import ApplyHostForm from "./ApplyHostForm";
 
-const PlayerDashboard = () => {
+const PlayerDashboard = ({ game }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeSection, setActiveSection] = useState(0);
   const [showHostForm, setShowHostForm] = useState(false);
@@ -55,6 +55,14 @@ const PlayerDashboard = () => {
     // You can add additional logic here, like showing a toast notification
   };
 
+  // Get game-specific title
+  const getGameTitle = () => {
+    if (game === 'valorant') {
+      return 'Valorant';
+    }
+    return 'Tournament';
+  };
+
   return (
     <div className="player-dashboard-ultra-modern">
       {/* Animated Background */}
@@ -102,16 +110,16 @@ const PlayerDashboard = () => {
           <div className="hero-visual">
             <div className="floating-card card-1">
               <div className="card-content">
-                <div className="card-icon">🏆</div>
-                <div className="card-title">Tournament Champion</div>
-                <div className="card-value">$2,500</div>
+                <div className="card-icon">🎯</div>
+                <div className="card-title">Tournament Stats</div>
+                <div className="card-value">24 Active</div>
               </div>
             </div>
             <div className="floating-card card-2">
               <div className="card-content">
-                <div className="card-icon">⚡</div>
-                <div className="card-title">Win Streak</div>
-                <div className="card-value">7 Games</div>
+                <div className="card-icon">💰</div>
+                <div className="card-title">Total Earnings</div>
+                <div className="card-value">$12.5K</div>
               </div>
             </div>
           </div>
@@ -120,10 +128,73 @@ const PlayerDashboard = () => {
 
       {/* Main Dashboard Sections */}
       <div className="dashboard-sections-container">
-        {/* Claim Money Section */}
+        {/* Quick Actions Section */}
         <section
-          className="dashboard-section-ultra-modern claim-section"
-          data-section="claim"
+          className="dashboard-section-ultra-modern"
+          data-section="actions"
+        >
+          <div className="section-background-modern">
+            <div className="section-pattern"></div>
+            <div className="section-glow"></div>
+          </div>
+          <div className="section-content-modern">
+            <div className="section-header-modern">
+              <div className="section-icon-modern">
+                <div className="icon-bg">⚡</div>
+              </div>
+              <div className="section-content-wrapper">
+                <div className="section-text">
+                  <h2 className="section-title">Quick Actions</h2>
+                  <p className="section-description">
+                    Access your most important features and tournament management
+                    tools
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="actions-grid-modern">
+              <div className="action-card-modern">
+                <div className="action-icon-modern">
+                  <div className="icon-bg">🔍</div>
+                </div>
+                <div className="action-content">
+                  <h3>Browse Tournaments</h3>
+                  <p>Find and join tournaments that match your skills</p>
+                  <Button
+                    variant="primary"
+                    onClick={handleBrowseTournaments}
+                    className="action-button"
+                  >
+                    <span className="button-text">Browse</span>
+                    <span className="button-icon">🔍</span>
+                  </Button>
+                </div>
+              </div>
+              <div className="action-card-modern">
+                <div className="action-icon-modern">
+                  <div className="icon-bg">📋</div>
+                </div>
+                <div className="action-content">
+                  <h3>My Tournaments</h3>
+                  <p>View your joined tournaments and track progress</p>
+                  <Button
+                    variant="primary"
+                    onClick={handleJoinedTournaments}
+                    className="action-button"
+                  >
+                    <span className="button-text">View</span>
+                    <span className="button-icon">📋</span>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Earnings Section */}
+        <section
+          className="dashboard-section-ultra-modern"
+          data-section="earnings"
         >
           <div className="section-background-modern">
             <div className="section-pattern"></div>
@@ -134,12 +205,14 @@ const PlayerDashboard = () => {
               <div className="section-icon-modern">
                 <div className="icon-bg">💰</div>
               </div>
-              <div className="section-text">
-                <h2 className="section-title">Claim Your Winnings</h2>
-                <p className="section-description">
-                  Collect your tournament earnings instantly with secure payment
-                  processing
-                </p>
+              <div className="section-content-wrapper">
+                <div className="section-text">
+                  <h2 className="section-title">Tournament Earnings</h2>
+                  <p className="section-description">
+                    Collect your tournament earnings instantly with secure payment
+                    processing
+                  </p>
+                </div>
               </div>
             </div>
             <div className="claim-preview-modern">
@@ -183,9 +256,9 @@ const PlayerDashboard = () => {
                 <div className="icon-bg">📝</div>
               </div>
               <div className="section-text">
-                <h2 className="section-title">Become a Host</h2>
+                <h2 className="section-title">Become a {getGameTitle()} Host</h2>
                 <p className="section-description">
-                  Create and manage your own tournaments with professional tools
+                  Create and manage your own {getGameTitle().toLowerCase()} tournaments with professional tools
                 </p>
               </div>
             </div>
@@ -212,7 +285,7 @@ const PlayerDashboard = () => {
                   className="apply-button-modern"
                 >
                   <span className="button-text">
-                    {isSubmitting ? "Redirecting..." : "Apply to Become Host"}
+                    {isSubmitting ? "Redirecting..." : `Apply to Become ${getGameTitle()} Host`}
                   </span>
                   <span className="button-icon">
                     {isSubmitting ? "⏳" : "🚀"}
@@ -229,6 +302,7 @@ const PlayerDashboard = () => {
         <ApplyHostForm
           onClose={handleHostFormClose}
           onSuccess={handleHostFormSuccess}
+          game={game}
         />
       )}
     </div>

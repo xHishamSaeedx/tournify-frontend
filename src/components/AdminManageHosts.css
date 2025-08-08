@@ -100,8 +100,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Error States */
@@ -174,6 +178,84 @@
 .remove-button {
   padding: 0.5rem 1rem;
   font-size: 0.9rem;
+}
+
+/* Hosts Table */
+.hosts-table-container {
+  overflow-x: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.hosts-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.hosts-table thead {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.hosts-table th {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 1rem;
+  border: none;
+}
+
+.hosts-table th:first-child {
+  border-top-left-radius: 12px;
+}
+
+.hosts-table th:last-child {
+  border-top-right-radius: 12px;
+}
+
+.hosts-table tbody tr {
+  border-bottom: 1px solid #e0e0e0;
+  transition: background-color 0.2s ease;
+}
+
+.hosts-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.hosts-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.hosts-table td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.hosts-table .host-email {
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+}
+
+.hosts-table .host-date {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.hosts-table .host-actions {
+  text-align: center;
+  width: 150px;
+}
+
+.hosts-table .remove-button {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  width: 100%;
+  max-width: 140px;
 }
 
 /* Applications Grid */
@@ -310,7 +392,30 @@
     align-items: flex-start;
   }
 
-  .hosts-grid,
+  .hosts-table-container {
+    margin: 0 -1rem;
+    border-radius: 0;
+  }
+
+  .hosts-table {
+    font-size: 0.9rem;
+  }
+
+  .hosts-table th,
+  .hosts-table td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .hosts-table .host-actions {
+    width: 120px;
+  }
+
+  .hosts-table .remove-button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    max-width: 110px;
+  }
+
   .applications-grid {
     grid-template-columns: 1fr;
   }

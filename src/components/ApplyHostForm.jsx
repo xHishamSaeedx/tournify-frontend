@@ -4,12 +4,13 @@ import supabase from '../supabaseClient';
 import Button from './Button';
 import './ApplyHostForm.css';
 
-const ApplyHostForm = ({ onClose, onSuccess }) => {
+const ApplyHostForm = ({ onClose, onSuccess, game }) => {
   const { user } = useAuth();
   const [formData, setFormData] = useState({
     youtube_channel: '',
     experience: '',
-    motivation: ''
+    motivation: '',
+    game: game || ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -68,7 +69,8 @@ const ApplyHostForm = ({ onClose, onSuccess }) => {
           setFormData({
             youtube_channel: '',
             experience: '',
-            motivation: ''
+            motivation: '',
+            game: game || ''
           });
           setSuccess(false);
           onClose();
@@ -99,10 +101,19 @@ const ApplyHostForm = ({ onClose, onSuccess }) => {
     setFormData({
       youtube_channel: '',
       experience: '',
-      motivation: ''
+      motivation: '',
+      game: game || ''
     });
     setError('');
     setSuccess(false);
+  };
+
+  // Get game-specific title
+  const getGameTitle = () => {
+    if (game === 'valorant') {
+      return 'Valorant';
+    }
+    return 'Tournament';
   };
 
   if (success) {
@@ -113,13 +124,17 @@ const ApplyHostForm = ({ onClose, onSuccess }) => {
           <div className="success-icon">✅</div>
           <h2 className="success-title">Application Submitted Successfully!</h2>
           <p className="success-message">
-            Thank you for your interest in becoming a host. We'll review your application 
+            Thank you for your interest in becoming a {getGameTitle().toLowerCase()} host. We'll review your application 
             and get back to you within 3-5 business days.
           </p>
           <div className="success-details">
             <div className="detail-item">
               <span className="detail-label">Application ID:</span>
               <span className="detail-value">{formData.id || 'N/A'}</span>
+            </div>
+            <div className="detail-item">
+              <span className="detail-label">Game:</span>
+              <span className="detail-value">{getGameTitle()}</span>
             </div>
             <div className="detail-item">
               <span className="detail-label">Submitted:</span>
@@ -145,7 +160,7 @@ const ApplyHostForm = ({ onClose, onSuccess }) => {
       <div className="modal-overlay" onClick={handleClose}></div>
       <div className="modal-content">
         <div className="modal-header">
-          <h2 className="modal-title">Apply to Become a Host</h2>
+          <h2 className="modal-title">Apply to Become a {getGameTitle()} Host</h2>
           <button 
             className="close-button-icon" 
             onClick={handleClose}
@@ -160,6 +175,23 @@ const ApplyHostForm = ({ onClose, onSuccess }) => {
           <div className="form-section">
             <h3 className="section-title">Tell us about yourself</h3>
             
+            {game && (
+              <div className="form-group">
+                <label className="form-label">
+                  Game
+                </label>
+                <input
+                  type="text"
+                  value={getGameTitle()}
+                  className="form-input"
+                  disabled
+                />
+                <small className="form-help">
+                  You are applying to become a host for {getGameTitle()}
+                </small>
+              </div>
+            )}
+
             <div className="form-group">
               <label htmlFor="youtube_channel" className="form-label">
                 YouTube Channel (Optional)
@@ -199,7 +231,7 @@ const ApplyHostForm = ({ onClose, onSuccess }) => {
 
             <div className="form-group">
               <label htmlFor="motivation" className="form-label required">
-                Why do you want to become a host? *
+                Why do you want to become a {getGameTitle().toLowerCase()} host? *
               </label>
               <textarea
                 id="motivation"

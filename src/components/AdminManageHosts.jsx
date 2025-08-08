@@ -1,26 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import supabase from '../supabaseClient';
-import Button from './Button';
-import './AdminManageHosts.css';
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate, useLocation } from "react-router-dom";
+import supabase from "../supabaseClient";
+import Button from "./Button";
+import "./AdminManageHosts.css";
 
 const AdminManageHosts = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [currentHosts, setCurrentHosts] = useState([]);
   const [pendingApplications, setPendingApplications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [actionLoading, setActionLoading] = useState({});
 
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+  // Get game from location state or default to null
+  const game = location.state?.game || null;
+
+  const backendUrl =
+    import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
 
   // Get authentication token
   const getAuthToken = async () => {
-    const { data: { session }, error } = await supabase.auth.getSession();
+    const {
+      data: { session },
+      error,
+    } = await supabase.auth.getSession();
     if (error || !session) {
-      throw new Error('No active session');
+      throw new Error("No active session");
     }
     return session.access_token;
   };
@@ -31,25 +39,29 @@ const AdminManageHosts = () => {
       const token = await getAuthToken();
       const response = await fetch(`${backendUrl}/api/admin/current-hosts`, {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) {
         if (response.status === 403) {
-          throw new Error('Access denied. Admin privileges required.');
+          throw new Error("Access denied. Admin privileges required.");
         }
-        throw new Error('Failed to fetch hosts');
+        throw new Error("Failed to fetch hosts");
       }
 
       const result = await response.json();
       if (result.success) {
-        setCurrentHosts(result.data);
+        // Filter hosts by game if game is specified
+        const hosts = game 
+          ? result.data.filter(host => host.game === game)
+          : result.data;
+        setCurrentHosts(hosts);
       } else {
-        throw new Error(result.error || 'Failed to fetch hosts');
+        throw new Error(result.error || "Failed to fetch hosts");
       }
     } catch (error) {
-      console.error('Error fetching hosts:', error);
+      console.error("Error fetching hosts:", error);
       setError(error.message);
     }
   };
@@ -58,27 +70,34 @@ const AdminManageHosts = () => {
   const fetchPendingApplications = async () => {
     try {
       const token = await getAuthToken();
-      const response = await fetch(`${backendUrl}/api/admin/pending-applications`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
+      const response = await fetch(
+        `${backendUrl}/api/admin/pending-applications`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
+      );
 
       if (!response.ok) {
         if (response.status === 403) {
-          throw new Error('Access denied. Admin privileges required.');
+          throw new Error("Access denied. Admin privileges required.");
         }
-        throw new Error('Failed to fetch applications');
+        throw new Error("Failed to fetch applications");
       }
 
       const result = await response.json();
       if (result.success) {
-        setPendingApplications(result.data);
+        // Filter applications by game if game is specified
+        const applications = game 
+          ? result.data.filter(app => app.game === game)
+          : result.data;
+        setPendingApplications(applications);
       } else {
-        throw new Error(result.error || 'Failed to fetch applications');
+        throw new Error(result.error || "Failed to fetch applications");
       }
     } catch (error) {
-      console.error('Error fetching applications:', error);
+      console.error("Error fetching applications:", error);
       setError(error.message);
     }
   };
@@ -87,7 +106,7 @@ const AdminManageHosts = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      setError('');
+      setError("");
       try {
         await Promise.all([fetchCurrentHosts(), fetchPendingApplications()]);
       } catch (error) {
@@ -98,21 +117,30 @@ const AdminManageHosts = () => {
     };
 
     loadData();
-  }, []);
+  }, [game]);
 
   // Approve application
   const handleApproveApplication = async (applicationId) => {
-    setActionLoading(prev => ({ ...prev, [`approve-${applicationId}`]: true }));
+    setActionLoading((prev) => ({
+      ...prev,
+      [`approve-${applicationId}`]: true,
+    }));
     try {
       const token = await getAuthToken();
-      const response = await fetch(`${backendUrl}/api/admin/approve-application`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ applicationId })
-      });
+      const response = await fetch(
+        `${backendUrl}/api/admin/approve-application`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ 
+            applicationId,
+            game: game // Pass the game to the backend
+          }),
+        }
+      );
 
       const result = await response.json();
       if (result.success) {
@@ -120,33 +148,46 @@ const AdminManageHosts = () => {
         await Promise.all([fetchCurrentHosts(), fetchPendingApplications()]);
         alert(`✅ Application approved for ${result.data.user_email}`);
       } else {
-        throw new Error(result.error || 'Failed to approve application');
+        throw new Error(result.error || "Failed to approve application");
       }
     } catch (error) {
-      console.error('Error approving application:', error);
+      console.error("Error approving application:", error);
       alert(`❌ Error: ${error.message}`);
     } finally {
-      setActionLoading(prev => ({ ...prev, [`approve-${applicationId}`]: false }));
+      setActionLoading((prev) => ({
+        ...prev,
+        [`approve-${applicationId}`]: false,
+      }));
     }
   };
 
   // Reject application
   const handleRejectApplication = async (applicationId) => {
-    if (!confirm('Are you sure you want to reject this application? This action cannot be undone.')) {
+    if (
+      !confirm(
+        "Are you sure you want to reject this application? This action cannot be undone."
+      )
+    ) {
       return;
     }
 
-    setActionLoading(prev => ({ ...prev, [`reject-${applicationId}`]: true }));
+    setActionLoading((prev) => ({
+      ...prev,
+      [`reject-${applicationId}`]: true,
+    }));
     try {
       const token = await getAuthToken();
-      const response = await fetch(`${backendUrl}/api/admin/reject-application`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ applicationId })
-      });
+      const response = await fetch(
+        `${backendUrl}/api/admin/reject-application`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ applicationId }),
+        }
+      );
 
       const result = await response.json();
       if (result.success) {
@@ -154,32 +195,39 @@ const AdminManageHosts = () => {
         await fetchPendingApplications();
         alert(`❌ Application rejected for ${result.data.user_email}`);
       } else {
-        throw new Error(result.error || 'Failed to reject application');
+        throw new Error(result.error || "Failed to reject application");
       }
     } catch (error) {
-      console.error('Error rejecting application:', error);
+      console.error("Error rejecting application:", error);
       alert(`❌ Error: ${error.message}`);
     } finally {
-      setActionLoading(prev => ({ ...prev, [`reject-${applicationId}`]: false }));
+      setActionLoading((prev) => ({
+        ...prev,
+        [`reject-${applicationId}`]: false,
+      }));
     }
   };
 
   // Remove host
   const handleRemoveHost = async (userId) => {
-    if (!confirm('Are you sure you want to remove this host? They will be set back to player role.')) {
+    if (
+      !confirm(
+        "Are you sure you want to remove this host? They will be set back to player role."
+      )
+    ) {
       return;
     }
 
-    setActionLoading(prev => ({ ...prev, [`remove-${userId}`]: true }));
+    setActionLoading((prev) => ({ ...prev, [`remove-${userId}`]: true }));
     try {
       const token = await getAuthToken();
       const response = await fetch(`${backendUrl}/api/admin/remove-host`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ userId })
+        body: JSON.stringify({ userId }),
       });
 
       const result = await response.json();
@@ -188,25 +236,33 @@ const AdminManageHosts = () => {
         await fetchCurrentHosts();
         alert(`👤 Host removed: ${result.data.user_email}`);
       } else {
-        throw new Error(result.error || 'Failed to remove host');
+        throw new Error(result.error || "Failed to remove host");
       }
     } catch (error) {
-      console.error('Error removing host:', error);
+      console.error("Error removing host:", error);
       alert(`❌ Error: ${error.message}`);
     } finally {
-      setActionLoading(prev => ({ ...prev, [`remove-${userId}`]: false }));
+      setActionLoading((prev) => ({ ...prev, [`remove-${userId}`]: false }));
     }
   };
 
   // Format date
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
+  };
+
+  // Get game-specific title
+  const getGameTitle = () => {
+    if (game === 'valorant') {
+      return 'Valorant';
+    }
+    return 'All Games';
   };
 
   if (loading) {
@@ -244,15 +300,15 @@ const AdminManageHosts = () => {
             ← Back to Dashboard
           </Button>
         </div>
-        <h1>🏆 Admin - Manage Hosts</h1>
-        <p>Manage current hosts and review pending applications</p>
+        <h1>🏆 Admin - Manage {getGameTitle()} Hosts</h1>
+        <p>Manage current {getGameTitle().toLowerCase()} hosts and review pending applications</p>
       </div>
 
       <div className="admin-content">
         {/* Current Hosts Section */}
         <div className="section-container">
           <div className="section-header">
-            <h2>👥 Current Hosts ({currentHosts.length})</h2>
+            <h2>👥 Current {getGameTitle()} Hosts ({currentHosts.length})</h2>
             <Button
               variant="secondary"
               onClick={() => fetchCurrentHosts()}
@@ -264,39 +320,44 @@ const AdminManageHosts = () => {
 
           {currentHosts.length === 0 ? (
             <div className="empty-state">
-              <p>No hosts found.</p>
+              <p>No {getGameTitle().toLowerCase()} hosts found.</p>
             </div>
           ) : (
-            <div className="hosts-grid">
-              {currentHosts.map((host) => (
-                <div key={host.user_id} className="host-card">
-                  <div className="host-info">
-                    <div className="host-email">{host.user_email}</div>
-                    <div className="host-date">
-                      Host since: {formatDate(host.created_at)}
-                    </div>
-                  </div>
-                  <div className="host-actions">
-                    <Button
-                      variant="danger"
-                      onClick={() => handleRemoveHost(host.user_id)}
-                      disabled={actionLoading[`remove-${host.user_id}`]}
-                      className="remove-button"
-                    >
-                      {actionLoading[`remove-${host.user_id}`] ? (
-                        <>
-                          <span className="loading-spinner"></span>
-                          Removing...
-                        </>
-                      ) : (
-                        <>
-                          🗑️ Remove Host
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              ))}
+            <div className="hosts-table-container">
+              <table className="hosts-table">
+                <thead>
+                  <tr>
+                    <th>Email</th>
+                    <th>Game</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentHosts.map((host) => (
+                    <tr key={host.user_id} className="host-row">
+                      <td className="host-email">{host.user_email}</td>
+                      <td className="host-game">{host.game || 'N/A'}</td>
+                      <td className="host-actions">
+                        <Button
+                          variant="danger"
+                          onClick={() => handleRemoveHost(host.user_id)}
+                          disabled={actionLoading[`remove-${host.user_id}`]}
+                          className="remove-button"
+                        >
+                          {actionLoading[`remove-${host.user_id}`] ? (
+                            <>
+                              <span className="loading-spinner"></span>
+                              Removing...
+                            </>
+                          ) : (
+                            <>🗑️ Remove Host</>
+                          )}
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>
@@ -304,7 +365,7 @@ const AdminManageHosts = () => {
         {/* Pending Applications Section */}
         <div className="section-container">
           <div className="section-header">
-            <h2>📝 Pending Applications ({pendingApplications.length})</h2>
+            <h2>📝 Pending {getGameTitle()} Applications ({pendingApplications.length})</h2>
             <Button
               variant="secondary"
               onClick={() => fetchPendingApplications()}
@@ -316,14 +377,16 @@ const AdminManageHosts = () => {
 
           {pendingApplications.length === 0 ? (
             <div className="empty-state">
-              <p>No pending applications.</p>
+              <p>No pending {getGameTitle().toLowerCase()} applications.</p>
             </div>
           ) : (
             <div className="applications-grid">
               {pendingApplications.map((application) => (
                 <div key={application.id} className="application-card">
                   <div className="application-header">
-                    <div className="applicant-email">{application.user_email}</div>
+                    <div className="applicant-email">
+                      {application.user_email}
+                    </div>
                     <div className="application-date">
                       Applied: {formatDate(application.created_at)}
                     </div>
@@ -333,9 +396,9 @@ const AdminManageHosts = () => {
                     {application.youtube_channel && (
                       <div className="application-field">
                         <label>YouTube Channel:</label>
-                        <a 
-                          href={application.youtube_channel} 
-                          target="_blank" 
+                        <a
+                          href={application.youtube_channel}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="youtube-link"
                         >
@@ -346,13 +409,26 @@ const AdminManageHosts = () => {
 
                     <div className="application-field">
                       <label>Experience:</label>
-                      <div className="field-content">{application.experience}</div>
+                      <div className="field-content">
+                        {application.experience}
+                      </div>
                     </div>
 
                     <div className="application-field">
                       <label>Motivation:</label>
-                      <div className="field-content">{application.motivation}</div>
+                      <div className="field-content">
+                        {application.motivation}
+                      </div>
                     </div>
+
+                    {application.game && (
+                      <div className="application-field">
+                        <label>Game:</label>
+                        <div className="field-content">
+                          {application.game}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="application-actions">
@@ -368,9 +444,7 @@ const AdminManageHosts = () => {
                           Approving...
                         </>
                       ) : (
-                        <>
-                          ✅ Approve
-                        </>
+                        <>✅ Approve</>
                       )}
                     </Button>
                     <Button
@@ -385,9 +459,7 @@ const AdminManageHosts = () => {
                           Rejecting...
                         </>
                       ) : (
-                        <>
-                          ❌ Reject
-                        </>
+                        <>❌ Reject</>
                       )}
                     </Button>
                   </div>

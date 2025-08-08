@@ -1,9 +1,13 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Button from "./Button";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Get game from location state or default to null
+  const game = location.state?.game || null;
 
   // Animated background effect
   useEffect(() => {
@@ -21,11 +25,19 @@ const AdminDashboard = () => {
   }, []);
 
   const handleManageHosts = () => {
-    navigate('/admin/manage-hosts');
+    navigate('/admin/manage-hosts', { state: { game } });
   };
 
   const handleManageTournaments = () => {
     console.log("Manage tournaments clicked");
+  };
+
+  // Get game-specific title
+  const getGameTitle = () => {
+    if (game === 'valorant') {
+      return 'Valorant';
+    }
+    return 'All Games';
   };
 
   return (
@@ -109,9 +121,9 @@ const AdminDashboard = () => {
               </div>
               <div className="section-content-wrapper">
                 <div className="section-text">
-                  <h2 className="section-title">Manage Hosts</h2>
+                  <h2 className="section-title">Manage {getGameTitle()} Hosts</h2>
                   <p className="section-description">
-                    Create new hosts, manage existing host accounts, and oversee
+                    Create new {getGameTitle().toLowerCase()} hosts, manage existing host accounts, and oversee
                     tournament creation permissions
                   </p>
                 </div>
@@ -121,7 +133,7 @@ const AdminDashboard = () => {
                     onClick={handleManageHosts}
                     className="section-button"
                   >
-                    <span className="button-text">Manage Hosts</span>
+                    <span className="button-text">Manage {getGameTitle()} Hosts</span>
                     <span className="button-icon">👑</span>
                   </Button>
                 </div>
@@ -134,10 +146,10 @@ const AdminDashboard = () => {
                     <div className="icon-bg">➕</div>
                   </div>
                   <div className="feature-content">
-                    <h3>Create New Hosts</h3>
+                    <h3>Create New {getGameTitle()} Hosts</h3>
                     <p>
                       Promote users to host role with full tournament creation
-                      privileges
+                      privileges for {getGameTitle().toLowerCase()}
                     </p>
                   </div>
                 </div>
@@ -146,10 +158,10 @@ const AdminDashboard = () => {
                     <div className="icon-bg">📊</div>
                   </div>
                   <div className="feature-content">
-                    <h3>Host Analytics</h3>
+                    <h3>{getGameTitle()} Host Analytics</h3>
                     <p>
                       Monitor host performance, tournament success rates, and
-                      activity metrics
+                      activity metrics for {getGameTitle().toLowerCase()}
                     </p>
                   </div>
                 </div>

@@ -9,7 +9,7 @@ import { useUserRoles } from "../contexts/UserRolesContext";
 import { useAuth } from "../contexts/AuthContext";
 
 const ValorantPage = () => {
-  const { userRole, loading, isPlayer, isHost, isAdmin } = useUserRoles();
+  const { loading, isPlayer, isAdmin } = useUserRoles();
   const { user } = useAuth();
 
   // Scroll to top when component mounts
@@ -64,9 +64,9 @@ const ValorantPage = () => {
               </div>
             </div>
           ) : isAdmin ? (
-            <AdminDashboard />
+            <AdminDashboard game="valorant" />
           ) : isPlayer ? (
-            <PlayerDashboard />
+            <PlayerDashboard game="valorant" />
           ) : null}
         </div>
       </div>
