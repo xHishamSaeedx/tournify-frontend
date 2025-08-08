@@ -1,7 +1,10 @@
 import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "./Button";
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
+
   // Animated background effect
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -18,7 +21,7 @@ const AdminDashboard = () => {
   }, []);
 
   const handleManageHosts = () => {
-    console.log("Manage hosts clicked");
+    navigate('/admin/manage-hosts');
   };
 
   const handleManageTournaments = () => {

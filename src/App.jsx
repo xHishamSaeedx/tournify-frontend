@@ -15,6 +15,8 @@ import PlayerForm from "./components/PlayerForm";
 import BackButton from "./components/BackButton";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ValorantPage from "./components/ValorantPage";
+import AdminManageHosts from "./components/AdminManageHosts";
+import AdminDashboard from "./components/AdminDashboard";
 import { AuthProvider } from "./contexts/AuthContext";
 import { UserRolesProvider } from "./contexts/UserRolesContext";
 
@@ -76,6 +78,22 @@ const App = () => {
                 }
               />
               <Route path="/valorant" element={<ValorantPage />} />
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedRoute>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/admin/manage-hosts"
+                element={
+                  <ProtectedRoute>
+                    <AdminManageHosts />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/"
                 element={

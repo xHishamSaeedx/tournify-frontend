@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import Button from "./Button";
 import { setUserRole } from "../utils/userRoles";
 import { useAuth } from "../contexts/AuthContext";
+import ApplyHostForm from "./ApplyHostForm";
 
 const PlayerDashboard = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeSection, setActiveSection] = useState(0);
+  const [showHostForm, setShowHostForm] = useState(false);
   const { user } = useAuth();
 
   // Animated background effect
@@ -41,18 +43,16 @@ const PlayerDashboard = () => {
       return;
     }
 
-    setIsSubmitting(true);
-    // Redirect to external application page
-    // Replace with your actual application URL
-    window.open(
-      "https://your-application-website.com/host-application",
-      "_blank"
-    );
+    setShowHostForm(true);
+  };
 
-    // Reset the submitting state after a short delay
-    setTimeout(() => {
-      setIsSubmitting(false);
-    }, 1000);
+  const handleHostFormClose = () => {
+    setShowHostForm(false);
+  };
+
+  const handleHostFormSuccess = (applicationData) => {
+    console.log("Host application submitted:", applicationData);
+    // You can add additional logic here, like showing a toast notification
   };
 
   return (
@@ -223,6 +223,14 @@ const PlayerDashboard = () => {
           </div>
         </section>
       </div>
+
+      {/* Host Application Form Modal */}
+      {showHostForm && (
+        <ApplyHostForm
+          onClose={handleHostFormClose}
+          onSuccess={handleHostFormSuccess}
+        />
+      )}
     </div>
   );
 };
