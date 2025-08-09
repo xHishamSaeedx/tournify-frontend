@@ -1,25 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import api from '../utils/api';
-import BackButton from './BackButton';
+import React, { useState, useEffect, useRef } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import api from "../utils/api";
+import BackButton from "./BackButton";
 
 // Import images for background
 import jettImage from "/assets/jett.avif";
 import kjImage from "/assets/kj.png";
 
+// Global cache to prevent duplicate API calls across component instances
+const playerCheckCache = new Map();
+
 const PlayerForm = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [existingPlayer, setExistingPlayer] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  
+
   const [formData, setFormData] = useState({
-    display_name: '',
-    username: '',
-    DOB: '',
-    valo_id: '',
-    VPA: ''
+    display_name: "",
+    username: "",
+    DOB: "",
+    valo_id: "",
+    VPA: "",
   });
 
   const backgroundImages = [jettImage, kjImage];
@@ -27,7 +30,9 @@ const PlayerForm = () => {
   // Background image slideshow
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % backgroundImages.length);
+      setCurrentImageIndex(
+        (prevIndex) => (prevIndex + 1) % backgroundImages.length
+      );
     }, 4000);
 
     return () => clearInterval(interval);
@@ -35,49 +40,103 @@ const PlayerForm = () => {
 
   // Check if player already exists when user is authenticated
   useEffect(() => {
+    let isMounted = true;
+    let timeoutId = null;
+
     const checkExistingPlayer = async () => {
-      if (user) {
+      if (user && isMounted) {
+        const userId = user.id;
+        
+        // Check if we've already made a request for this user
+        if (playerCheckCache.has(userId)) {
+          console.log("🔄 Using cached player check for user:", userId);
+          const cachedResult = playerCheckCache.get(userId);
+          if (isMounted) {
+            setExistingPlayer(cachedResult);
+            if (cachedResult) {
+              setFormData({
+                display_name: cachedResult.display_name || "",
+                username: cachedResult.username || "",
+                DOB: cachedResult.DOB || "",
+                valo_id: cachedResult.valo_id || "",
+                VPA: cachedResult.VPA || "",
+              });
+            }
+          }
+          return;
+        }
+
+        // Mark that we're checking this user
+        playerCheckCache.set(userId, null);
+        
         try {
-          const response = await api.getPlayer(user.id);
-          
-          if (response.success && response.data) {
+          console.log("🔍 Checking for existing player for user:", userId);
+          const response = await api.getPlayer(userId);
+
+          if (response.success && response.data && isMounted) {
+            console.log("✅ Found existing player:", response.data.display_name);
+            playerCheckCache.set(userId, response.data);
             setExistingPlayer(response.data);
             setFormData({
-              display_name: response.data.display_name || '',
-              username: response.data.username || '',
-              DOB: response.data.DOB || '',
-              valo_id: response.data.valo_id || '',
-              VPA: response.data.VPA || ''
+              display_name: response.data.display_name || "",
+              username: response.data.username || "",
+              DOB: response.data.DOB || "",
+              valo_id: response.data.valo_id || "",
+              VPA: response.data.VPA || "",
             });
+          } else if (isMounted) {
+            // Cache the null result to prevent future calls
+            playerCheckCache.set(userId, null);
           }
         } catch (error) {
           // Player not found or other error - this is expected for new users
-          console.log('No existing player found or error:', error.message);
+          console.log("No existing player found or error:", error.message);
+          if (isMounted) {
+            // Cache the null result to prevent future calls
+            playerCheckCache.set(userId, null);
+          }
         }
       }
     };
 
-    checkExistingPlayer();
+    // Add a small delay to handle React Strict Mode
+    if (user) {
+      setExistingPlayer(null);
+      
+      timeoutId = setTimeout(() => {
+        if (isMounted) {
+          checkExistingPlayer();
+        }
+      }, 100);
+    }
+
+    // Cleanup function
+    return () => {
+      isMounted = false;
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [user]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!user) {
-      setMessage('Please log in to submit player information');
+      setMessage("Please log in to submit player information");
       return;
     }
 
     setLoading(true);
-    setMessage('');
+    setMessage("");
 
     try {
       const playerData = {
@@ -86,32 +145,32 @@ const PlayerForm = () => {
         username: formData.username.trim(),
         DOB: formData.DOB,
         valo_id: formData.valo_id.trim(),
-        VPA: formData.VPA.trim()
+        VPA: formData.VPA.trim(),
       };
 
       let result;
-      
+
       if (existingPlayer) {
         // Update existing player
         const response = await api.updatePlayer(user.id, playerData);
-        
+
         if (!response.success) {
-          throw new Error(response.error || 'Failed to update player');
+          throw new Error(response.error || "Failed to update player");
         }
-        
+
         result = response.data;
-        setMessage('Player information updated successfully!');
+        setMessage("Player information updated successfully!");
       } else {
         // Insert new player
         const response = await api.createPlayer(playerData);
-        
+
         if (!response.success) {
-          throw new Error(response.error || 'Failed to create player');
+          throw new Error(response.error || "Failed to create player");
         }
-        
+
         result = response.data;
         setExistingPlayer(result);
-        setMessage('Player information saved successfully!');
+        setMessage("Player information saved successfully!");
       }
 
       // Update form data with the returned data
@@ -120,11 +179,10 @@ const PlayerForm = () => {
         username: result.username,
         DOB: result.DOB,
         valo_id: result.valo_id,
-        VPA: result.VPA
+        VPA: result.VPA,
       });
-
     } catch (error) {
-      console.error('Error saving player data:', error);
+      console.error("Error saving player data:", error);
       setMessage(`Error: ${error.message}`);
     } finally {
       setLoading(false);
@@ -157,12 +215,13 @@ const PlayerForm = () => {
             <div className="player-form-header">
               <h1 className="player-form-title">Player Registration</h1>
               <p className="player-form-subtitle">
-                Please log in to register as a player and join the competitive Valorant community.
+                Please log in to register as a player and join the competitive
+                Valorant community.
               </p>
             </div>
             <div className="player-form-cta">
-              <button 
-                onClick={() => window.location.href = '/login'}
+              <button
+                onClick={() => (window.location.href = "/login")}
                 className="player-form-button primary"
               >
                 Sign In to Continue
@@ -198,13 +257,14 @@ const PlayerForm = () => {
           <BackButton />
           <div className="player-form-header">
             <h1 className="player-form-title">
-              {existingPlayer ? 'Update Player Profile' : 'Join the Competition'}
+              {existingPlayer
+                ? "Update Player Profile"
+                : "Join the Competition"}
             </h1>
             <p className="player-form-subtitle">
-              {existingPlayer 
-                ? 'Update your player information to keep your profile current.'
-                : 'Complete your player registration to participate in Valorant tournaments.'
-              }
+              {existingPlayer
+                ? "Update your player information to keep your profile current."
+                : "Complete your player registration to participate in Valorant tournaments."}
             </p>
           </div>
 
@@ -300,14 +360,20 @@ const PlayerForm = () => {
                   <span className="spinner"></span>
                   Saving...
                 </span>
+              ) : existingPlayer ? (
+                "Update Profile"
               ) : (
-                existingPlayer ? 'Update Profile' : 'Register Player'
+                "Register Player"
               )}
             </button>
           </form>
 
           {message && (
-            <div className={`message ${message.includes('Error') ? 'error' : 'success'}`}>
+            <div
+              className={`message ${
+                message.includes("Error") ? "error" : "success"
+              }`}
+            >
               {message}
             </div>
           )}
@@ -317,7 +383,10 @@ const PlayerForm = () => {
               <div className="notice-icon">✓</div>
               <div className="notice-content">
                 <h3>Profile Found</h3>
-                <p>You already have a player profile. You can update your information above.</p>
+                <p>
+                  You already have a player profile. You can update your
+                  information above.
+                </p>
               </div>
             </div>
           )}
@@ -327,4 +396,4 @@ const PlayerForm = () => {
   );
 };
 
-export default PlayerForm; 
+export default PlayerForm;
