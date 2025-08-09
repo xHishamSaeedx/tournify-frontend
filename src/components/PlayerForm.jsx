@@ -21,7 +21,8 @@ const PlayerForm = () => {
     display_name: "",
     username: "",
     DOB: "",
-    valo_id: "",
+    valo_name: "",
+    valo_tag: "",
     VPA: "",
   });
 
@@ -46,7 +47,7 @@ const PlayerForm = () => {
     const checkExistingPlayer = async () => {
       if (user && isMounted) {
         const userId = user.id;
-        
+
         // Check if we've already made a request for this user
         if (playerCheckCache.has(userId)) {
           console.log("🔄 Using cached player check for user:", userId);
@@ -58,7 +59,8 @@ const PlayerForm = () => {
                 display_name: cachedResult.display_name || "",
                 username: cachedResult.username || "",
                 DOB: cachedResult.DOB || "",
-                valo_id: cachedResult.valo_id || "",
+                valo_name: cachedResult.valo_name || "",
+                valo_tag: cachedResult.valo_tag || "",
                 VPA: cachedResult.VPA || "",
               });
             }
@@ -68,20 +70,24 @@ const PlayerForm = () => {
 
         // Mark that we're checking this user
         playerCheckCache.set(userId, null);
-        
+
         try {
           console.log("🔍 Checking for existing player for user:", userId);
           const response = await api.getPlayer(userId);
 
           if (response.success && response.data && isMounted) {
-            console.log("✅ Found existing player:", response.data.display_name);
+            console.log(
+              "✅ Found existing player:",
+              response.data.display_name
+            );
             playerCheckCache.set(userId, response.data);
             setExistingPlayer(response.data);
             setFormData({
               display_name: response.data.display_name || "",
               username: response.data.username || "",
               DOB: response.data.DOB || "",
-              valo_id: response.data.valo_id || "",
+              valo_name: response.data.valo_name || "",
+              valo_tag: response.data.valo_tag || "",
               VPA: response.data.VPA || "",
             });
           } else if (isMounted) {
@@ -102,7 +108,7 @@ const PlayerForm = () => {
     // Add a small delay to handle React Strict Mode
     if (user) {
       setExistingPlayer(null);
-      
+
       timeoutId = setTimeout(() => {
         if (isMounted) {
           checkExistingPlayer();
@@ -144,7 +150,8 @@ const PlayerForm = () => {
         display_name: formData.display_name.trim(),
         username: formData.username.trim(),
         DOB: formData.DOB,
-        valo_id: formData.valo_id.trim(),
+        valo_name: formData.valo_name.trim(),
+        valo_tag: formData.valo_tag.trim(),
         VPA: formData.VPA.trim(),
       };
 
@@ -178,7 +185,8 @@ const PlayerForm = () => {
         display_name: result.display_name,
         username: result.username,
         DOB: result.DOB,
-        valo_id: result.valo_id,
+        valo_name: result.valo_name,
+        valo_tag: result.valo_tag,
         VPA: result.VPA,
       });
     } catch (error) {
@@ -318,18 +326,34 @@ const PlayerForm = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="valo_id" className="form-label">
-                  Valorant ID *
+                <label htmlFor="valo_name" className="form-label">
+                  Valorant Username *
                 </label>
                 <input
                   type="text"
-                  id="valo_id"
-                  name="valo_id"
-                  value={formData.valo_id}
+                  id="valo_name"
+                  name="valo_name"
+                  value={formData.valo_name}
                   onChange={handleInputChange}
                   required
                   className="form-input"
-                  placeholder="Username#Tag"
+                  placeholder="Enter your Valorant username"
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="valo_tag" className="form-label">
+                  Valorant Tag *
+                </label>
+                <input
+                  type="text"
+                  id="valo_tag"
+                  name="valo_tag"
+                  value={formData.valo_tag}
+                  onChange={handleInputChange}
+                  required
+                  className="form-input"
+                  placeholder="Enter your Valorant tag (e.g., #NA1)"
                 />
               </div>
 
