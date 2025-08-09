@@ -70,6 +70,7 @@ export const api = {
   // Tournament endpoints
   getTournaments: () => authenticatedApiCall("/api/tournaments"),
   getTournament: (id) => authenticatedApiCall(`/api/tournaments/${id}`),
+  getHostTournaments: (hostId) => authenticatedApiCall(`/api/tournaments/host/${hostId}`),
   createTournament: (data) =>
     authenticatedApiCall("/api/tournaments", {
       method: "POST",

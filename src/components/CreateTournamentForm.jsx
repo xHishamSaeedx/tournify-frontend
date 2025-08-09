@@ -12,7 +12,7 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
     prize_second_pct: "30", // Default 30%
     prize_third_pct: "20", // Default 20%
     party_join_time: "",
-    capacity: "16", // Default 16 participants
+    capacity: "10", // Default 10 participants
     host_percentage: "5", // Default 5% for host
     platform: "pc", // Default to PC
     region: "eu", // Default to EU
@@ -526,7 +526,7 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
               name="capacity"
               value={formData.capacity}
               onChange={handleInputChange}
-              placeholder="16"
+              placeholder="10"
               min="2"
               max="128"
             />
