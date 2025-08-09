@@ -100,6 +100,22 @@ function UserProfile() {
                   {playerData.VPA || "Not set"}
                 </span>
               </div>
+              <div className="profile-detail-item">
+                <span className="detail-label">Platform:</span>
+                <span className="detail-value">
+                  {playerData.platform
+                    ? playerData.platform.toUpperCase()
+                    : "Not set"}
+                </span>
+              </div>
+              <div className="profile-detail-item">
+                <span className="detail-label">Region:</span>
+                <span className="detail-value">
+                  {playerData.region
+                    ? playerData.region.toUpperCase()
+                    : "Not set"}
+                </span>
+              </div>
             </div>
           )}
 

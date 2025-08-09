@@ -24,6 +24,8 @@ const PlayerForm = () => {
     valo_name: "",
     valo_tag: "",
     VPA: "",
+    platform: "",
+    region: "",
   });
 
   const backgroundImages = [jettImage, kjImage];
@@ -62,6 +64,8 @@ const PlayerForm = () => {
                 valo_name: cachedResult.valo_name || "",
                 valo_tag: cachedResult.valo_tag || "",
                 VPA: cachedResult.VPA || "",
+                platform: cachedResult.platform || "",
+                region: cachedResult.region || "",
               });
             }
           }
@@ -89,6 +93,8 @@ const PlayerForm = () => {
               valo_name: response.data.valo_name || "",
               valo_tag: response.data.valo_tag || "",
               VPA: response.data.VPA || "",
+              platform: response.data.platform || "",
+              region: response.data.region || "",
             });
           } else if (isMounted) {
             // Cache the null result to prevent future calls
@@ -153,6 +159,8 @@ const PlayerForm = () => {
         valo_name: formData.valo_name.trim(),
         valo_tag: formData.valo_tag.trim(),
         VPA: formData.VPA.trim(),
+        platform: formData.platform,
+        region: formData.region,
       };
 
       let result;
@@ -188,6 +196,8 @@ const PlayerForm = () => {
         valo_name: result.valo_name,
         valo_tag: result.valo_tag,
         VPA: result.VPA,
+        platform: result.platform,
+        region: result.region,
       });
     } catch (error) {
       console.error("Error saving player data:", error);
@@ -371,6 +381,46 @@ const PlayerForm = () => {
                   className="form-input"
                   placeholder="Enter your VPA"
                 />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="platform" className="form-label">
+                  Platform *
+                </label>
+                <select
+                  id="platform"
+                  name="platform"
+                  value={formData.platform}
+                  onChange={handleInputChange}
+                  required
+                  className="form-input"
+                >
+                  <option value="">Select Platform</option>
+                  <option value="pc">PC</option>
+                  <option value="console">Console</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="region" className="form-label">
+                  Region *
+                </label>
+                <select
+                  id="region"
+                  name="region"
+                  value={formData.region}
+                  onChange={handleInputChange}
+                  required
+                  className="form-input"
+                >
+                  <option value="">Select Region</option>
+                  <option value="eu">EU</option>
+                  <option value="na">NA</option>
+                  <option value="latam">LATAM</option>
+                  <option value="br">BR</option>
+                  <option value="ap">AP</option>
+                  <option value="kr">KR</option>
+                </select>
               </div>
             </div>
 

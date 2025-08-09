@@ -1020,6 +1020,39 @@
   background: rgba(255, 255, 255, 0.06);
 }
 
+/* Select element specific styles */
+.form-input[type="select"],
+.form-input select,
+select.form-input {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+.form-input[type="select"] option,
+.form-input select option,
+select.form-input option {
+  background: var(--surface);
+  color: var(--text-main);
+  padding: 0.5rem;
+}
+
+.form-input[type="select"]:focus,
+.form-input select:focus,
+select.form-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(0, 240, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.form-input[type="select"]:hover,
+.form-input select:hover,
+select.form-input:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+}
+
 .player-form-submit {
   width: 100%;
   padding: 1.25rem 2rem;
