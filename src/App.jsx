@@ -17,6 +17,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ValorantPage from "./components/ValorantPage";
 import AdminManageHosts from "./components/AdminManageHosts";
 import AdminDashboard from "./components/AdminDashboard";
+import HostDashboard from "./components/HostDashboard";
 import { AuthProvider } from "./contexts/AuthContext";
 import { UserRolesProvider } from "./contexts/UserRolesContext";
 
@@ -91,6 +92,14 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <AdminManageHosts />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/host-dashboard"
+                element={
+                  <ProtectedRoute>
+                    <HostDashboard />
                   </ProtectedRoute>
                 }
               />

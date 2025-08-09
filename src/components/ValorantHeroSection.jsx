@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "./Button";
 import { useUserRoles } from "../contexts/UserRolesContext";
 
@@ -13,6 +14,7 @@ import jettImage2 from "/assets/jett.avif";
 const ValorantHeroSection = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { isPlayer, isHost, isAdmin } = useUserRoles();
+  const navigate = useNavigate();
 
   const images = [omenImage, trioImage, vyseImage, jettImage, jettImage2];
 
@@ -42,18 +44,15 @@ const ValorantHeroSection = () => {
   };
 
   const handleCreateTournament = () => {
-    // TODO: Navigate to create tournament page
-    console.log("Create tournament clicked");
+    navigate("/host-dashboard");
   };
 
   const handleMyCreatedTournaments = () => {
-    // TODO: Navigate to my created tournaments page
-    console.log("My created tournaments clicked");
+    navigate("/host-dashboard");
   };
 
   const handleCreateHosts = () => {
-    // TODO: Navigate to create hosts page
-    console.log("Create hosts clicked");
+    navigate("/admin/manage-hosts");
   };
 
   const handleBrowseAllTournaments = () => {
