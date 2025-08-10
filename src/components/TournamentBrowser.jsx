@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar";
 import BackButton from "./BackButton";
 import Button from "./Button";
@@ -12,7 +11,6 @@ const TournamentBrowser = () => {
   const [filteredTournaments, setFilteredTournaments] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("match_start_time");
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchTournaments();
@@ -344,6 +342,14 @@ const TournamentBrowser = () => {
                           <div className="info-value">
                             {tournament.region || "Global"}
                           </div>
+                        </div>
+                      </div>
+
+                      <div className="info-item gametype-info">
+                        <div className="info-icon">🎯</div>
+                        <div className="info-content">
+                          <div className="info-label">Game Type</div>
+                          <div className="info-value">Deathmatch</div>
                         </div>
                       </div>
                     </div>

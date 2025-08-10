@@ -425,7 +425,7 @@
 /* Tournament Info Grid */
 .tournament-info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   gap: 15px;
 }
 
@@ -524,6 +524,11 @@
 .region-info .info-icon {
   background: rgba(78, 205, 196, 0.2);
   color: #4ecdc4;
+}
+
+.gametype-info .info-icon {
+  background: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
 }
 
 .players-info .info-value {
@@ -726,7 +731,19 @@
 }
 
 /* Responsive Design */
+@media (max-width: 1200px) {
+  .tournament-info-grid {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+}
+
 @media (max-width: 768px) {
+  .tournament-info-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
   .tournament-browser-page {
     padding: 10px;
     padding-top: 80px;
