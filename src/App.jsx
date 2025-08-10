@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
+import "./styles/tournament-browser.css";
 import Navbar from "./components/Navbar";
 import HeroSection from "./components/HeroSection";
 import AboutSection from "./components/AboutSection";
@@ -15,6 +16,7 @@ import PlayerForm from "./components/PlayerForm";
 import BackButton from "./components/BackButton";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ValorantPage from "./components/ValorantPage";
+import TournamentBrowser from "./components/TournamentBrowser";
 import AdminManageHosts from "./components/AdminManageHosts";
 import AdminDashboard from "./components/AdminDashboard";
 import HostDashboard from "./components/HostDashboard";
@@ -79,6 +81,14 @@ const App = () => {
                 }
               />
               <Route path="/valorant" element={<ValorantPage />} />
+              <Route
+                path="/browse-tournaments"
+                element={
+                  <ProtectedRoute>
+                    <TournamentBrowser />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/admin"
                 element={

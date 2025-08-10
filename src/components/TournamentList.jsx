@@ -101,6 +101,7 @@ function TournamentList() {
                 {tournament.max_participants && (
                   <span>Max: {tournament.max_participants}</span>
                 )}
+                <span>Host: {tournament.host?.display_name || tournament.host?.username || "Unknown Host"}</span>
               </div>
               
               {/* Only show delete button if user is the creator */}

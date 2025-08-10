@@ -34,8 +34,7 @@ const ValorantHeroSection = () => {
   ];
 
   const handleBrowseTournaments = () => {
-    // TODO: Navigate to browse tournaments page
-    console.log("Browse tournaments clicked");
+    navigate("/browse-tournaments");
   };
 
   const handleMyTournaments = () => {
@@ -56,8 +55,7 @@ const ValorantHeroSection = () => {
   };
 
   const handleBrowseAllTournaments = () => {
-    // TODO: Navigate to browse all tournaments page
-    console.log("Browse all tournaments clicked");
+    navigate("/browse-tournaments");
   };
 
   return (
