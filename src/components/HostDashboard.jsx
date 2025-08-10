@@ -93,15 +93,7 @@ const HostDashboard = () => {
           </div>
         ) : tournaments.length === 0 ? (
           <div className="empty-state">
-            <p>No tournaments created yet. Create your first tournament!</p>
-            <Button
-              variant="primary"
-              onClick={() => setShowCreateForm(true)}
-              className="create-first-tournament-btn"
-            >
-              <span className="btn-icon">➕</span>
-              Create Your First Tournament
-            </Button>
+            <p>No tournaments created yet.</p>
           </div>
         ) : (
           <div className="tournaments-grid">
