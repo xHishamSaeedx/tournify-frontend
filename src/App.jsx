@@ -17,6 +17,7 @@ import BackButton from "./components/BackButton";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ValorantPage from "./components/ValorantPage";
 import TournamentBrowser from "./components/TournamentBrowser";
+import JoinedTournaments from "./components/JoinedTournaments";
 import AdminManageHosts from "./components/AdminManageHosts";
 import AdminDashboard from "./components/AdminDashboard";
 import HostDashboard from "./components/HostDashboard";
@@ -69,14 +70,7 @@ const App = () => {
                 path="/my-tournaments"
                 element={
                   <ProtectedRoute>
-                    <div className="my-tournaments-page">
-                      <Navbar />
-                      <div className="tournaments-container">
-                        <BackButton />
-                        <h1>My Tournaments</h1>
-                        <p>My tournaments page coming soon...</p>
-                      </div>
-                    </div>
+                    <JoinedTournaments />
                   </ProtectedRoute>
                 }
               />

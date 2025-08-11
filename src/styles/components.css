@@ -362,6 +362,26 @@
   box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
 }
 
+.btn-success {
+  background: #10b981;
+  color: white;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+}
+
+.btn-success:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+}
+
+.btn-success:disabled {
+  background: #6b7280;
+  color: #9ca3af;
+  transform: none;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
 /* Enhanced button effects */
 .btn-primary::before {
   content: "";

@@ -38,8 +38,7 @@ const ValorantHeroSection = () => {
   };
 
   const handleMyTournaments = () => {
-    // TODO: Navigate to my tournaments page
-    console.log("My tournaments clicked");
+    navigate("/my-tournaments");
   };
 
   const handleCreateTournament = () => {

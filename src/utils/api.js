@@ -85,6 +85,22 @@ export const api = {
     authenticatedApiCall(`/api/tournaments/${id}`, {
       method: "DELETE",
     }),
+  
+  // Tournament participation endpoints
+  joinTournament: (id) =>
+    authenticatedApiCall(`/api/tournaments/${id}/join`, {
+      method: "POST",
+    }),
+  leaveTournament: (id) =>
+    authenticatedApiCall(`/api/tournaments/${id}/leave`, {
+      method: "POST",
+    }),
+  getTournamentParticipants: (id) =>
+    authenticatedApiCall(`/api/tournaments/${id}/participants`),
+  getParticipationStatus: (id) =>
+    authenticatedApiCall(`/api/tournaments/${id}/participation`),
+  getJoinedTournaments: () =>
+    authenticatedApiCall(`/api/tournaments/joined/me`),
 
   // User endpoints
   getUsers: () => authenticatedApiCall("/api/users"),

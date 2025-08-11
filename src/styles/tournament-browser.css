@@ -13,9 +13,20 @@
 }
 
 .tournament-browser-header {
-  text-align: center;
   margin-bottom: 40px;
   color: white;
+}
+
+.tournament-browser-header .header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.tournament-browser-header .header-text {
+  text-align: left;
 }
 
 .tournament-browser-header h1 {
@@ -32,6 +43,41 @@
   font-size: 1.2rem;
   color: #a0aec0;
   margin: 0;
+}
+
+.tournament-browser-header .header-actions {
+  display: flex;
+  gap: 15px;
+}
+
+.my-tournaments-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #4a5568, #2d3748);
+  border: 2px solid #4a5568;
+  border-radius: 25px;
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.my-tournaments-btn:hover {
+  background: linear-gradient(135deg, #2d3748, #1a202c);
+  border-color: #4ecdc4;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(78, 205, 196, 0.3);
+}
+
+.my-tournaments-btn .button-text {
+  font-size: 0.9rem;
+}
+
+.my-tournaments-btn .button-icon {
+  font-size: 1rem;
 }
 
 /* Filters Section */
@@ -273,6 +319,13 @@
   background: rgba(78, 205, 196, 0.2);
   color: #4ecdc4;
   border: 1px solid rgba(78, 205, 196, 0.3);
+}
+
+.status-badge.joined {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  margin-left: 8px;
 }
 
 /* Tournament Details Container - New Modern Design */
@@ -753,12 +806,25 @@
     padding: 10px;
   }
 
+  .tournament-browser-header .header-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .tournament-browser-header .header-text {
+    text-align: center;
+  }
+
   .tournament-browser-header h1 {
     font-size: 2.2rem;
   }
 
   .tournament-browser-header p {
     font-size: 1rem;
+  }
+
+  .tournament-browser-header .header-actions {
+    justify-content: center;
   }
 
   .tournament-filters {
@@ -1091,5 +1157,140 @@
   }
   100% {
     transform: rotate(360deg);
+  }
+}
+
+/* Joined Tournaments Page Styles */
+.joined-tournaments-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #2d3748 100%);
+  padding: 20px;
+  padding-top: 100px;
+}
+
+.joined-tournaments-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.joined-tournaments-header {
+  text-align: center;
+  margin-bottom: 40px;
+  color: white;
+}
+
+.joined-tournaments-header h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, #4ecdc4, #45b7d1, #ff6b6b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.joined-tournaments-header p {
+  font-size: 1.2rem;
+  color: #a0aec0;
+  margin: 0;
+}
+
+/* Joined tournament specific styles */
+.tournament-row-card.joined {
+  border-left: 4px solid #4ecdc4;
+  background: linear-gradient(
+    135deg,
+    rgba(78, 205, 196, 0.1),
+    rgba(69, 183, 209, 0.1)
+  );
+}
+
+.tournament-row-card.joined::before {
+  background: linear-gradient(
+    135deg,
+    rgba(78, 205, 196, 0.2),
+    rgba(69, 183, 209, 0.2)
+  );
+}
+
+.joined-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
+.joined-label {
+  color: #a0aec0;
+  font-weight: 500;
+}
+
+.joined-date {
+  color: #4ecdc4;
+  font-weight: 600;
+}
+
+.status-badge.ended {
+  background: linear-gradient(135deg, #e53e3e, #c53030);
+  color: white;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.browse-btn {
+  margin-top: 20px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #4ecdc4, #45b7d1);
+  border: none;
+  border-radius: 25px;
+  color: white;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.browse-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(78, 205, 196, 0.4);
+}
+
+/* Responsive styles for joined tournaments */
+@media (max-width: 768px) {
+  .joined-tournaments-header h1 {
+    font-size: 2.5rem;
+  }
+
+  .joined-tournaments-header p {
+    font-size: 1rem;
+  }
+
+  .joined-info {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .joined-tournaments-header h1 {
+    font-size: 2rem;
+  }
+
+  .joined-tournaments-page {
+    padding: 15px;
+    padding-top: 80px;
+  }
+
+  .joined-tournaments-container {
+    padding: 15px;
   }
 }

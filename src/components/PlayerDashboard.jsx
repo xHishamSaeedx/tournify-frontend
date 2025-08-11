@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Button from "./Button";
 import { setUserRole } from "../utils/userRoles";
 import { useAuth } from "../contexts/AuthContext";
@@ -9,6 +10,7 @@ const PlayerDashboard = ({ game }) => {
   const [activeSection, setActiveSection] = useState(0);
   const [showHostForm, setShowHostForm] = useState(false);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   // Animated background effect
   useEffect(() => {
@@ -26,11 +28,15 @@ const PlayerDashboard = ({ game }) => {
   }, []);
 
   const handleBrowseTournaments = () => {
-    console.log("Browse tournaments clicked");
+    navigate("/browse-tournaments");
   };
 
   const handleJoinedTournaments = () => {
-    console.log("Joined tournaments clicked");
+    console.log(
+      "My Tournaments button clicked - navigating to /my-tournaments"
+    );
+    console.log("Current user:", user);
+    navigate("/my-tournaments");
   };
 
   const handleClaimMoney = () => {
@@ -57,10 +63,10 @@ const PlayerDashboard = ({ game }) => {
 
   // Get game-specific title
   const getGameTitle = () => {
-    if (game === 'valorant') {
-      return 'Valorant';
+    if (game === "valorant") {
+      return "Valorant";
     }
-    return 'Tournament';
+    return "Tournament";
   };
 
   return (
@@ -146,8 +152,8 @@ const PlayerDashboard = ({ game }) => {
                 <div className="section-text">
                   <h2 className="section-title">Quick Actions</h2>
                   <p className="section-description">
-                    Access your most important features and tournament management
-                    tools
+                    Access your most important features and tournament
+                    management tools
                   </p>
                 </div>
               </div>
@@ -209,8 +215,8 @@ const PlayerDashboard = ({ game }) => {
                 <div className="section-text">
                   <h2 className="section-title">Tournament Earnings</h2>
                   <p className="section-description">
-                    Collect your tournament earnings instantly with secure payment
-                    processing
+                    Collect your tournament earnings instantly with secure
+                    payment processing
                   </p>
                 </div>
               </div>
@@ -256,9 +262,12 @@ const PlayerDashboard = ({ game }) => {
                 <div className="icon-bg">📝</div>
               </div>
               <div className="section-text">
-                <h2 className="section-title">Become a {getGameTitle()} Host</h2>
+                <h2 className="section-title">
+                  Become a {getGameTitle()} Host
+                </h2>
                 <p className="section-description">
-                  Create and manage your own {getGameTitle().toLowerCase()} tournaments with professional tools
+                  Create and manage your own {getGameTitle().toLowerCase()}{" "}
+                  tournaments with professional tools
                 </p>
               </div>
             </div>
@@ -285,7 +294,9 @@ const PlayerDashboard = ({ game }) => {
                   className="apply-button-modern"
                 >
                   <span className="button-text">
-                    {isSubmitting ? "Redirecting..." : `Apply to Become ${getGameTitle()} Host`}
+                    {isSubmitting
+                      ? "Redirecting..."
+                      : `Apply to Become ${getGameTitle()} Host`}
                   </span>
                   <span className="button-icon">
                     {isSubmitting ? "⏳" : "🚀"}

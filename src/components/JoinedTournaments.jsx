@@ -5,112 +5,49 @@ import Button from "./Button";
 import { api } from "../utils/api";
 import { useAuth } from "../contexts/AuthContext";
 
-const TournamentBrowser = () => {
+const JoinedTournaments = () => {
   const { user } = useAuth();
-  const [tournaments, setTournaments] = useState([]);
+  const [joinedTournaments, setJoinedTournaments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filteredTournaments, setFilteredTournaments] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortBy, setSortBy] = useState("match_start_time");
-  const [participationStatus, setParticipationStatus] = useState({});
-  const [joiningTournament, setJoiningTournament] = useState(null);
-  const [loadingParticipation, setLoadingParticipation] = useState(false);
+  const [sortBy, setSortBy] = useState("joined_at");
+  const [leavingTournament, setLeavingTournament] = useState(null);
 
   useEffect(() => {
-    fetchTournaments();
-  }, []);
-
-  useEffect(() => {
-    if (user && tournaments.length > 0) {
-      fetchParticipationStatus();
+    if (user) {
+      fetchJoinedTournaments();
+    } else {
+      setLoading(false);
     }
-  }, [user, tournaments]);
+  }, [user]);
 
   useEffect(() => {
     filterAndSortTournaments();
-  }, [tournaments, searchTerm, sortBy]);
+  }, [joinedTournaments, searchTerm, sortBy]);
 
-  const fetchTournaments = async () => {
+  const fetchJoinedTournaments = async () => {
     try {
       setLoading(true);
-      const response = await api.getTournaments();
+      const response = await api.getJoinedTournaments();
 
       if (response.success) {
-        console.log("Tournaments data:", response.data);
-        if (response.data && response.data.length > 0) {
-          console.log("First tournament keys:", Object.keys(response.data[0]));
-          console.log("First tournament full object:", response.data[0]);
-          console.log("Tournament ID field:", response.data[0].tournament_id);
-        }
-        setTournaments(response.data || []);
+        console.log("Joined tournaments data:", response.data);
+        setJoinedTournaments(response.data || []);
       } else {
-        setError("Failed to fetch tournaments");
+        setError("Failed to fetch joined tournaments");
       }
     } catch (err) {
-      console.error("Error fetching tournaments:", err);
-      setError("Failed to load tournaments. Please try again.");
+      console.error("Error fetching joined tournaments:", err);
+      setError("Failed to load joined tournaments. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchParticipationStatus = async () => {
-    try {
-      setLoadingParticipation(true);
-      const statusPromises = tournaments.map(async (tournament) => {
-        const tournamentId = tournament.tournament_id;
-        if (!tournamentId) {
-          console.warn("Tournament missing tournament_id:", tournament);
-          return {
-            tournamentId: null,
-            isParticipant: false,
-          };
-        }
-        try {
-          const response = await api.getParticipationStatus(tournamentId);
-          return {
-            tournamentId: tournamentId,
-            isParticipant: response.success
-              ? response.data.isParticipant
-              : false,
-          };
-        } catch (error) {
-          console.error(
-            `Error fetching participation status for tournament ${tournamentId}:`,
-            error
-          );
-          return {
-            tournamentId: tournamentId,
-            isParticipant: false,
-          };
-        }
-      });
-
-      const statuses = await Promise.all(statusPromises);
-      const statusMap = {};
-      statuses.forEach((status) => {
-        statusMap[status.tournamentId] = status.isParticipant;
-      });
-      setParticipationStatus(statusMap);
-    } catch (error) {
-      console.error("Error fetching participation statuses:", error);
-    } finally {
-      setLoadingParticipation(false);
-    }
-  };
-
   const filterAndSortTournaments = () => {
-    let filtered = [...tournaments];
-
-    // Filter tournaments that are at least 5 minutes from match_start_time
-    const now = new Date();
-    const fiveMinutesFromNow = new Date(now.getTime() + 5 * 60 * 1000);
-
-    filtered = filtered.filter((tournament) => {
-      const matchStartTime = new Date(tournament.match_start_time);
-      return matchStartTime > fiveMinutesFromNow;
-    });
+    let filtered = [...joinedTournaments];
 
     // Apply search filter
     if (searchTerm) {
@@ -127,14 +64,12 @@ const TournamentBrowser = () => {
     // Apply sorting
     filtered.sort((a, b) => {
       switch (sortBy) {
+        case "joined_at":
+          return new Date(b.joined_at) - new Date(a.joined_at);
         case "match_start_time":
           return new Date(a.match_start_time) - new Date(b.match_start_time);
         case "prize_pool":
           return b.prize_pool - a.prize_pool;
-        case "joining_fee":
-          return a.joining_fee - b.joining_fee;
-        case "capacity":
-          return b.capacity - a.capacity;
         case "name":
           return a.name.localeCompare(b.name);
         default:
@@ -165,7 +100,9 @@ const TournamentBrowser = () => {
     const diffHours = Math.floor(diffMins / 60);
     const diffDays = Math.floor(diffHours / 24);
 
-    if (diffDays > 0) {
+    if (diffMs < 0) {
+      return "Tournament ended";
+    } else if (diffDays > 0) {
       return `${diffDays} day${diffDays > 1 ? "s" : ""} from now`;
     } else if (diffHours > 0) {
       return `${diffHours} hour${diffHours > 1 ? "s" : ""} from now`;
@@ -176,68 +113,13 @@ const TournamentBrowser = () => {
     }
   };
 
-  const handleJoinTournament = async (tournamentId) => {
-    if (!user) {
-      alert("Please sign in to join tournaments");
-      return;
-    }
-
-    if (!tournamentId) {
-      alert("Invalid tournament ID");
-      return;
-    }
-
-    try {
-      setJoiningTournament(tournamentId);
-      const response = await api.joinTournament(tournamentId);
-
-      if (response.success) {
-        // Update participation status
-        setParticipationStatus((prev) => ({
-          ...prev,
-          [tournamentId]: true,
-        }));
-
-        // Update tournament current_players count
-        setTournaments((prev) =>
-          prev.map((tournament) =>
-            tournament.tournament_id === tournamentId
-              ? {
-                  ...tournament,
-                  current_players: (tournament.current_players || 0) + 1,
-                }
-              : tournament
-          )
-        );
-
-        alert("Successfully joined tournament!");
-      } else {
-        alert(response.message || "Failed to join tournament");
-      }
-    } catch (error) {
-      console.error("Error joining tournament:", error);
-      let errorMessage = "Failed to join tournament";
-
-      if (error.message) {
-        if (error.message.includes("Profile incomplete")) {
-          errorMessage =
-            "Please complete your profile before joining tournaments. Go to your profile and fill in your username, Valorant ID, and VPA.";
-        } else if (error.message.includes("Tournament closed")) {
-          errorMessage =
-            "Tournament registration is closed. It starts in less than 5 minutes.";
-        } else if (error.message.includes("Already joined")) {
-          errorMessage = "You are already registered for this tournament.";
-        } else if (error.message.includes("Tournament full")) {
-          errorMessage = "This tournament is already full.";
-        } else {
-          errorMessage = error.message;
-        }
-      }
-
-      alert(errorMessage);
-    } finally {
-      setJoiningTournament(null);
-    }
+  const formatJoinedDate = (dateTimeString) => {
+    const date = new Date(dateTimeString);
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
   };
 
   const handleLeaveTournament = async (tournamentId) => {
@@ -251,29 +133,13 @@ const TournamentBrowser = () => {
     }
 
     try {
-      setJoiningTournament(tournamentId);
+      setLeavingTournament(tournamentId);
       const response = await api.leaveTournament(tournamentId);
 
       if (response.success) {
-        // Update participation status
-        setParticipationStatus((prev) => ({
-          ...prev,
-          [tournamentId]: false,
-        }));
-
-        // Update tournament current_players count
-        setTournaments((prev) =>
-          prev.map((tournament) =>
-            tournament.tournament_id === tournamentId
-              ? {
-                  ...tournament,
-                  current_players: Math.max(
-                    0,
-                    (tournament.current_players || 0) - 1
-                  ),
-                }
-              : tournament
-          )
+        // Remove tournament from joined tournaments list
+        setJoinedTournaments((prev) =>
+          prev.filter((tournament) => tournament.tournament_id !== tournamentId)
         );
 
         alert("Successfully left tournament!");
@@ -294,7 +160,7 @@ const TournamentBrowser = () => {
 
       alert(errorMessage);
     } finally {
-      setJoiningTournament(null);
+      setLeavingTournament(null);
     }
   };
 
@@ -304,15 +170,45 @@ const TournamentBrowser = () => {
     alert("Tournament details page coming soon!");
   };
 
+  if (!user) {
+    return (
+      <>
+        <Navbar />
+        <div className="joined-tournaments-page">
+          <BackButton />
+          <div className="signin-prompt-container">
+            <div className="signin-hero">
+              <div className="signin-icon">🎯</div>
+              <h2 className="signin-title">Sign In to View Joined Tournaments</h2>
+              <p className="signin-subtitle">
+                Access your tournament history and manage your participations
+              </p>
+            </div>
+
+            <div className="signin-actions">
+              <button
+                className="signin-btn primary"
+                onClick={() => (window.location.href = "/login")}
+              >
+                <span className="btn-icon">🚀</span>
+                Sign In
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   if (loading) {
     return (
       <>
         <Navbar />
-        <div className="tournament-browser-page">
+        <div className="joined-tournaments-page">
           <BackButton />
           <div className="loading-container">
             <div className="loading-spinner"></div>
-            <p>Loading tournaments...</p>
+            <p>Loading your joined tournaments...</p>
           </div>
         </div>
       </>
@@ -323,12 +219,12 @@ const TournamentBrowser = () => {
     return (
       <>
         <Navbar />
-        <div className="tournament-browser-page">
+        <div className="joined-tournaments-page">
           <BackButton />
           <div className="error-container">
-            <h2>Error Loading Tournaments</h2>
+            <h2>Error Loading Joined Tournaments</h2>
             <p>{error}</p>
-            <Button onClick={fetchTournaments} variant="primary">
+            <Button onClick={fetchJoinedTournaments} variant="primary">
               Try Again
             </Button>
           </div>
@@ -340,34 +236,20 @@ const TournamentBrowser = () => {
   return (
     <>
       <Navbar />
-      <div className="tournament-browser-page">
+      <div className="joined-tournaments-page">
         <BackButton />
 
-        <div className="tournament-browser-container">
-          <div className="tournament-browser-header">
-            <div className="header-content">
-              <div className="header-text">
-                <h1>Browse Tournaments</h1>
-                <p>Find and join exciting Valorant tournaments</p>
-              </div>
-              <div className="header-actions">
-                <Button
-                  variant="secondary"
-                  onClick={() => (window.location.href = "/my-tournaments")}
-                  className="my-tournaments-btn"
-                >
-                  <span className="button-text">My Tournaments</span>
-                  <span className="button-icon">📋</span>
-                </Button>
-              </div>
-            </div>
+        <div className="joined-tournaments-container">
+          <div className="joined-tournaments-header">
+            <h1>My Joined Tournaments</h1>
+            <p>Track your tournament participations and progress</p>
           </div>
 
           <div className="tournament-filters">
             <div className="search-container">
               <input
                 type="text"
-                placeholder="Search tournaments..."
+                placeholder="Search joined tournaments..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="search-input"
@@ -383,10 +265,9 @@ const TournamentBrowser = () => {
                 onChange={(e) => setSortBy(e.target.value)}
                 className="sort-select"
               >
+                <option value="joined_at">Join Date</option>
                 <option value="match_start_time">Start Time</option>
                 <option value="prize_pool">Prize Pool</option>
-                <option value="joining_fee">Entry Fee</option>
-                <option value="capacity">Capacity</option>
                 <option value="name">Name</option>
               </select>
             </div>
@@ -395,7 +276,7 @@ const TournamentBrowser = () => {
           <div className="tournament-stats">
             <div className="stat-card">
               <span className="stat-number">{filteredTournaments.length}</span>
-              <span className="stat-label">Available Tournaments</span>
+              <span className="stat-label">Joined Tournaments</span>
             </div>
             <div className="stat-card">
               <span className="stat-number">
@@ -406,24 +287,42 @@ const TournamentBrowser = () => {
               </span>
               <span className="stat-label">Total Prize Pool</span>
             </div>
+            <div className="stat-card">
+              <span className="stat-number">
+                {filteredTournaments.filter((t) => {
+                  const matchTime = new Date(t.match_start_time);
+                  return matchTime > new Date();
+                }).length}
+              </span>
+              <span className="stat-label">Upcoming Tournaments</span>
+            </div>
           </div>
 
           {filteredTournaments.length === 0 ? (
             <div className="no-tournaments">
               <div className="no-tournaments-icon">🏆</div>
-              <h3>No tournaments available</h3>
+              <h3>No joined tournaments</h3>
               <p>
                 {searchTerm
-                  ? "No tournaments match your search criteria."
-                  : "Check back later for new tournaments!"}
+                  ? "No joined tournaments match your search criteria."
+                  : "You haven't joined any tournaments yet. Browse tournaments to get started!"}
               </p>
+              {!searchTerm && (
+                <Button
+                  onClick={() => (window.location.href = "/browse-tournaments")}
+                  variant="primary"
+                  className="browse-btn"
+                >
+                  Browse Tournaments
+                </Button>
+              )}
             </div>
           ) : (
             <div className="tournaments-list">
               {filteredTournaments.map((tournament) => (
                 <div
                   key={tournament.tournament_id || tournament.name}
-                  className="tournament-row-card"
+                  className="tournament-row-card joined"
                 >
                   <div className="tournament-main-info">
                     <div className="tournament-name-host">
@@ -436,11 +335,19 @@ const TournamentBrowser = () => {
                             "Unknown Host"}
                         </span>
                       </div>
+                      <div className="joined-info">
+                        <span className="joined-label">Joined:</span>
+                        <span className="joined-date">
+                          {formatJoinedDate(tournament.joined_at)}
+                        </span>
+                      </div>
                     </div>
                     <div className="tournament-status">
-                      <span className="status-badge upcoming">Upcoming</span>
-                      {participationStatus[tournament.tournament_id] && (
-                        <span className="status-badge joined">✓ Joined</span>
+                      <span className="status-badge joined">✓ Joined</span>
+                      {new Date(tournament.match_start_time) > new Date() ? (
+                        <span className="status-badge upcoming">Upcoming</span>
+                      ) : (
+                        <span className="status-badge ended">Ended</span>
                       )}
                     </div>
                   </div>
@@ -461,21 +368,15 @@ const TournamentBrowser = () => {
                       <div className="payout-breakdown">
                         <div className="payout-item">
                           <span className="place">1st</span>
-                          <span className="percentage">
-                            {(tournament.prize_first_pct * 100).toFixed(0)}%
-                          </span>
+                          <span className="percentage">60%</span>
                         </div>
                         <div className="payout-item">
                           <span className="place">2nd</span>
-                          <span className="percentage">
-                            {(tournament.prize_second_pct * 100).toFixed(0)}%
-                          </span>
+                          <span className="percentage">30%</span>
                         </div>
                         <div className="payout-item">
                           <span className="place">3rd</span>
-                          <span className="percentage">
-                            {(tournament.prize_third_pct * 100).toFixed(0)}%
-                          </span>
+                          <span className="percentage">10%</span>
                         </div>
                       </div>
 
@@ -554,52 +455,18 @@ const TournamentBrowser = () => {
                   </div>
 
                   <div className="tournament-actions">
-                    {!user ? (
-                      <Button
-                        variant="primary"
-                        onClick={() =>
-                          alert("Please sign in to join tournaments")
-                        }
-                        className="join-btn"
-                        disabled
-                      >
-                        Sign In to Join
-                      </Button>
-                    ) : loadingParticipation ? (
-                      <Button variant="primary" className="join-btn" disabled>
-                        Loading...
-                      </Button>
-                    ) : participationStatus[tournament.tournament_id] ? (
-                      <Button
-                        variant="secondary"
-                        onClick={() =>
-                          handleLeaveTournament(tournament.tournament_id)
-                        }
-                        className="leave-btn"
-                        disabled={
-                          joiningTournament === tournament.tournament_id
-                        }
-                      >
-                        {joiningTournament === tournament.tournament_id
-                          ? "Leaving..."
-                          : "Leave Tournament"}
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="primary"
-                        onClick={() =>
-                          handleJoinTournament(tournament.tournament_id)
-                        }
-                        className="join-btn"
-                        disabled={
-                          joiningTournament === tournament.tournament_id
-                        }
-                      >
-                        {joiningTournament === tournament.tournament_id
-                          ? "Joining..."
-                          : "Join Tournament"}
-                      </Button>
-                    )}
+                    <Button
+                      variant="secondary"
+                      onClick={() =>
+                        handleLeaveTournament(tournament.tournament_id)
+                      }
+                      className="leave-btn"
+                      disabled={leavingTournament === tournament.tournament_id}
+                    >
+                      {leavingTournament === tournament.tournament_id
+                        ? "Leaving..."
+                        : "Leave Tournament"}
+                    </Button>
                     <Button
                       variant="secondary"
                       onClick={() =>
@@ -620,4 +487,4 @@ const TournamentBrowser = () => {
   );
 };
 
-export default TournamentBrowser;
+export default JoinedTournaments;
