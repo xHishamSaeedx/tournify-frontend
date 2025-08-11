@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "./Navbar";
 import BackButton from "./BackButton";
 import Button from "./Button";
+import ConfirmationModal from "./ConfirmationModal";
 import { api } from "../utils/api";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -14,6 +15,10 @@ const JoinedTournaments = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("joined_at");
   const [leavingTournament, setLeavingTournament] = useState(null);
+  const [showLeaveConfirmation, setShowLeaveConfirmation] = useState(false);
+  const [showPenaltyWarning, setShowPenaltyWarning] = useState(false);
+  const [pendingLeaveTournament, setPendingLeaveTournament] = useState(null);
+  const [penaltyTournament, setPenaltyTournament] = useState(null);
 
   useEffect(() => {
     if (user) {
@@ -128,21 +133,47 @@ const JoinedTournaments = () => {
       return;
     }
 
-    if (!confirm("Are you sure you want to leave this tournament?")) {
+    // Find the tournament to check match start time
+    const tournament = joinedTournaments.find(
+      (t) => t.tournament_id === tournamentId
+    );
+    if (!tournament) {
+      alert("Tournament not found");
       return;
     }
 
+    // Check if match starts within 15 minutes
+    const matchStartTime = new Date(tournament.match_start_time);
+    const currentTime = new Date();
+    const timeDifference = matchStartTime.getTime() - currentTime.getTime();
+    const minutesUntilMatch = Math.floor(timeDifference / (1000 * 60));
+
+    if (minutesUntilMatch <= 15) {
+      setPenaltyTournament(tournament);
+      setShowPenaltyWarning(true);
+      return;
+    }
+
+    // Show confirmation modal
+    setPendingLeaveTournament(tournament);
+    setShowLeaveConfirmation(true);
+  };
+
+  const handleConfirmLeaveTournament = async () => {
+    const tournament = pendingLeaveTournament;
+    if (!tournament) return;
+
     try {
-      setLeavingTournament(tournamentId);
-      const response = await api.leaveTournament(tournamentId);
+      setLeavingTournament(tournament.tournament_id);
+      const response = await api.leaveTournament(tournament.tournament_id);
 
       if (response.success) {
         // Remove tournament from joined tournaments list
         setJoinedTournaments((prev) =>
-          prev.filter((tournament) => tournament.tournament_id !== tournamentId)
+          prev.filter((t) => t.tournament_id !== tournament.tournament_id)
         );
 
-        alert("Successfully left tournament!");
+        alert(response.message || "Successfully left tournament!");
       } else {
         alert(response.message || "Failed to leave tournament");
       }
@@ -153,6 +184,13 @@ const JoinedTournaments = () => {
       if (error.message) {
         if (error.message.includes("Not a participant")) {
           errorMessage = "You are not registered for this tournament.";
+        } else if (
+          error.message.includes("Cannot leave tournament within 15 minutes")
+        ) {
+          errorMessage =
+            "Cannot leave tournament within 15 minutes of match start time.";
+        } else if (error.message.includes("Tournament not found")) {
+          errorMessage = "Tournament not found.";
         } else {
           errorMessage = error.message;
         }
@@ -175,7 +213,10 @@ const JoinedTournaments = () => {
       <>
         <Navbar />
         <div className="joined-tournaments-page">
-          <BackButton destination="/valorant" buttonText="Back to Valorant Page" />
+          <BackButton
+            destination="/valorant"
+            buttonText="Back to Valorant Page"
+          />
           <div className="signin-prompt-container">
             <div className="signin-hero">
               <div className="signin-icon">🎯</div>
@@ -207,7 +248,10 @@ const JoinedTournaments = () => {
       <>
         <Navbar />
         <div className="joined-tournaments-page">
-          <BackButton destination="/valorant" buttonText="Back to Valorant Page" />
+          <BackButton
+            destination="/valorant"
+            buttonText="Back to Valorant Page"
+          />
           <div className="loading-container">
             <div className="loading-spinner"></div>
             <p>Loading your joined tournaments...</p>
@@ -222,7 +266,10 @@ const JoinedTournaments = () => {
       <>
         <Navbar />
         <div className="joined-tournaments-page">
-          <BackButton destination="/valorant" buttonText="Back to Valorant Page" />
+          <BackButton
+            destination="/valorant"
+            buttonText="Back to Valorant Page"
+          />
           <div className="error-container">
             <h2>Error Loading Joined Tournaments</h2>
             <p>{error}</p>
@@ -239,7 +286,10 @@ const JoinedTournaments = () => {
     <>
       <Navbar />
       <div className="joined-tournaments-page">
-        <BackButton destination="/valorant" buttonText="Back to Valorant Page" />
+        <BackButton
+          destination="/valorant"
+          buttonText="Back to Valorant Page"
+        />
 
         <div className="joined-tournaments-container">
           <div className="joined-tournaments-header">
@@ -493,8 +543,67 @@ const JoinedTournaments = () => {
           )}
         </div>
       </div>
-    </>
-  );
+
+             {/* Leave Tournament Confirmation Modal */}
+       <ConfirmationModal
+         isOpen={showLeaveConfirmation}
+         onClose={() => setShowLeaveConfirmation(false)}
+         onConfirm={handleConfirmLeaveTournament}
+         title="Confirm Tournament Cancellation"
+         message={
+           pendingLeaveTournament
+             ? `⚠️ Are you sure you want to leave "${
+                 pendingLeaveTournament.name
+               }"?
+
+• You will be refunded only 50% of your joining fee ($${Math.floor(
+                 (pendingLeaveTournament.joining_fee || 0) * 0.5
+               )})
+• This action cannot be undone
+• You will lose your tournament spot
+
+Are you sure you want to proceed?`
+             : ""
+         }
+         confirmText="Leave Tournament"
+         cancelText="Stay in Tournament"
+         confirmButtonClass="confirm-btn"
+         cancelButtonClass="cancel-btn"
+       />
+
+       {/* Penalty Warning Modal */}
+       <ConfirmationModal
+         isOpen={showPenaltyWarning}
+         onClose={() => setShowPenaltyWarning(false)}
+         onConfirm={() => setShowPenaltyWarning(false)}
+         title="⚠️ Tournament Locked"
+         message={
+           penaltyTournament
+             ? `You cannot leave "${
+                 penaltyTournament.name
+               }" at this time.
+
+The tournament starts in ${Math.max(
+                 0,
+                 Math.floor(
+                   (new Date(penaltyTournament.match_start_time).getTime() -
+                     new Date().getTime()) /
+                     (1000 * 60)
+                 )
+               )} minutes.
+
+🚨 **IMPORTANT**: If you are found not joining the match, you will be issued a penalty that may affect your future tournament participation.
+
+Please ensure you are ready to participate in the tournament.`
+             : ""
+         }
+         confirmText="I Understand"
+         cancelText=""
+         confirmButtonClass="confirm-btn"
+         cancelButtonClass="cancel-btn"
+       />
+     </>
+   );
 };
 
 export default JoinedTournaments;

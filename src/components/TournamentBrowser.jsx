@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Navbar from "./Navbar";
 import BackButton from "./BackButton";
 import Button from "./Button";
+import ConfirmationModal from "./ConfirmationModal";
 import { api } from "../utils/api";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -16,6 +17,12 @@ const TournamentBrowser = () => {
   const [participationStatus, setParticipationStatus] = useState({});
   const [joiningTournament, setJoiningTournament] = useState(null);
   const [loadingParticipation, setLoadingParticipation] = useState(false);
+  const [showJoinConfirmation, setShowJoinConfirmation] = useState(false);
+  const [showLeaveConfirmation, setShowLeaveConfirmation] = useState(false);
+  const [showPenaltyWarning, setShowPenaltyWarning] = useState(false);
+  const [pendingTournamentId, setPendingTournamentId] = useState(null);
+  const [pendingLeaveTournament, setPendingLeaveTournament] = useState(null);
+  const [penaltyTournament, setPenaltyTournament] = useState(null);
 
   useEffect(() => {
     fetchTournaments();
@@ -187,6 +194,14 @@ const TournamentBrowser = () => {
       return;
     }
 
+    // Show confirmation modal first
+    setPendingTournamentId(tournamentId);
+    setShowJoinConfirmation(true);
+  };
+
+  const handleConfirmJoinTournament = async () => {
+    const tournamentId = pendingTournamentId;
+
     try {
       setJoiningTournament(tournamentId);
       const response = await api.joinTournament(tournamentId);
@@ -246,37 +261,60 @@ const TournamentBrowser = () => {
       return;
     }
 
-    if (!confirm("Are you sure you want to leave this tournament?")) {
+    // Find the tournament to check match start time
+    const tournament = tournaments.find(
+      (t) => t.tournament_id === tournamentId
+    );
+    if (!tournament) {
+      alert("Tournament not found");
       return;
     }
 
+    // Check if match starts within 15 minutes
+    const matchStartTime = new Date(tournament.match_start_time);
+    const currentTime = new Date();
+    const timeDifference = matchStartTime.getTime() - currentTime.getTime();
+    const minutesUntilMatch = Math.floor(timeDifference / (1000 * 60));
+
+    if (minutesUntilMatch <= 15) {
+      setPenaltyTournament(tournament);
+      setShowPenaltyWarning(true);
+      return;
+    }
+
+    // Show confirmation modal
+    setPendingLeaveTournament(tournament);
+    setShowLeaveConfirmation(true);
+  };
+
+  const handleConfirmLeaveTournament = async () => {
+    const tournament = pendingLeaveTournament;
+    if (!tournament) return;
+
     try {
-      setJoiningTournament(tournamentId);
-      const response = await api.leaveTournament(tournamentId);
+      setJoiningTournament(tournament.tournament_id);
+      const response = await api.leaveTournament(tournament.tournament_id);
 
       if (response.success) {
         // Update participation status
         setParticipationStatus((prev) => ({
           ...prev,
-          [tournamentId]: false,
+          [tournament.tournament_id]: false,
         }));
 
         // Update tournament current_players count
         setTournaments((prev) =>
-          prev.map((tournament) =>
-            tournament.tournament_id === tournamentId
+          prev.map((t) =>
+            t.tournament_id === tournament.tournament_id
               ? {
-                  ...tournament,
-                  current_players: Math.max(
-                    0,
-                    (tournament.current_players || 0) - 1
-                  ),
+                  ...t,
+                  current_players: Math.max(0, (t.current_players || 0) - 1),
                 }
-              : tournament
+              : t
           )
         );
 
-        alert("Successfully left tournament!");
+        alert(response.message || "Successfully left tournament!");
       } else {
         alert(response.message || "Failed to leave tournament");
       }
@@ -287,6 +325,13 @@ const TournamentBrowser = () => {
       if (error.message) {
         if (error.message.includes("Not a participant")) {
           errorMessage = "You are not registered for this tournament.";
+        } else if (
+          error.message.includes("Cannot leave tournament within 15 minutes")
+        ) {
+          errorMessage =
+            "Cannot leave tournament within 15 minutes of match start time.";
+        } else if (error.message.includes("Tournament not found")) {
+          errorMessage = "Tournament not found.";
         } else {
           errorMessage = error.message;
         }
@@ -638,6 +683,84 @@ const TournamentBrowser = () => {
           <span className="floating-icon">🏆</span>
         </Button>
       </div>
+
+      {/* Join Tournament Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showJoinConfirmation}
+        onClose={() => setShowJoinConfirmation(false)}
+        onConfirm={handleConfirmJoinTournament}
+        title="Confirm Tournament Registration"
+        message="⚠️ Important: By joining this tournament, you agree to the following terms:
+
+• If you leave the tournament, there will be a 50% cancellation fee
+• You will only receive half of your credits back upon cancellation
+• No cancellations are allowed within 15 minutes of the match start time
+
+Are you sure you want to join this tournament?"
+        confirmText="Join Tournament"
+        cancelText="Cancel"
+        confirmButtonClass="confirm-btn"
+        cancelButtonClass="cancel-btn"
+      />
+
+      {/* Leave Tournament Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showLeaveConfirmation}
+        onClose={() => setShowLeaveConfirmation(false)}
+        onConfirm={handleConfirmLeaveTournament}
+        title="Confirm Tournament Cancellation"
+        message={
+          pendingLeaveTournament
+            ? `⚠️ Are you sure you want to leave "${
+                pendingLeaveTournament.name
+              }"?
+
+• You will be refunded only 50% of your joining fee ($${Math.floor(
+                (pendingLeaveTournament.joining_fee || 0) * 0.5
+              )})
+• This action cannot be undone
+• You will lose your tournament spot
+
+Are you sure you want to proceed?`
+            : ""
+        }
+        confirmText="Leave Tournament"
+        cancelText="Stay in Tournament"
+        confirmButtonClass="confirm-btn"
+        cancelButtonClass="cancel-btn"
+      />
+
+      {/* Penalty Warning Modal */}
+      <ConfirmationModal
+        isOpen={showPenaltyWarning}
+        onClose={() => setShowPenaltyWarning(false)}
+        onConfirm={() => setShowPenaltyWarning(false)}
+        title="⚠️ Tournament Locked"
+        message={
+          penaltyTournament
+            ? `You cannot leave "${
+                penaltyTournament.name
+              }" at this time.
+
+The tournament starts in ${Math.max(
+                0,
+                Math.floor(
+                  (new Date(penaltyTournament.match_start_time).getTime() -
+                    new Date().getTime()) /
+                    (1000 * 60)
+                )
+              )} minutes.
+
+🚨 **IMPORTANT**: If you are found not joining the match, you will be issued a penalty that may affect your future tournament participation.
+
+Please ensure you are ready to participate in the tournament.`
+            : ""
+        }
+        confirmText="I Understand"
+        cancelText=""
+        confirmButtonClass="confirm-btn"
+        cancelButtonClass="cancel-btn"
+      />
     </>
   );
 };
