@@ -21,6 +21,8 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
   const [userTimezone, setUserTimezone] = useState("");
+  const [existingTournaments, setExistingTournaments] = useState([]);
+  const [isCheckingConflicts, setIsCheckingConflicts] = useState(false);
   const { user } = useAuth();
 
   // Detect user's timezone on component mount
@@ -28,6 +30,24 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     setUserTimezone(timezone);
   }, []);
+
+  // Fetch existing tournaments for the current host
+  React.useEffect(() => {
+    const fetchExistingTournaments = async () => {
+      if (!user) return;
+      
+      try {
+        const response = await api.getHostTournaments(user.id);
+        if (response.success) {
+          setExistingTournaments(response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching existing tournaments:", error);
+      }
+    };
+
+    fetchExistingTournaments();
+  }, [user]);
 
   // Check and clear match start time if it becomes invalid (less than 15 minutes from now)
   React.useEffect(() => {
@@ -109,6 +129,29 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
 
       return newData;
     });
+
+    // Check for time conflicts in real-time when match start time changes
+    if (name === "match_start_time" && value) {
+      setIsCheckingConflicts(true);
+      
+      // Use setTimeout to debounce the conflict check
+      setTimeout(() => {
+        const conflict = checkTimeConflicts(value);
+        if (conflict) {
+          setErrors((prev) => ({
+            ...prev,
+            match_start_time: `Time conflict detected! You have another tournament "${conflict.tournament.name}" starting in ${conflict.minutesDifference} minutes. There must be at least a 20-minute gap between your tournaments.`,
+          }));
+        } else {
+          // Clear the error if no conflict
+          setErrors((prev) => ({
+            ...prev,
+            match_start_time: "",
+          }));
+        }
+        setIsCheckingConflicts(false);
+      }, 500); // 500ms debounce
+    }
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
@@ -196,6 +239,28 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
     return Math.ceil(basePrizePool + hostContributionToPrizePool);
   };
 
+  // Check for time conflicts with existing tournaments
+  const checkTimeConflicts = (newStartTime) => {
+    if (!newStartTime || existingTournaments.length === 0) return null;
+    
+    const newTime = new Date(newStartTime);
+    
+    for (const tournament of existingTournaments) {
+      const existingTime = new Date(tournament.match_start_time);
+      const timeDifference = Math.abs(newTime.getTime() - existingTime.getTime());
+      const minutesDifference = timeDifference / (1000 * 60);
+      
+      if (minutesDifference < 20) {
+        return {
+          tournament: tournament,
+          minutesDifference: Math.round(minutesDifference),
+        };
+      }
+    }
+    
+    return null;
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -214,6 +279,13 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
       if (matchStartTime < minTime) {
         newErrors.match_start_time =
           "Match start time must be at least 15 minutes from now";
+      } else {
+        // Check for conflicts with existing tournaments
+        const conflict = checkTimeConflicts(formData.match_start_time);
+        if (conflict) {
+          newErrors.match_start_time =
+            `Time conflict detected! You have another tournament "${conflict.tournament.name}" starting in ${conflict.minutesDifference} minutes. There must be at least a 20-minute gap between your tournaments.`;
+        }
       }
     }
 
@@ -411,11 +483,19 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
             {errors.match_start_time && (
               <span className="error-message">{errors.match_start_time}</span>
             )}
+            {isCheckingConflicts && (
+              <div className="checking-conflicts">
+                🔍 Checking for time conflicts...
+              </div>
+            )}
             {userTimezone && (
               <div className="timezone-info">Your timezone: {userTimezone}</div>
             )}
             <div className="input-hint">
               ⏰ Select a time at least 15 minutes from now
+            </div>
+            <div className="input-hint">
+              ⚠️ There must be at least a 20-minute gap between your tournaments
             </div>
           </div>
 

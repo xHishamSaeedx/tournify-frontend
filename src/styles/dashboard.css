@@ -2472,6 +2472,16 @@
   font-style: italic;
 }
 
+.checking-conflicts {
+  font-size: 0.8rem;
+  color: var(--primary-color);
+  margin-top: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
 .disabled-input {
   opacity: 0.6;
   cursor: not-allowed;
