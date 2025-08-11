@@ -309,7 +309,10 @@ const TournamentBrowser = () => {
       <>
         <Navbar />
         <div className="tournament-browser-page">
-          <BackButton />
+          <BackButton
+            destination="/valorant"
+            buttonText="Back to Valorant Page"
+          />
           <div className="loading-container">
             <div className="loading-spinner"></div>
             <p>Loading tournaments...</p>
@@ -324,7 +327,10 @@ const TournamentBrowser = () => {
       <>
         <Navbar />
         <div className="tournament-browser-page">
-          <BackButton />
+          <BackButton
+            destination="/valorant"
+            buttonText="Back to Valorant Page"
+          />
           <div className="error-container">
             <h2>Error Loading Tournaments</h2>
             <p>{error}</p>
@@ -341,7 +347,10 @@ const TournamentBrowser = () => {
     <>
       <Navbar />
       <div className="tournament-browser-page">
-        <BackButton />
+        <BackButton
+          destination="/valorant"
+          buttonText="Back to Valorant Page"
+        />
 
         <div className="tournament-browser-container">
           <div className="tournament-browser-header">
@@ -352,12 +361,13 @@ const TournamentBrowser = () => {
               </div>
               <div className="header-actions">
                 <Button
-                  variant="secondary"
+                  variant="primary"
                   onClick={() => (window.location.href = "/my-tournaments")}
-                  className="my-tournaments-btn"
+                  className="my-tournaments-btn-prominent"
                 >
+                  <span className="button-icon">🏆</span>
                   <span className="button-text">My Tournaments</span>
-                  <span className="button-icon">📋</span>
+                  <span className="button-arrow">→</span>
                 </Button>
               </div>
             </div>
@@ -615,6 +625,18 @@ const TournamentBrowser = () => {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Floating Action Button for My Tournaments */}
+      <div className="floating-my-tournaments">
+        <Button
+          variant="primary"
+          onClick={() => (window.location.href = "/my-tournaments")}
+          className="floating-my-tournaments-btn"
+          title="My Tournaments"
+        >
+          <span className="floating-icon">🏆</span>
+        </Button>
       </div>
     </>
   );

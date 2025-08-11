@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Button from "./Button";
+import BackButton from "./BackButton";
 import { useAuth } from "../contexts/AuthContext";
 import CreateTournamentForm from "./CreateTournamentForm";
 import { api } from "../utils/api";
@@ -151,6 +152,7 @@ const HostDashboard = () => {
 
   return (
     <div className="host-dashboard">
+      <BackButton destination="/valorant" buttonText="Back to Valorant Page" />
       <div className="dashboard-header">
         <div className="header-content">
           <div className="header-text">

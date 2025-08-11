@@ -1,16 +1,18 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "./Navbar";
 import ValorantHeroSection from "./ValorantHeroSection";
 import BackButton from "./BackButton";
 import PlayerDashboard from "./PlayerDashboard";
 import HostDashboard from "./HostDashboard";
 import AdminDashboard from "./AdminDashboard";
+import CreateTournamentForm from "./CreateTournamentForm";
 import { useUserRoles } from "../contexts/UserRolesContext";
 import { useAuth } from "../contexts/AuthContext";
 
 const ValorantPage = () => {
   const { loading, isPlayer, isAdmin } = useUserRoles();
   const { user } = useAuth();
+  const [showCreateForm, setShowCreateForm] = useState(false);
 
   // Scroll to top when component mounts
   useEffect(() => {
@@ -37,7 +39,7 @@ const ValorantPage = () => {
       <Navbar />
       <div className="valorant-page">
         <BackButton />
-        <ValorantHeroSection />
+        <ValorantHeroSection onShowCreateForm={() => setShowCreateForm(true)} />
 
         {/* Role-based dashboard */}
         <div className="dashboard-section">
@@ -70,6 +72,25 @@ const ValorantPage = () => {
           ) : null}
         </div>
       </div>
+
+      {/* Create Tournament Form Modal */}
+      {showCreateForm && (
+        <div className="modal-overlay" onClick={() => setShowCreateForm(false)}>
+          <div
+            className="modal-content create-form-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <CreateTournamentForm
+              onClose={() => setShowCreateForm(false)}
+              onSuccess={(tournament) => {
+                console.log("Tournament created:", tournament);
+                setShowCreateForm(false);
+                // Optionally refresh or redirect
+              }}
+            />
+          </div>
+        </div>
+      )}
     </>
   );
 };

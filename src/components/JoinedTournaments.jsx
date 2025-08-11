@@ -175,11 +175,13 @@ const JoinedTournaments = () => {
       <>
         <Navbar />
         <div className="joined-tournaments-page">
-          <BackButton />
+          <BackButton destination="/valorant" buttonText="Back to Valorant Page" />
           <div className="signin-prompt-container">
             <div className="signin-hero">
               <div className="signin-icon">🎯</div>
-              <h2 className="signin-title">Sign In to View Joined Tournaments</h2>
+              <h2 className="signin-title">
+                Sign In to View Joined Tournaments
+              </h2>
               <p className="signin-subtitle">
                 Access your tournament history and manage your participations
               </p>
@@ -205,7 +207,7 @@ const JoinedTournaments = () => {
       <>
         <Navbar />
         <div className="joined-tournaments-page">
-          <BackButton />
+          <BackButton destination="/valorant" buttonText="Back to Valorant Page" />
           <div className="loading-container">
             <div className="loading-spinner"></div>
             <p>Loading your joined tournaments...</p>
@@ -220,7 +222,7 @@ const JoinedTournaments = () => {
       <>
         <Navbar />
         <div className="joined-tournaments-page">
-          <BackButton />
+          <BackButton destination="/valorant" buttonText="Back to Valorant Page" />
           <div className="error-container">
             <h2>Error Loading Joined Tournaments</h2>
             <p>{error}</p>
@@ -237,12 +239,27 @@ const JoinedTournaments = () => {
     <>
       <Navbar />
       <div className="joined-tournaments-page">
-        <BackButton />
+        <BackButton destination="/valorant" buttonText="Back to Valorant Page" />
 
         <div className="joined-tournaments-container">
           <div className="joined-tournaments-header">
-            <h1>My Joined Tournaments</h1>
-            <p>Track your tournament participations and progress</p>
+            <div className="header-content">
+              <div className="header-text">
+                <h1>My Joined Tournaments</h1>
+                <p>Track your tournament participations and progress</p>
+              </div>
+              <div className="header-actions">
+                <Button
+                  variant="primary"
+                  onClick={() => (window.location.href = "/browse-tournaments")}
+                  className="browse-tournaments-btn-prominent"
+                >
+                  <span className="button-icon">🔍</span>
+                  <span className="button-text">Browse Tournaments</span>
+                  <span className="button-arrow">→</span>
+                </Button>
+              </div>
+            </div>
           </div>
 
           <div className="tournament-filters">
@@ -289,10 +306,12 @@ const JoinedTournaments = () => {
             </div>
             <div className="stat-card">
               <span className="stat-number">
-                {filteredTournaments.filter((t) => {
-                  const matchTime = new Date(t.match_start_time);
-                  return matchTime > new Date();
-                }).length}
+                {
+                  filteredTournaments.filter((t) => {
+                    const matchTime = new Date(t.match_start_time);
+                    return matchTime > new Date();
+                  }).length
+                }
               </span>
               <span className="stat-label">Upcoming Tournaments</span>
             </div>
@@ -307,15 +326,6 @@ const JoinedTournaments = () => {
                   ? "No joined tournaments match your search criteria."
                   : "You haven't joined any tournaments yet. Browse tournaments to get started!"}
               </p>
-              {!searchTerm && (
-                <Button
-                  onClick={() => (window.location.href = "/browse-tournaments")}
-                  variant="primary"
-                  className="browse-btn"
-                >
-                  Browse Tournaments
-                </Button>
-              )}
             </div>
           ) : (
             <div className="tournaments-list">

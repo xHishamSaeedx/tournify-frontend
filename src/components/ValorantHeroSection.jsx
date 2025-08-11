@@ -11,7 +11,7 @@ import jettImage from "/assets/jett.png";
 import jettImage2 from "/assets/jett.avif";
 
 // Valorant Hero Section Component
-const ValorantHeroSection = () => {
+const ValorantHeroSection = ({ onShowCreateForm }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { isPlayer, isHost, isAdmin } = useUserRoles();
   const navigate = useNavigate();
@@ -42,7 +42,11 @@ const ValorantHeroSection = () => {
   };
 
   const handleCreateTournament = () => {
-    navigate("/host-dashboard");
+    if (onShowCreateForm) {
+      onShowCreateForm();
+    } else {
+      navigate("/host-dashboard");
+    }
   };
 
   const handleMyCreatedTournaments = () => {
