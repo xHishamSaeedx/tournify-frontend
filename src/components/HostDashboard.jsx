@@ -49,8 +49,8 @@ const HostDashboard = () => {
   };
 
   const handleViewDetails = (tournament) => {
-    setSelectedTournament(tournament);
-    setShowDetailsModal(true);
+    // Navigate to host tournament room page
+    window.location.href = `/host/tournament/${tournament.tournament_id}`;
   };
 
   const closeDetailsModal = () => {

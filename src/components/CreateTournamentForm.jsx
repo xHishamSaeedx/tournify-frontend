@@ -17,6 +17,7 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
     host_contribution: "0", // Default 0 host contribution
     platform: "pc", // Default to PC
     region: "eu", // Default to EU
+    match_map: "", // Default empty for map selection
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
@@ -382,15 +383,16 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
         // Map to correct Supabase column names
         capacity: parseInt(formData.capacity) || 16,
         joining_fee: parseFloat(formData.joining_fee) || 0,
-        prize_first_pct: parseFloat(formData.prize_first_pct) || 50,
-        prize_second_pct: parseFloat(formData.prize_second_pct) || 30,
-        prize_third_pct: parseFloat(formData.prize_third_pct) || 20,
+        prize_first_pct: parseFloat(formData.prize_first_pct) / 100 || 0.5,
+        prize_second_pct: parseFloat(formData.prize_second_pct) / 100 || 0.3,
+        prize_third_pct: parseFloat(formData.prize_third_pct) / 100 || 0.2,
         host_percentage: parseFloat(formData.host_percentage) || 5,
         host_contribution: parseFloat(formData.host_contribution) || 0,
         match_start_time: new Date(formData.match_start_time).toISOString(),
         party_join_time: new Date(formData.party_join_time).toISOString(),
         platform: formData.platform,
         region: formData.region,
+        match_map: formData.match_map || null, // Add map field
 
         // Add host ID (user ID)
         host_id: user.id,
@@ -695,6 +697,36 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
             </select>
             {errors.region && (
               <span className="error-message">{errors.region}</span>
+            )}
+          </div>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="match_map">Match Map</label>
+            <select
+              id="match_map"
+              name="match_map"
+              value={formData.match_map}
+              onChange={handleInputChange}
+            >
+              <option value="">Select a map (optional)</option>
+              <option value="ascent">Ascent</option>
+              <option value="bind">Bind</option>
+              <option value="haven">Haven</option>
+              <option value="split">Split</option>
+              <option value="icebox">Icebox</option>
+              <option value="breeze">Breeze</option>
+              <option value="fracture">Fracture</option>
+              <option value="pearl">Pearl</option>
+              <option value="lotus">Lotus</option>
+              <option value="sunset">Sunset</option>
+            </select>
+            <div className="input-hint">
+              🗺️ Choose a specific map or leave empty for random selection
+            </div>
+            {errors.match_map && (
+              <span className="error-message">{errors.match_map}</span>
             )}
           </div>
         </div>
