@@ -14,6 +14,7 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
     party_join_time: "",
     capacity: "10", // Default 10 participants
     host_percentage: "5", // Default 5% for host
+    host_contribution: "0", // Default 0 host contribution
     platform: "pc", // Default to PC
     region: "eu", // Default to EU
   });
@@ -178,6 +179,23 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
     );
   };
 
+  // Calculate expected prize pool
+  const calculateExpectedPrizePool = () => {
+    const joiningFee = parseFloat(formData.joining_fee || 0);
+    const capacity = parseInt(formData.capacity || 10);
+    const hostPercentage = parseFloat(formData.host_percentage || 5) / 100;
+    const hostContribution = parseFloat(formData.host_contribution || 0);
+
+    // Base prize pool from joining fees: (0.7 + (0.15-host_percentage))*capacity*joining_fee
+    const basePrizePool =
+      (0.7 + (0.15 - hostPercentage)) * capacity * joiningFee;
+
+    // Add 90% of host contribution
+    const hostContributionToPrizePool = hostContribution * 0.9;
+
+    return Math.ceil(basePrizePool + hostContributionToPrizePool);
+  };
+
   const validateForm = () => {
     const newErrors = {};
 
@@ -242,6 +260,10 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
       newErrors.host_percentage = "Host percentage must be between 0 and 15";
     }
 
+    if (formData.host_contribution < 0) {
+      newErrors.host_contribution = "Host contribution cannot be negative";
+    }
+
     if (!formData.platform) {
       newErrors.platform = "Platform is required";
     }
@@ -292,6 +314,7 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
         prize_second_pct: parseFloat(formData.prize_second_pct) || 30,
         prize_third_pct: parseFloat(formData.prize_third_pct) || 20,
         host_percentage: parseFloat(formData.host_percentage) || 5,
+        host_contribution: parseFloat(formData.host_contribution) || 0,
         match_start_time: new Date(formData.match_start_time).toISOString(),
         party_join_time: new Date(formData.party_join_time).toISOString(),
         platform: formData.platform,
@@ -450,6 +473,28 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
               <span className="error-message">{errors.host_percentage}</span>
             )}
           </div>
+
+          <div className="form-group">
+            <label htmlFor="host_contribution">
+              Host Contribution (Credits) *
+            </label>
+            <input
+              type="number"
+              id="host_contribution"
+              name="host_contribution"
+              value={formData.host_contribution}
+              onChange={handleInputChange}
+              placeholder="0"
+              min="0"
+              step="1"
+            />
+            <div className="input-hint">
+              💡 We keep 10% as platform fee, 90% goes to prize pool
+            </div>
+            {errors.host_contribution && (
+              <span className="error-message">{errors.host_contribution}</span>
+            )}
+          </div>
         </div>
 
         <div className="form-row">
@@ -595,6 +640,44 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
             {errors.prize_percentages}
           </div>
         )}
+
+        <div className="expected-prize-pool-display">
+          <div className="prize-pool-summary">
+            <h4>🏆 Expected Total Prize Pool</h4>
+            <div className="prize-pool-breakdown">
+              <div className="breakdown-item">
+                <span>Base Prize Pool (from joining fees):</span>
+                <span>
+                  {Math.ceil(
+                    (0.7 +
+                      (0.15 -
+                        parseFloat(formData.host_percentage || 5) / 100)) *
+                      parseInt(formData.capacity || 10) *
+                      parseFloat(formData.joining_fee || 0)
+                  )}{" "}
+                  credits
+                </span>
+              </div>
+              <div className="breakdown-item">
+                <span>Host Contribution (90% to prize pool):</span>
+                <span>
+                  {Math.ceil(parseFloat(formData.host_contribution || 0) * 0.9)}{" "}
+                  credits
+                </span>
+              </div>
+              <div className="breakdown-item total">
+                <span>
+                  <strong>Total Expected Prize Pool:</strong>
+                </span>
+                <span>
+                  <strong>
+                    {calculateExpectedPrizePool().toLocaleString()} credits
+                  </strong>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div className="form-actions">
           <Button
