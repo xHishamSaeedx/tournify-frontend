@@ -36,7 +36,7 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
   React.useEffect(() => {
     const fetchExistingTournaments = async () => {
       if (!user) return;
-      
+
       try {
         const response = await api.getHostTournaments(user.id);
         if (response.success) {
@@ -134,7 +134,7 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
     // Check for time conflicts in real-time when match start time changes
     if (name === "match_start_time" && value) {
       setIsCheckingConflicts(true);
-      
+
       // Use setTimeout to debounce the conflict check
       setTimeout(() => {
         const conflict = checkTimeConflicts(value);
@@ -243,14 +243,16 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
   // Check for time conflicts with existing tournaments
   const checkTimeConflicts = (newStartTime) => {
     if (!newStartTime || existingTournaments.length === 0) return null;
-    
+
     const newTime = new Date(newStartTime);
-    
+
     for (const tournament of existingTournaments) {
       const existingTime = new Date(tournament.match_start_time);
-      const timeDifference = Math.abs(newTime.getTime() - existingTime.getTime());
+      const timeDifference = Math.abs(
+        newTime.getTime() - existingTime.getTime()
+      );
       const minutesDifference = timeDifference / (1000 * 60);
-      
+
       if (minutesDifference < 20) {
         return {
           tournament: tournament,
@@ -258,7 +260,7 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
         };
       }
     }
-    
+
     return null;
   };
 
@@ -284,8 +286,7 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
         // Check for conflicts with existing tournaments
         const conflict = checkTimeConflicts(formData.match_start_time);
         if (conflict) {
-          newErrors.match_start_time =
-            `Time conflict detected! You have another tournament "${conflict.tournament.name}" starting in ${conflict.minutesDifference} minutes. There must be at least a 20-minute gap between your tournaments.`;
+          newErrors.match_start_time = `Time conflict detected! You have another tournament "${conflict.tournament.name}" starting in ${conflict.minutesDifference} minutes. There must be at least a 20-minute gap between your tournaments.`;
         }
       }
     }
@@ -343,6 +344,10 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
 
     if (!formData.region) {
       newErrors.region = "Region is required";
+    }
+
+    if (!formData.match_map || formData.match_map.trim() === "") {
+      newErrors.match_map = "Match map is required";
     }
 
     // Check if prize percentages sum to 100 or less
@@ -703,14 +708,14 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
 
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="match_map">Match Map</label>
+            <label htmlFor="match_map">Match Map *</label>
             <select
               id="match_map"
               name="match_map"
               value={formData.match_map}
               onChange={handleInputChange}
             >
-              <option value="">Select a map (optional)</option>
+              <option value="">Select a map</option>
               <option value="ascent">Ascent</option>
               <option value="bind">Bind</option>
               <option value="haven">Haven</option>
@@ -723,7 +728,7 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
               <option value="sunset">Sunset</option>
             </select>
             <div className="input-hint">
-              🗺️ Choose a specific map or leave empty for random selection
+              🗺️ Choose a specific map for the tournament
             </div>
             {errors.match_map && (
               <span className="error-message">{errors.match_map}</span>

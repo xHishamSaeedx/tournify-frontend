@@ -214,6 +214,89 @@
   color: #4ade80;
 }
 
+/* Map Information Section */
+.map-information-section {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.map-information-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.map-info-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 15px;
+  padding: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+}
+
+.map-info-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.map-info-card .card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.map-info-card .card-icon {
+  font-size: 1.5rem;
+}
+
+.map-info-card .card-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.map-display {
+  margin-bottom: 15px;
+}
+
+.map-name {
+  margin-bottom: 10px;
+}
+
+.map-selected {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #4ade80;
+  text-transform: capitalize;
+}
+
+.map-tbd {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #f59e0b;
+}
+
+.map-status {
+  margin-bottom: 15px;
+}
+
+.map-description {
+  color: #b0b0b0;
+  line-height: 1.6;
+}
+
+.map-description p {
+  margin: 0;
+}
+
+.map-description strong {
+  color: #4ade80;
+}
+
 /* Party Code Management Section */
 .party-code-management-section {
   background: rgba(255, 255, 255, 0.05);

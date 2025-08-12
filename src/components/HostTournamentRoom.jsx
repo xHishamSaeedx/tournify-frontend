@@ -144,8 +144,6 @@ const HostTournamentRoom = () => {
   const [isHost, setIsHost] = useState(false);
   const [partyCode, setPartyCode] = useState("");
   const [updatingPartyCode, setUpdatingPartyCode] = useState(false);
-  const [selectedMap, setSelectedMap] = useState("");
-  const [updatingMap, setUpdatingMap] = useState(false);
   const [canEnterPartyCode, setCanEnterPartyCode] = useState(false);
   const [partyCodeTimeStatus, setPartyCodeTimeStatus] = useState("");
 
@@ -197,7 +195,6 @@ const HostTournamentRoom = () => {
         });
         setTournament(response.data);
         setPartyCode(response.data.party_code || "");
-        setSelectedMap(response.data.match_map || "");
       } else {
         setError("Failed to fetch tournament details");
       }
@@ -488,29 +485,6 @@ const HostTournamentRoom = () => {
       alert("Failed to update party code. Please try again.");
     } finally {
       setUpdatingPartyCode(false);
-    }
-  };
-
-  const handleUpdateMap = async () => {
-    try {
-      setUpdatingMap(true);
-      const response = await api.updateTournament(tournamentId, {
-        match_map: selectedMap || null,
-      });
-
-      if (response.success) {
-        setTournament((prev) => ({ ...prev, match_map: selectedMap || null }));
-        alert(
-          "Match map updated successfully! All participants will see this map."
-        );
-      } else {
-        alert("Failed to update match map");
-      }
-    } catch (err) {
-      console.error("Error updating match map:", err);
-      alert("Failed to update match map. Please try again.");
-    } finally {
-      setUpdatingMap(false);
     }
   };
 
@@ -858,56 +832,41 @@ const HostTournamentRoom = () => {
             </div>
           </div>
 
-          {/* Map Management */}
-          <div className="map-management-section">
+          {/* Match Map Information */}
+          <div className="map-information-section">
             <div className="section-header">
-              <h3>Match Map Management</h3>
+              <h3>Match Map Information</h3>
               <div className="section-icon">🗺️</div>
             </div>
 
-            <div className="map-management-grid">
-              <div className="map-card">
+            <div className="map-information-grid">
+              <div className="map-info-card">
                 <div className="card-header">
-                  <span className="card-icon">🗺️</span>
+                  <span className="card-icon">🎯</span>
                   <span className="card-title">Match Map</span>
                 </div>
                 <div className="card-content">
-                  <div className="map-input-section">
-                    <select
-                      value={selectedMap}
-                      onChange={(e) => setSelectedMap(e.target.value)}
-                      className="map-select"
-                    >
-                      <option value="">Select a map (optional)</option>
-                      <option value="ascent">Ascent</option>
-                      <option value="bind">Bind</option>
-                      <option value="haven">Haven</option>
-                      <option value="split">Split</option>
-                      <option value="icebox">Icebox</option>
-                      <option value="breeze">Breeze</option>
-                      <option value="fracture">Fracture</option>
-                      <option value="pearl">Pearl</option>
-                      <option value="lotus">Lotus</option>
-                      <option value="sunset">Sunset</option>
-                    </select>
-                    <Button
-                      variant="primary"
-                      onClick={handleUpdateMap}
-                      disabled={updatingMap}
-                      className="update-btn"
-                    >
-                      {updatingMap ? "Updating..." : "Update Map"}
-                    </Button>
+                  <div className="map-display">
+                    <div className="map-name">
+                      {tournament.match_map ? (
+                        <span className="map-selected">{tournament.match_map}</span>
+                      ) : (
+                        <span className="map-tbd">To Be Determined</span>
+                      )}
+                    </div>
+                    <div className="map-status">
+                      {tournament.match_map ? (
+                        <span className="status-available">Map Confirmed</span>
+                      ) : (
+                        <span className="status-pending">Map Not Set</span>
+                      )}
+                    </div>
                   </div>
-                  <div className="map-status">
+                  <div className="map-description">
                     {tournament.match_map ? (
-                      <span className="status-available">
-                        Map Set: {tournament.match_map}
-                      </span>
+                      <p>This tournament will be played on <strong>{tournament.match_map}</strong>.</p>
                     ) : (
-                      <span className="status-pending">
-                        No Map Selected (Random)
-                      </span>
+                      <p>The match map will be determined before the tournament starts.</p>
                     )}
                   </div>
                 </div>

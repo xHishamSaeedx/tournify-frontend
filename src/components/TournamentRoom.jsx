@@ -472,6 +472,48 @@ const TournamentRoom = () => {
             </div>
           </div>
 
+          {/* Match Map Information */}
+          <div className="map-information-section">
+            <div className="section-header">
+              <h3>Match Map Information</h3>
+              <div className="section-icon">🗺️</div>
+            </div>
+
+            <div className="map-information-grid">
+              <div className="map-info-card">
+                <div className="card-header">
+                  <span className="card-icon">🎯</span>
+                  <span className="card-title">Match Map</span>
+                </div>
+                <div className="card-content">
+                  <div className="map-display">
+                    <div className="map-name">
+                      {tournament.match_map ? (
+                        <span className="map-selected">{tournament.match_map}</span>
+                      ) : (
+                        <span className="map-tbd">To Be Determined</span>
+                      )}
+                    </div>
+                    <div className="map-status">
+                      {tournament.match_map ? (
+                        <span className="status-available">Map Confirmed</span>
+                      ) : (
+                        <span className="status-pending">Map Not Set</span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="map-description">
+                    {tournament.match_map ? (
+                      <p>This tournament will be played on <strong>{tournament.match_map}</strong>.</p>
+                    ) : (
+                      <p>The match map will be determined before the tournament starts.</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Tournament Details */}
           <div className="tournament-details-section">
             <div className="section-header">
