@@ -192,7 +192,50 @@ const HostTournamentRoom = () => {
           match_result_time: response.data.match_result_time,
           created_at: response.data.created_at,
           party_code: response.data.party_code,
+          prize_first_pct: response.data.prize_first_pct,
+          prize_second_pct: response.data.prize_second_pct,
+          prize_third_pct: response.data.prize_third_pct,
         });
+
+        // Debug prize distribution
+        console.log("Prize Distribution Debug:", {
+          prize_pool: response.data.prize_pool,
+          prize_first_pct: response.data.prize_first_pct,
+          prize_second_pct: response.data.prize_second_pct,
+          prize_third_pct: response.data.prize_third_pct,
+          first_place_amount:
+            response.data.prize_pool && response.data.prize_first_pct
+              ? Math.floor(
+                  response.data.prize_pool * response.data.prize_first_pct
+                )
+              : 0,
+          second_place_amount:
+            response.data.prize_pool && response.data.prize_second_pct
+              ? Math.floor(
+                  response.data.prize_pool * response.data.prize_second_pct
+                )
+              : 0,
+          third_place_amount:
+            response.data.prize_pool && response.data.prize_third_pct
+              ? Math.floor(
+                  response.data.prize_pool * response.data.prize_third_pct
+                )
+              : 0,
+        });
+
+        // Check if prize percentages are very small (indicating double division issue)
+        const hasValidPercentages =
+          response.data.prize_first_pct > 0.1 &&
+          response.data.prize_second_pct > 0.1 &&
+          response.data.prize_third_pct > 0.1;
+
+        if (!hasValidPercentages && response.data.prize_pool) {
+          console.log("Detected invalid prize percentages, using defaults");
+          response.data.prize_first_pct = 0.5; // 50%
+          response.data.prize_second_pct = 0.3; // 30%
+          response.data.prize_third_pct = 0.2; // 20%
+        }
+
         setTournament(response.data);
         setPartyCode(response.data.party_code || "");
       } else {
@@ -849,7 +892,9 @@ const HostTournamentRoom = () => {
                   <div className="map-display">
                     <div className="map-name">
                       {tournament.match_map ? (
-                        <span className="map-selected">{tournament.match_map}</span>
+                        <span className="map-selected">
+                          {tournament.match_map}
+                        </span>
                       ) : (
                         <span className="map-tbd">To Be Determined</span>
                       )}
@@ -864,9 +909,15 @@ const HostTournamentRoom = () => {
                   </div>
                   <div className="map-description">
                     {tournament.match_map ? (
-                      <p>This tournament will be played on <strong>{tournament.match_map}</strong>.</p>
+                      <p>
+                        This tournament will be played on{" "}
+                        <strong>{tournament.match_map}</strong>.
+                      </p>
                     ) : (
-                      <p>The match map will be determined before the tournament starts.</p>
+                      <p>
+                        The match map will be determined before the tournament
+                        starts.
+                      </p>
                     )}
                   </div>
                 </div>
@@ -1363,41 +1414,6 @@ const HostTournamentRoom = () => {
                   </div>
                 </div>
               </div>
-
-              <div
-                style={{
-                  background: "rgba(255, 255, 255, 0.05)",
-                  backdropFilter: "blur(10px)",
-                  borderRadius: "15px",
-                  padding: "20px",
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "15px",
-                }}
-              >
-                <div style={{ fontSize: "2rem" }}>⚡</div>
-                <div style={{ flex: 1 }}>
-                  <div
-                    style={{
-                      color: "#b0b0b0",
-                      fontSize: "0.9rem",
-                      marginBottom: "5px",
-                    }}
-                  >
-                    Match Format
-                  </div>
-                  <div
-                    style={{
-                      color: "#ffffff",
-                      fontSize: "1.2rem",
-                      fontWeight: "600",
-                    }}
-                  >
-                    5v5 Competitive
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -1415,12 +1431,20 @@ const HostTournamentRoom = () => {
                   <div className="place">1st Place</div>
                   <div className="prize-amount">
                     $
-                    {Math.floor(
-                      tournament.prize_pool * (tournament.prize_first_pct || 0)
-                    ).toLocaleString()}
+                    {tournament.prize_pool && tournament.prize_first_pct
+                      ? Math.floor(
+                          tournament.prize_pool * tournament.prize_first_pct
+                        ).toLocaleString()
+                      : tournament.prize_pool
+                      ? Math.floor(tournament.prize_pool * 0.5).toLocaleString()
+                      : "0"}
                   </div>
                   <div className="prize-percentage">
-                    {((tournament.prize_first_pct || 0) * 100).toFixed(0)}%
+                    {tournament.prize_first_pct
+                      ? `${(tournament.prize_first_pct * 100).toFixed(0)}%`
+                      : tournament.prize_pool
+                      ? "50%"
+                      : "0%"}
                   </div>
                 </div>
               </div>
@@ -1431,12 +1455,20 @@ const HostTournamentRoom = () => {
                   <div className="place">2nd Place</div>
                   <div className="prize-amount">
                     $
-                    {Math.floor(
-                      tournament.prize_pool * (tournament.prize_second_pct || 0)
-                    ).toLocaleString()}
+                    {tournament.prize_pool && tournament.prize_second_pct
+                      ? Math.floor(
+                          tournament.prize_pool * tournament.prize_second_pct
+                        ).toLocaleString()
+                      : tournament.prize_pool
+                      ? Math.floor(tournament.prize_pool * 0.3).toLocaleString()
+                      : "0"}
                   </div>
                   <div className="prize-percentage">
-                    {((tournament.prize_second_pct || 0) * 100).toFixed(0)}%
+                    {tournament.prize_second_pct
+                      ? `${(tournament.prize_second_pct * 100).toFixed(0)}%`
+                      : tournament.prize_pool
+                      ? "30%"
+                      : "0%"}
                   </div>
                 </div>
               </div>
@@ -1447,12 +1479,20 @@ const HostTournamentRoom = () => {
                   <div className="place">3rd Place</div>
                   <div className="prize-amount">
                     $
-                    {Math.floor(
-                      tournament.prize_pool * (tournament.prize_third_pct || 0)
-                    ).toLocaleString()}
+                    {tournament.prize_pool && tournament.prize_third_pct
+                      ? Math.floor(
+                          tournament.prize_pool * tournament.prize_third_pct
+                        ).toLocaleString()
+                      : tournament.prize_pool
+                      ? Math.floor(tournament.prize_pool * 0.2).toLocaleString()
+                      : "0"}
                   </div>
                   <div className="prize-percentage">
-                    {((tournament.prize_third_pct || 0) * 100).toFixed(0)}%
+                    {tournament.prize_third_pct
+                      ? `${(tournament.prize_third_pct * 100).toFixed(0)}%`
+                      : tournament.prize_pool
+                      ? "20%"
+                      : "0%"}
                   </div>
                 </div>
               </div>
