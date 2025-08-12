@@ -390,6 +390,33 @@
   gap: 10px;
 }
 
+/* Party Code Time Status */
+.party-code-time-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 10px;
+}
+
+.status-indicator {
+  font-size: 1.1rem;
+  animation: pulse 2s infinite;
+}
+
+.status-indicator.available {
+  animation: none;
+}
+
+.status-text {
+  font-size: 0.85rem;
+  color: #ffffff;
+  font-weight: 500;
+}
+
 .room-id-display {
   display: flex;
   align-items: center;

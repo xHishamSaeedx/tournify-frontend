@@ -55,7 +55,7 @@
   background: rgba(255, 255, 255, 0.1);
   padding: 4px 8px;
   border-radius: 6px;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
 }
 
 .host-status {
@@ -88,29 +88,50 @@
 }
 
 .countdown-section.live {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.2) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.2) 0%,
+    rgba(220, 38, 38, 0.2) 100%
+  );
   border-color: rgba(239, 68, 68, 0.3);
   animation: pulse 2s infinite;
 }
 
 .countdown-section.starting {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.2) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.2) 0%,
+    rgba(217, 119, 6, 0.2) 100%
+  );
   border-color: rgba(245, 158, 11, 0.3);
 }
 
 .countdown-section.preparing {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.2) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.2) 0%,
+    rgba(37, 99, 235, 0.2) 100%
+  );
   border-color: rgba(59, 130, 246, 0.3);
 }
 
 .countdown-section.waiting {
-  background: linear-gradient(135deg, rgba(107, 114, 128, 0.2) 0%, rgba(75, 85, 99, 0.2) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(107, 114, 128, 0.2) 0%,
+    rgba(75, 85, 99, 0.2) 100%
+  );
   border-color: rgba(107, 114, 128, 0.3);
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
 }
 
 .countdown-header h2 {
@@ -146,7 +167,7 @@
   font-weight: 700;
   color: #ffffff;
   text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
 }
 
 .timer-label {
@@ -273,7 +294,7 @@
   background: rgba(255, 255, 255, 0.05);
   color: #ffffff;
   font-size: 0.9rem;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
 }
 
 .party-code-input::placeholder {
@@ -284,6 +305,102 @@
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+/* Party Code Time Status */
+.party-code-time-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 15px;
+}
+
+.status-indicator {
+  font-size: 1.2rem;
+  animation: pulse 2s infinite;
+}
+
+.status-indicator.available {
+  animation: none;
+}
+
+.status-text {
+  font-size: 0.9rem;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+/* Party Code Disabled Section */
+.party-code-disabled-section {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.disabled-message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px;
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.3);
+  border-radius: 8px;
+  color: #fbbf24;
+}
+
+.disabled-icon {
+  font-size: 1.2rem;
+}
+
+.disabled-text {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.current-party-code {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(74, 222, 128, 0.1);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  border-radius: 8px;
+  color: #4ade80;
+}
+
+.current-code-label {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.current-code-value {
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: "Courier New", monospace;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.copy-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: auto;
+}
+
+.copy-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .update-btn {
@@ -689,7 +806,8 @@
   flex-wrap: wrap;
 }
 
-.join-discord-btn, .back-btn {
+.join-discord-btn,
+.back-btn {
   padding: 12px 24px;
   border-radius: 10px;
   font-weight: 600;
@@ -734,7 +852,9 @@
 }
 
 /* Loading and Error States */
-.loading-container, .error-container, .signin-prompt-container {
+.loading-container,
+.error-container,
+.signin-prompt-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -754,8 +874,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .signin-hero {
@@ -917,7 +1041,8 @@
     align-items: center;
   }
 
-  .join-discord-btn, .back-btn {
+  .join-discord-btn,
+  .back-btn {
     width: 100%;
     max-width: 300px;
     justify-content: center;
@@ -1071,7 +1196,7 @@
 }
 
 .valorant-id {
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   color: #4ade80;
   font-weight: 500;
   font-size: 0.9rem;
@@ -1145,24 +1270,24 @@
   .participants-table {
     font-size: 0.8rem;
   }
-  
+
   .participants-table th,
   .participants-table td {
     padding: 8px 6px;
   }
-  
+
   .participant-info-cell {
     min-width: 150px;
   }
-  
+
   .valorant-id-cell {
     min-width: 120px;
   }
-  
+
   .joined-cell {
     min-width: 100px;
   }
-  
+
   .details-grid {
     grid-template-columns: 1fr;
     gap: 10px;
@@ -1173,18 +1298,18 @@
   .participants-table {
     font-size: 0.75rem;
   }
-  
+
   .participants-table th,
   .participants-table td {
     padding: 6px 4px;
   }
-  
+
   .participant-avatar-small {
     width: 24px;
     height: 24px;
     font-size: 0.8rem;
   }
-  
+
   .details-toggle-btn {
     width: 24px;
     height: 24px;
