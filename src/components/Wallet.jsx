@@ -39,15 +39,15 @@ const Wallet = () => {
         fetchTransactions();
       }
     };
-    window.addEventListener('wallet:updated', onWalletUpdated);
-    return () => window.removeEventListener('wallet:updated', onWalletUpdated);
+    window.addEventListener("wallet:updated", onWalletUpdated);
+    return () => window.removeEventListener("wallet:updated", onWalletUpdated);
   }, [user, currentPage]);
 
   const fetchWalletBalance = async () => {
     try {
       const userId = user.player_id || user.id;
       const response = await api.getWalletBalance(userId);
-      
+
       if (response.success) {
         setWalletBalance(response.data.balance);
       } else {
@@ -64,7 +64,7 @@ const Wallet = () => {
       setLoading(true);
       const userId = user.player_id || user.id;
       const response = await api.getWalletTransactions(userId, currentPage, 10);
-      
+
       if (response.success) {
         setTransactions(response.data);
         setTotalPages(response.pagination.totalPages);
@@ -82,7 +82,7 @@ const Wallet = () => {
   const handlePackageSelection = (selectedPackage) => {
     setShowComingSoon(true);
     setShowCreditPackages(false);
-    
+
     // Auto-hide the coming soon notification after 3 seconds
     setTimeout(() => {
       setShowComingSoon(false);
@@ -190,18 +190,14 @@ const Wallet = () => {
                 {creditPackages.map((pkg) => (
                   <div
                     key={pkg.id}
-                    className={`package-card ${pkg.popular ? 'popular' : ''}`}
+                    className="package-card"
                     onClick={() => handlePackageSelection(pkg)}
                   >
-                    {pkg.popular && (
-                      <div className="popular-badge">Most Popular</div>
-                    )}
                     <div className="package-header">
-                      <div className="package-credits">{pkg.credits} Credits</div>
+                      <div className="package-credits">
+                        {pkg.credits} Credits
+                      </div>
                       <div className="package-price">₹{pkg.rupees}</div>
-                    </div>
-                    <div className="package-value">
-                      {((pkg.credits / pkg.rupees) * 100).toFixed(1)}% value
                     </div>
                     <button className="select-package-btn">
                       Select Package
@@ -251,7 +247,10 @@ const Wallet = () => {
           <div className="empty-state">
             <div className="empty-icon">📊</div>
             <h4>No Transactions Yet</h4>
-            <p>Your transaction history will appear here once you start using credits.</p>
+            <p>
+              Your transaction history will appear here once you start using
+              credits.
+            </p>
           </div>
         ) : (
           <>
@@ -269,7 +268,10 @@ const Wallet = () => {
                   <div className="transaction-details">
                     <div className="transaction-description">
                       {transaction.tournament_name
-                        ? transaction.description.replace(transaction.ref_id, transaction.tournament_name)
+                        ? transaction.description.replace(
+                            transaction.ref_id,
+                            transaction.tournament_name
+                          )
                         : transaction.description}
                     </div>
                     <div className="transaction-meta">
@@ -282,7 +284,10 @@ const Wallet = () => {
                     </div>
                   </div>
                   <div className="transaction-amount">
-                    {transaction.type === "debit" || transaction.type === "tournament_entry" ? "-" : "+"}
+                    {transaction.type === "debit" ||
+                    transaction.type === "tournament_entry"
+                      ? "-"
+                      : "+"}
                     {formatAmount(transaction.amount)}
                   </div>
                 </div>
