@@ -21,6 +21,7 @@ const PlayerForm = () => {
     display_name: "",
     username: "",
     DOB: "",
+    selected_game: "",
     valo_name: "",
     valo_tag: "",
     VPA: "",
@@ -61,11 +62,12 @@ const PlayerForm = () => {
                 display_name: cachedResult.display_name || "",
                 username: cachedResult.username || "",
                 DOB: cachedResult.DOB || "",
-                valo_name: cachedResult.valo_name || "",
-                valo_tag: cachedResult.valo_tag || "",
+                selected_game: cachedResult.valorant_data ? "valorant" : "",
+                valo_name: cachedResult.valorant_data?.valorant_name || "",
+                valo_tag: cachedResult.valorant_data?.valorant_tag || "",
                 VPA: cachedResult.VPA || "",
-                platform: cachedResult.platform || "",
-                region: cachedResult.region || "",
+                platform: cachedResult.valorant_data?.platform || "",
+                region: cachedResult.valorant_data?.region || "",
               });
             }
           }
@@ -90,11 +92,12 @@ const PlayerForm = () => {
               display_name: response.data.display_name || "",
               username: response.data.username || "",
               DOB: response.data.DOB || "",
-              valo_name: response.data.valo_name || "",
-              valo_tag: response.data.valo_tag || "",
+              selected_game: response.data.valorant_data ? "valorant" : "",
+              valo_name: response.data.valorant_data?.valorant_name || "",
+              valo_tag: response.data.valorant_data?.valorant_tag || "",
               VPA: response.data.VPA || "",
-              platform: response.data.platform || "",
-              region: response.data.region || "",
+              platform: response.data.valorant_data?.platform || "",
+              region: response.data.valorant_data?.region || "",
             });
           } else if (isMounted) {
             // Cache the null result to prevent future calls
@@ -156,12 +159,22 @@ const PlayerForm = () => {
         display_name: formData.display_name.trim(),
         username: formData.username.trim(),
         DOB: formData.DOB,
-        valo_name: formData.valo_name.trim(),
-        valo_tag: formData.valo_tag.trim(),
         VPA: formData.VPA.trim(),
-        platform: formData.platform,
-        region: formData.region,
       };
+
+      // Only include Valorant data if Valorant is selected and all fields are filled
+      if (
+        formData.selected_game === "valorant" &&
+        formData.valo_name &&
+        formData.valo_tag &&
+        formData.platform &&
+        formData.region
+      ) {
+        playerData.valo_name = formData.valo_name.trim();
+        playerData.valo_tag = formData.valo_tag.trim();
+        playerData.platform = formData.platform;
+        playerData.region = formData.region;
+      }
 
       let result;
 
@@ -193,11 +206,12 @@ const PlayerForm = () => {
         display_name: result.display_name,
         username: result.username,
         DOB: result.DOB,
-        valo_name: result.valo_name,
-        valo_tag: result.valo_tag,
+        selected_game: result.valorant_data ? "valorant" : "",
+        valo_name: result.valorant_data?.valorant_name || "",
+        valo_tag: result.valorant_data?.valorant_tag || "",
         VPA: result.VPA,
-        platform: result.platform,
-        region: result.region,
+        platform: result.valorant_data?.platform || "",
+        region: result.valorant_data?.region || "",
       });
     } catch (error) {
       console.error("Error saving player data:", error);
@@ -281,8 +295,8 @@ const PlayerForm = () => {
             </h1>
             <p className="player-form-subtitle">
               {existingPlayer
-                ? "Update your player information to keep your profile current."
-                : "Complete your player registration to participate in Valorant tournaments."}
+                ? "Update your player information and add game details to enhance your profile."
+                : "Complete your player registration to participate in tournaments. You can add game information later."}
             </p>
           </div>
 
@@ -336,36 +350,63 @@ const PlayerForm = () => {
               </div>
 
               <div className="form-group">
-                <label htmlFor="valo_name" className="form-label">
-                  Valorant Username *
+                <label htmlFor="selected_game" className="form-label">
+                  Select Game
                 </label>
-                <input
-                  type="text"
-                  id="valo_name"
-                  name="valo_name"
-                  value={formData.valo_name}
+                <select
+                  id="selected_game"
+                  name="selected_game"
+                  value={formData.selected_game}
                   onChange={handleInputChange}
-                  required
                   className="form-input"
-                  placeholder="Enter your Valorant username"
-                />
+                >
+                  <option value="">Select a game (optional)</option>
+                  <option value="valorant">Valorant</option>
+                </select>
+                <small className="form-hint">
+                  {existingPlayer 
+                    ? "You can add game information now or update it later to enhance your profile."
+                    : "You can add game information now or later to enhance your profile."}
+                </small>
               </div>
 
-              <div className="form-group">
-                <label htmlFor="valo_tag" className="form-label">
-                  Valorant Tag *
-                </label>
-                <input
-                  type="text"
-                  id="valo_tag"
-                  name="valo_tag"
-                  value={formData.valo_tag}
-                  onChange={handleInputChange}
-                  required
-                  className="form-input"
-                  placeholder="Enter your Valorant tag (e.g., #NA1)"
-                />
-              </div>
+              {formData.selected_game === "valorant" && (
+                <>
+                  <div className="form-group">
+                    <label htmlFor="valo_name" className="form-label">
+                      Valorant Username *
+                    </label>
+                    <input
+                      type="text"
+                      id="valo_name"
+                      name="valo_name"
+                      value={formData.valo_name}
+                      onChange={handleInputChange}
+                      required
+                      className="form-input"
+                      placeholder="Enter your Valorant username"
+                    />
+                  </div>
+                </>
+              )}
+
+              {formData.selected_game === "valorant" && (
+                <div className="form-group">
+                  <label htmlFor="valo_tag" className="form-label">
+                    Valorant Tag *
+                  </label>
+                  <input
+                    type="text"
+                    id="valo_tag"
+                    name="valo_tag"
+                    value={formData.valo_tag}
+                    onChange={handleInputChange}
+                    required
+                    className="form-input"
+                    placeholder="Enter your Valorant tag (e.g., #NA1)"
+                  />
+                </div>
+              )}
 
               <div className="form-group full-width">
                 <label htmlFor="VPA" className="form-label">
@@ -383,45 +424,49 @@ const PlayerForm = () => {
                 />
               </div>
 
-              <div className="form-group">
-                <label htmlFor="platform" className="form-label">
-                  Platform *
-                </label>
-                <select
-                  id="platform"
-                  name="platform"
-                  value={formData.platform}
-                  onChange={handleInputChange}
-                  required
-                  className="form-input"
-                >
-                  <option value="">Select Platform</option>
-                  <option value="pc">PC</option>
-                  <option value="console">Console</option>
-                </select>
-              </div>
+              {formData.selected_game === "valorant" && (
+                <>
+                  <div className="form-group">
+                    <label htmlFor="platform" className="form-label">
+                      Platform *
+                    </label>
+                    <select
+                      id="platform"
+                      name="platform"
+                      value={formData.platform}
+                      onChange={handleInputChange}
+                      required
+                      className="form-input"
+                    >
+                      <option value="">Select Platform</option>
+                      <option value="pc">PC</option>
+                      <option value="console">Console</option>
+                    </select>
+                  </div>
 
-              <div className="form-group">
-                <label htmlFor="region" className="form-label">
-                  Region *
-                </label>
-                <select
-                  id="region"
-                  name="region"
-                  value={formData.region}
-                  onChange={handleInputChange}
-                  required
-                  className="form-input"
-                >
-                  <option value="">Select Region</option>
-                  <option value="eu">EU</option>
-                  <option value="na">NA</option>
-                  <option value="latam">LATAM</option>
-                  <option value="br">BR</option>
-                  <option value="ap">AP</option>
-                  <option value="kr">KR</option>
-                </select>
-              </div>
+                  <div className="form-group">
+                    <label htmlFor="region" className="form-label">
+                      Region *
+                    </label>
+                    <select
+                      id="region"
+                      name="region"
+                      value={formData.region}
+                      onChange={handleInputChange}
+                      required
+                      className="form-input"
+                    >
+                      <option value="">Select Region</option>
+                      <option value="eu">EU</option>
+                      <option value="na">NA</option>
+                      <option value="latam">LATAM</option>
+                      <option value="br">BR</option>
+                      <option value="ap">AP</option>
+                      <option value="kr">KR</option>
+                    </select>
+                  </div>
+                </>
+              )}
             </div>
 
             <button
@@ -458,8 +503,7 @@ const PlayerForm = () => {
               <div className="notice-content">
                 <h3>Profile Found</h3>
                 <p>
-                  You already have a player profile. You can update your
-                  information above.
+                  You already have a player profile. You can update your basic information and add game details to enhance your profile.
                 </p>
               </div>
             </div>
