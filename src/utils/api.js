@@ -186,6 +186,36 @@ export const api = {
     authenticatedApiCall(`/api/players/${id}`, {
       method: "DELETE",
     }),
+
+  // Wallet endpoints
+  getWalletBalance: (userId) => authenticatedApiCall(`/api/wallets/balance/${userId}`),
+  getWalletTransactions: (userId, page = 1, limit = 20) =>
+    authenticatedApiCall(`/api/wallets/transactions/${userId}?page=${page}&limit=${limit}`),
+  createTransaction: (data) =>
+    authenticatedApiCall("/api/wallets/transactions", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  processTournamentEntry: (data) =>
+    authenticatedApiCall("/api/wallets/tournament-entry", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  processTournamentPrize: (data) =>
+    authenticatedApiCall("/api/wallets/tournament-prize", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  addCredits: (data) =>
+    authenticatedApiCall("/api/wallets/add-credits", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  processTournamentRefund: (data) =>
+    authenticatedApiCall("/api/wallets/tournament-refund", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
 };
 
 export default api;

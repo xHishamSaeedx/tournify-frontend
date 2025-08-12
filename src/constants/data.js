@@ -4,7 +4,7 @@
 export const HERO_STATS = [
   { number: "1,247", label: "Active Tournaments" },
   { number: "45.2K", label: "Players Registered" },
-  { number: "$89.5K", label: "Prize Pools" },
+  { number: "89.5K", label: "Credits Awarded" },
   { number: "98.7%", label: "Success Rate" },
 ];
 

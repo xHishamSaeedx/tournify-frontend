@@ -29,7 +29,7 @@ const ValorantHeroSection = ({ onShowCreateForm }) => {
   const valorantStats = [
     { number: "342", label: "Active Tournaments" },
     { number: "15.2K", label: "Players Registered" },
-    { number: "$45.8K", label: "Prize Pools" },
+    { number: "45.8K", label: "Credits Awarded" },
     { number: "99.2%", label: "Success Rate" },
   ];
 

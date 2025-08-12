@@ -201,9 +201,36 @@ const TournamentBrowser = () => {
 
   const handleConfirmJoinTournament = async () => {
     const tournamentId = pendingTournamentId;
+    const tournament = tournaments.find((t) => t.tournament_id === tournamentId);
+    
+    if (!tournament) {
+      alert("Tournament not found");
+      return;
+    }
 
     try {
       setJoiningTournament(tournamentId);
+      
+      // First, process the tournament entry fee through wallet
+      if (tournament.joining_fee && tournament.joining_fee > 0) {
+        const userId = user.player_id || user.id;
+        const walletResponse = await api.processTournamentEntry({
+          user_id: userId,
+          tournament_id: tournamentId,
+          entry_fee: tournament.joining_fee,
+        });
+
+        if (!walletResponse.success) {
+          if (walletResponse.error === "Insufficient balance") {
+            alert(`Insufficient credits! You need ${tournament.joining_fee} credits but don't have enough. Please add credits to your wallet.`);
+          } else {
+            alert(walletResponse.message || "Failed to process entry fee");
+          }
+          return;
+        }
+      }
+
+      // Then join the tournament
       const response = await api.joinTournament(tournamentId);
 
       if (response.success) {
@@ -225,7 +252,16 @@ const TournamentBrowser = () => {
           )
         );
 
-        alert("Successfully joined tournament!");
+        // Ask other parts of the app to refresh balances/transactions after entry fee deduction
+        if (tournament.joining_fee && tournament.joining_fee > 0) {
+          window.dispatchEvent(new Event('wallet:updated'));
+        }
+
+        const feeMessage = tournament.joining_fee && tournament.joining_fee > 0 
+          ? ` Entry fee of ${tournament.joining_fee} credits has been deducted from your wallet.`
+          : "";
+        
+        alert(`Successfully joined tournament!${feeMessage}`);
       } else {
         alert(response.message || "Failed to join tournament");
       }
@@ -244,6 +280,8 @@ const TournamentBrowser = () => {
           errorMessage = "You are already registered for this tournament.";
         } else if (error.message.includes("Tournament full")) {
           errorMessage = "This tournament is already full.";
+        } else if (error.message.includes("Insufficient balance")) {
+          errorMessage = `Insufficient credits! You need ${tournament.joining_fee} credits to join this tournament.`;
         } else {
           errorMessage = error.message;
         }
@@ -314,6 +352,8 @@ const TournamentBrowser = () => {
           )
         );
 
+        // Ask other parts of the app (Navbar, Wallet page) to refresh balances/transactions
+        window.dispatchEvent(new Event('wallet:updated'));
         alert(response.message || "Successfully left tournament!");
       } else {
         alert(response.message || "Failed to leave tournament");
@@ -537,7 +577,7 @@ const TournamentBrowser = () => {
                       <div className="entry-fee">
                         <span className="fee-label">Entry Fee</span>
                         <span className="fee-amount">
-                          ${tournament.joining_fee}
+                          {tournament.joining_fee} credits
                         </span>
                       </div>
                     </div>
@@ -715,9 +755,9 @@ Are you sure you want to join this tournament?"
                 pendingLeaveTournament.name
               }"?
 
-• You will be refunded only 50% of your joining fee ($${Math.floor(
+• You will be refunded only 50% of your joining fee (${Math.floor(
                 (pendingLeaveTournament.joining_fee || 0) * 0.5
-              )})
+              )} credits)
 • This action cannot be undone
 • You will lose your tournament spot
 

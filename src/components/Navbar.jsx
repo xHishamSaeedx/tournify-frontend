@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { api } from '../utils/api';
 import Button from './Button';
 
 const Navbar = () => {
@@ -9,6 +10,7 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [walletBalance, setWalletBalance] = useState(0);
   const profileDropdownRef = useRef(null);
 
   // Handle scroll effect
@@ -21,6 +23,22 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Fetch wallet balance when user changes
+  useEffect(() => {
+    if (user) {
+      fetchWalletBalance();
+    }
+  }, [user]);
+
+  // Listen for global wallet updates (join/leave/prize/refund)
+  useEffect(() => {
+    const onWalletUpdated = () => {
+      if (user) fetchWalletBalance();
+    };
+    window.addEventListener('wallet:updated', onWalletUpdated);
+    return () => window.removeEventListener('wallet:updated', onWalletUpdated);
+  }, [user]);
+
   // Handle click outside dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -32,6 +50,19 @@ const Navbar = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const fetchWalletBalance = async () => {
+    try {
+      const userId = user.player_id || user.id;
+      const response = await api.getWalletBalance(userId);
+      
+      if (response.success) {
+        setWalletBalance(response.data.balance);
+      }
+    } catch (err) {
+      console.error("Error fetching wallet balance:", err);
+    }
+  };
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -65,6 +96,12 @@ const Navbar = () => {
     setIsMobileMenuOpen(false);
   };
 
+  const handleWallet = () => {
+    navigate('/wallet');
+    setIsProfileDropdownOpen(false);
+    setIsMobileMenuOpen(false);
+  };
+
   const handleSignOut = async () => {
     try {
       await signOut();
@@ -78,6 +115,10 @@ const Navbar = () => {
   const getInitials = (email) => {
     if (!email) return 'U';
     return email.charAt(0).toUpperCase();
+  };
+
+  const formatCredits = (amount) => {
+    return amount.toLocaleString();
   };
 
   return (
@@ -107,6 +148,13 @@ const Navbar = () => {
         <div className="navbar-actions desktop-actions">
           {user ? (
             <>
+              {/* Credits Display */}
+              <div className="credits-display">
+                <span className="credits-icon">💰</span>
+                <span className="credits-amount">{formatCredits(walletBalance)}</span>
+                <span className="credits-label">Credits</span>
+              </div>
+
               <div className="profile-dropdown-container" ref={profileDropdownRef}>
                 <Button
                   variant="secondary"
@@ -157,6 +205,14 @@ const Navbar = () => {
                       >
                         <span className="item-icon">🏆</span>
                         <span className="item-text">My Tournaments</span>
+                      </button>
+
+                      <button
+                        className="dropdown-item"
+                        onClick={handleWallet}
+                      >
+                        <span className="item-icon">💰</span>
+                        <span className="item-text">Wallet</span>
                       </button>
 
                       <button
@@ -231,6 +287,13 @@ const Navbar = () => {
                 <div className="mobile-user-role">Player</div>
               </div>
             </div>
+            
+            {/* Mobile Credits Display */}
+            <div className="mobile-credits-display">
+              <span className="mobile-credits-icon">💰</span>
+              <span className="mobile-credits-amount">{formatCredits(walletBalance)} Credits</span>
+            </div>
+
             <div className="mobile-profile-actions">
               <Button
                 variant="secondary"
@@ -252,6 +315,13 @@ const Navbar = () => {
                 onClick={handleMyTournaments}
               >
                 🏆 My Tournaments
+              </Button>
+              <Button
+                variant="secondary"
+                className="mobile-nav-btn"
+                onClick={handleWallet}
+              >
+                💰 Wallet
               </Button>
               <Button
                 variant="secondary"

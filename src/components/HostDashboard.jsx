@@ -112,8 +112,8 @@ const HostDashboard = () => {
                   </div>
                   <div className="tournament-details">
                     <p>
-                      <strong>Prize Pool:</strong> $
-                      {tournament.prize_pool || "TBD"}
+                      <strong>Prize Pool:</strong>{" "}
+                      {tournament.prize_pool ? `${tournament.prize_pool} credits` : "TBD"}
                     </p>
                     <p>
                       <strong>Capacity:</strong> {tournament.capacity || "N/A"}
@@ -129,8 +129,8 @@ const HostDashboard = () => {
                       <strong>Region:</strong> {tournament.region || "N/A"}
                     </p>
                     <p>
-                      <strong>Joining Fee:</strong> $
-                      {tournament.joining_fee || "Free"}
+                      <strong>Joining Fee:</strong>{" "}
+                      {tournament.joining_fee ? `${tournament.joining_fee} credits` : "Free"}
                     </p>
                   </div>
                   <div className="tournament-actions">
@@ -269,13 +269,13 @@ const HostDashboard = () => {
                   <div className="detail-item">
                     <span className="detail-label">Joining Fee:</span>
                     <span className="detail-value">
-                      ${selectedTournament.joining_fee || "Free"}
+                      {selectedTournament.joining_fee ? `${selectedTournament.joining_fee} credits` : "Free"}
                     </span>
                   </div>
                   <div className="detail-item">
                     <span className="detail-label">Prize Pool:</span>
                     <span className="detail-value">
-                      ${selectedTournament.prize_pool || "TBD"}
+                      {selectedTournament.prize_pool ? `${selectedTournament.prize_pool} credits` : "TBD"}
                     </span>
                   </div>
                   <div className="detail-item">

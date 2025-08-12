@@ -605,7 +605,7 @@ const TournamentRoom = () => {
                     }}
                   >
                     {tournament.prize_pool
-                      ? `$${tournament.prize_pool.toLocaleString()}`
+                      ? `${tournament.prize_pool.toLocaleString()} credits`
                       : "Not set"}
                   </div>
                 </div>
@@ -677,9 +677,9 @@ const TournamentRoom = () => {
                       fontWeight: "600",
                     }}
                   >
-                    {tournament.joining_fee
-                      ? `$${tournament.joining_fee}`
-                      : "Free"}
+                                {tournament.joining_fee
+              ? `${tournament.joining_fee} credits`
+              : "Free"}
                   </div>
                 </div>
               </div>

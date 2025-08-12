@@ -860,13 +860,13 @@ const HostTournamentRoom = () => {
                     <div className="stat-item">
                       <span className="stat-label">Prize Pool</span>
                       <span className="stat-value">
-                        ${tournament.prize_pool?.toLocaleString()}
+                        {tournament.prize_pool?.toLocaleString()} credits
                       </span>
                     </div>
                     <div className="stat-item">
                       <span className="stat-label">Entry Fee</span>
                       <span className="stat-value">
-                        ${tournament.joining_fee}
+                        {tournament.joining_fee} credits
                       </span>
                     </div>
                   </div>
@@ -1013,7 +1013,7 @@ const HostTournamentRoom = () => {
                     }}
                   >
                     {tournament.prize_pool
-                      ? `$${tournament.prize_pool.toLocaleString()}`
+                      ? `${tournament.prize_pool.toLocaleString()} credits`
                       : "Not set"}
                   </div>
                 </div>
@@ -1086,9 +1086,9 @@ const HostTournamentRoom = () => {
                       fontWeight: "600",
                     }}
                   >
-                    {tournament.joining_fee
-                      ? `$${tournament.joining_fee}`
-                      : "Free"}
+                                {tournament.joining_fee
+              ? `${tournament.joining_fee} credits`
+              : "Free"}
                   </div>
                 </div>
               </div>

@@ -172,7 +172,8 @@ const JoinedTournaments = () => {
         setJoinedTournaments((prev) =>
           prev.filter((t) => t.tournament_id !== tournament.tournament_id)
         );
-
+        // Ask other parts of the app (Navbar, Wallet page) to refresh balances/transactions
+        window.dispatchEvent(new Event('wallet:updated'));
         alert(response.message || "Successfully left tournament!");
       } else {
         alert(response.message || "Failed to leave tournament");
@@ -442,7 +443,7 @@ const JoinedTournaments = () => {
                       <div className="entry-fee">
                         <span className="fee-label">Entry Fee</span>
                         <span className="fee-amount">
-                          ${tournament.joining_fee}
+                          {tournament.joining_fee} credits
                         </span>
                       </div>
                     </div>
@@ -555,9 +556,9 @@ const JoinedTournaments = () => {
                  pendingLeaveTournament.name
                }"?
 
-• You will be refunded only 50% of your joining fee ($${Math.floor(
-                 (pendingLeaveTournament.joining_fee || 0) * 0.5
-               )})
+• You will be refunded only 50% of your joining fee (${Math.floor(
+                (pendingLeaveTournament.joining_fee || 0) * 0.5
+              )} credits)
 • This action cannot be undone
 • You will lose your tournament spot
 

@@ -24,6 +24,7 @@ import HostTournamentRoom from "./components/HostTournamentRoom";
 import AdminManageHosts from "./components/AdminManageHosts";
 import AdminDashboard from "./components/AdminDashboard";
 import HostDashboard from "./components/HostDashboard";
+import Wallet from "./components/Wallet";
 import { AuthProvider } from "./contexts/AuthContext";
 import { UserRolesProvider } from "./contexts/UserRolesContext";
 
@@ -125,6 +126,14 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <HostDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/wallet"
+                element={
+                  <ProtectedRoute>
+                    <Wallet />
                   </ProtectedRoute>
                 }
               />
