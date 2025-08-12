@@ -27,18 +27,23 @@ export const UserRolesProvider = ({ children }) => {
 
       try {
         const { data, error } = await supabase
-          .from('user_roles')
-          .select('user_role')
-          .eq('user_id', user.id)
+          .from("user_roles")
+          .select("user_role")
+          .eq("user_id", user.id)
           .single();
 
-        if (error && error.code !== 'PGRST116') {
-          console.error('Error fetching user role:', error);
+        if (error && error.code !== "PGRST116") {
+          console.error("Error fetching user role:", error);
         }
 
+        console.log("UserRolesContext: Fetched user role:", {
+          userId: user.id,
+          userRole: data?.user_role,
+          isAdmin: data?.user_role === "admin",
+        });
         setUserRole(data?.user_role || null);
       } catch (error) {
-        console.error('Error fetching user role:', error);
+        console.error("Error fetching user role:", error);
         setUserRole(null);
       } finally {
         setLoading(false);
@@ -51,10 +56,14 @@ export const UserRolesProvider = ({ children }) => {
   const value = {
     userRole,
     loading,
-    isPlayer: userRole === 'player' || !userRole,
-    isHost: userRole === 'host',
-    isAdmin: userRole === 'admin',
+    isPlayer: userRole === "player" || !userRole,
+    isHost: userRole === "host",
+    isAdmin: userRole === "admin",
   };
 
-  return <UserRolesContext.Provider value={value}>{children}</UserRolesContext.Provider>;
+  return (
+    <UserRolesContext.Provider value={value}>
+      {children}
+    </UserRolesContext.Provider>
+  );
 };

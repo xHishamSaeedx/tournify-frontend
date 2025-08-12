@@ -19,6 +19,7 @@ import ValorantPage from "./components/ValorantPage";
 import TournamentBrowser from "./components/TournamentBrowser";
 import JoinedTournaments from "./components/JoinedTournaments";
 import TournamentRoom from "./components/TournamentRoom";
+import TournamentAccessControl from "./components/TournamentAccessControl";
 import HostTournamentRoom from "./components/HostTournamentRoom";
 import AdminManageHosts from "./components/AdminManageHosts";
 import AdminDashboard from "./components/AdminDashboard";
@@ -80,7 +81,9 @@ const App = () => {
                 path="/tournament/:tournamentId"
                 element={
                   <ProtectedRoute>
-                    <TournamentRoom />
+                    <TournamentAccessControl>
+                      <TournamentRoom />
+                    </TournamentAccessControl>
                   </ProtectedRoute>
                 }
               />

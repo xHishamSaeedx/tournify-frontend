@@ -6,6 +6,135 @@
   padding: 20px;
 }
 
+/* Access Denied Styles */
+.access-denied-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  padding: 40px 20px;
+}
+
+.access-denied-content {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  max-width: 500px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.access-denied-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.access-denied-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 20px 0;
+  color: #ef4444;
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.access-denied-title.error {
+  color: #f59e0b;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.access-denied-message {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #b0b0b0;
+  margin-bottom: 30px;
+}
+
+.access-denied-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.access-denied-actions .browse-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.access-denied-actions .browse-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.access-denied-actions .my-tournaments-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.access-denied-actions .my-tournaments-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.button-icon {
+  font-size: 1.1rem;
+}
+
+/* Loading Container */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  gap: 20px;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-left: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .tournament-room-container {
   max-width: 1200px;
   margin: 0 auto;
@@ -55,7 +184,7 @@
   background: rgba(255, 255, 255, 0.1);
   padding: 4px 8px;
   border-radius: 6px;
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
 }
 
 .participation-status {
@@ -93,29 +222,50 @@
 }
 
 .countdown-section.live {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(220, 38, 38, 0.2) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(239, 68, 68, 0.2) 0%,
+    rgba(220, 38, 38, 0.2) 100%
+  );
   border-color: rgba(239, 68, 68, 0.3);
   animation: pulse 2s infinite;
 }
 
 .countdown-section.starting {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.2) 0%, rgba(217, 119, 6, 0.2) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(245, 158, 11, 0.2) 0%,
+    rgba(217, 119, 6, 0.2) 100%
+  );
   border-color: rgba(245, 158, 11, 0.3);
 }
 
 .countdown-section.preparing {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(37, 99, 235, 0.2) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.2) 0%,
+    rgba(37, 99, 235, 0.2) 100%
+  );
   border-color: rgba(59, 130, 246, 0.3);
 }
 
 .countdown-section.waiting {
-  background: linear-gradient(135deg, rgba(107, 114, 128, 0.2) 0%, rgba(75, 85, 99, 0.2) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(107, 114, 128, 0.2) 0%,
+    rgba(75, 85, 99, 0.2) 100%
+  );
   border-color: rgba(107, 114, 128, 0.3);
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.02); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
 }
 
 .countdown-header h2 {
@@ -151,7 +301,7 @@
   font-weight: 700;
   color: #ffffff;
   text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
 }
 
 .timer-label {
@@ -248,7 +398,7 @@
 }
 
 .room-id {
-  font-family: 'Courier New', monospace;
+  font-family: "Courier New", monospace;
   font-size: 1.1rem;
   font-weight: 600;
   color: #4ade80;
@@ -288,14 +438,18 @@
   font-weight: 500;
 }
 
-.game-type, .server-region, .platform {
+.game-type,
+.server-region,
+.platform {
   font-size: 1.1rem;
   font-weight: 600;
   color: #ffffff;
   margin-bottom: 5px;
 }
 
-.game-details, .server-details, .platform-details {
+.game-details,
+.server-details,
+.platform-details {
   font-size: 0.9rem;
   color: #b0b0b0;
 }
@@ -448,7 +602,9 @@
   flex-wrap: wrap;
 }
 
-.join-discord-btn, .back-btn, .browse-btn {
+.join-discord-btn,
+.back-btn,
+.browse-btn {
   padding: 12px 24px;
   border-radius: 10px;
   font-weight: 600;
@@ -503,7 +659,9 @@
 }
 
 /* Loading and Error States */
-.loading-container, .error-container, .signin-prompt-container {
+.loading-container,
+.error-container,
+.signin-prompt-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -523,8 +681,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .signin-hero {
@@ -635,7 +797,9 @@
     align-items: center;
   }
 
-  .join-discord-btn, .back-btn, .browse-btn {
+  .join-discord-btn,
+  .back-btn,
+  .browse-btn {
     width: 100%;
     max-width: 300px;
     justify-content: center;
