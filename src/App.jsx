@@ -97,14 +97,7 @@ const App = () => {
                 }
               />
               <Route path="/valorant" element={<ValorantPage />} />
-              <Route
-                path="/browse-tournaments"
-                element={
-                  <ProtectedRoute>
-                    <TournamentBrowser />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path="/browse-tournaments" element={<TournamentBrowser />} />
               <Route
                 path="/admin"
                 element={

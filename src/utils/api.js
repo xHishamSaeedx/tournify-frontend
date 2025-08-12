@@ -33,6 +33,58 @@ export const getAuthHeaders = async () => {
   }
 };
 
+// Generic non-authenticated API call function
+export const publicApiCall = async (endpoint, options = {}) => {
+  // Create a unique key for this request
+  const requestKey = `${endpoint}-${JSON.stringify(options)}`;
+
+  // Check if there's already a pending request for this endpoint
+  if (pendingRequests.has(requestKey)) {
+    console.log("🔄 Reusing pending request for:", endpoint);
+    return pendingRequests.get(requestKey);
+  }
+
+  try {
+    console.log("🚀 Making public API call to:", `${API_BASE_URL}${endpoint}`);
+
+    // Create the promise for this request
+    const requestPromise = fetch(`${API_BASE_URL}${endpoint}`, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+    }).then(async (response) => {
+      console.log("📡 Response status:", response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("❌ API call failed:", errorData);
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`
+        );
+      }
+
+      const data = await response.json();
+      console.log("✅ API call successful:", data);
+      return data;
+    });
+
+    // Store the promise in the cache
+    pendingRequests.set(requestKey, requestPromise);
+
+    // Remove from cache when resolved or rejected
+    requestPromise.finally(() => {
+      pendingRequests.delete(requestKey);
+    });
+
+    return requestPromise;
+  } catch (error) {
+    console.error(`API call failed for ${endpoint}:`, error);
+    throw error;
+  }
+};
+
 // Generic authenticated API call function
 export const authenticatedApiCall = async (endpoint, options = {}) => {
   // Create a unique key for this request
@@ -91,7 +143,7 @@ export const authenticatedApiCall = async (endpoint, options = {}) => {
 // Specific API functions for your endpoints
 export const api = {
   // Tournament endpoints
-  getTournaments: () => authenticatedApiCall("/api/tournaments"),
+  getTournaments: () => publicApiCall("/api/tournaments"),
   getTournament: (id) => authenticatedApiCall(`/api/tournaments/${id}`),
   getHostTournaments: (hostId) =>
     authenticatedApiCall(`/api/tournaments/host/${hostId}`),

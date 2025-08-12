@@ -5,6 +5,10 @@ import Button from "./Button";
 import ConfirmationModal from "./ConfirmationModal";
 import { api } from "../utils/api";
 import { useAuth } from "../contexts/AuthContext";
+import {
+  isValorantProfileComplete,
+  getProfileCompletionMessage,
+} from "../utils/profileValidation";
 
 const TournamentBrowser = () => {
   const { user } = useAuth();
@@ -23,6 +27,9 @@ const TournamentBrowser = () => {
   const [pendingTournamentId, setPendingTournamentId] = useState(null);
   const [pendingLeaveTournament, setPendingLeaveTournament] = useState(null);
   const [penaltyTournament, setPenaltyTournament] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
 
   useEffect(() => {
     fetchTournaments();
@@ -35,8 +42,44 @@ const TournamentBrowser = () => {
   }, [user, tournaments]);
 
   useEffect(() => {
+    if (user) {
+      fetchUserProfile();
+    }
+  }, [user]);
+
+  useEffect(() => {
     filterAndSortTournaments();
   }, [tournaments, searchTerm, sortBy]);
+
+  const fetchUserProfile = async () => {
+    try {
+      setProfileLoading(true);
+      const response = await api.getPlayer(user.id);
+      if (response.success) {
+        console.log("User profile loaded:", response.data);
+        console.log("Profile validation check:", {
+          isBasicComplete: isValorantProfileComplete(response.data),
+          hasValorantData: !!response.data.valorant_users && response.data.valorant_users.length > 0,
+          valorantFields: {
+            valorant_name: response.data.valorant_users?.[0]?.valorant_name,
+            valorant_tag: response.data.valorant_users?.[0]?.valorant_tag,
+            platform: response.data.valorant_users?.[0]?.platform,
+            region: response.data.valorant_users?.[0]?.region,
+          },
+        });
+        setUserProfile(response.data);
+      } else {
+        console.log("No user profile found, user needs to complete profile");
+        setUserProfile(null);
+      }
+    } catch (err) {
+      console.error("Error fetching user profile:", err);
+      // Don't set error state for profile fetch, just log it
+      setUserProfile(null);
+    } finally {
+      setProfileLoading(false);
+    }
+  };
 
   const fetchTournaments = async () => {
     try {
@@ -194,6 +237,19 @@ const TournamentBrowser = () => {
       return;
     }
 
+    // Check if user profile is complete for Valorant tournaments
+    console.log("Profile check on join:", {
+      hasUserProfile: !!userProfile,
+      isComplete: isValorantProfileComplete(userProfile),
+      profileData: userProfile,
+    });
+
+    if (!userProfile || !isValorantProfileComplete(userProfile)) {
+      console.log("Profile incomplete, showing modal");
+      setShowProfileModal(true);
+      return;
+    }
+
     // Show confirmation modal first
     setPendingTournamentId(tournamentId);
     setShowJoinConfirmation(true);
@@ -201,8 +257,10 @@ const TournamentBrowser = () => {
 
   const handleConfirmJoinTournament = async () => {
     const tournamentId = pendingTournamentId;
-    const tournament = tournaments.find((t) => t.tournament_id === tournamentId);
-    
+    const tournament = tournaments.find(
+      (t) => t.tournament_id === tournamentId
+    );
+
     if (!tournament) {
       alert("Tournament not found");
       return;
@@ -210,7 +268,7 @@ const TournamentBrowser = () => {
 
     try {
       setJoiningTournament(tournamentId);
-      
+
       // First, process the tournament entry fee through wallet
       if (tournament.joining_fee && tournament.joining_fee > 0) {
         const userId = user.player_id || user.id;
@@ -222,7 +280,9 @@ const TournamentBrowser = () => {
 
         if (!walletResponse.success) {
           if (walletResponse.error === "Insufficient balance") {
-            alert(`Insufficient credits! You need ${tournament.joining_fee} credits but don't have enough. Please add credits to your wallet.`);
+            alert(
+              `Insufficient credits! You need ${tournament.joining_fee} credits but don't have enough. Please add credits to your wallet.`
+            );
           } else {
             alert(walletResponse.message || "Failed to process entry fee");
           }
@@ -254,13 +314,14 @@ const TournamentBrowser = () => {
 
         // Ask other parts of the app to refresh balances/transactions after entry fee deduction
         if (tournament.joining_fee && tournament.joining_fee > 0) {
-          window.dispatchEvent(new Event('wallet:updated'));
+          window.dispatchEvent(new Event("wallet:updated"));
         }
 
-        const feeMessage = tournament.joining_fee && tournament.joining_fee > 0 
-          ? ` Entry fee of ${tournament.joining_fee} credits has been deducted from your wallet.`
-          : "";
-        
+        const feeMessage =
+          tournament.joining_fee && tournament.joining_fee > 0
+            ? ` Entry fee of ${tournament.joining_fee} credits has been deducted from your wallet.`
+            : "";
+
         alert(`Successfully joined tournament!${feeMessage}`);
       } else {
         alert(response.message || "Failed to join tournament");
@@ -353,7 +414,7 @@ const TournamentBrowser = () => {
         );
 
         // Ask other parts of the app (Navbar, Wallet page) to refresh balances/transactions
-        window.dispatchEvent(new Event('wallet:updated'));
+        window.dispatchEvent(new Event("wallet:updated"));
         alert(response.message || "Successfully left tournament!");
       } else {
         alert(response.message || "Failed to leave tournament");
@@ -442,21 +503,56 @@ const TournamentBrowser = () => {
             <div className="header-content">
               <div className="header-text">
                 <h1>Browse Tournaments</h1>
-                <p>Find and join exciting Valorant tournaments</p>
+                <p>
+                  {user
+                    ? "Find and join exciting Valorant tournaments"
+                    : "Browse exciting Valorant tournaments - Sign in to join!"}
+                </p>
               </div>
               <div className="header-actions">
-                <Button
-                  variant="primary"
-                  onClick={() => (window.location.href = "/my-tournaments")}
-                  className="my-tournaments-btn-prominent"
-                >
-                  <span className="button-icon">🏆</span>
-                  <span className="button-text">My Tournaments</span>
-                  <span className="button-arrow">→</span>
-                </Button>
+                {user ? (
+                  <Button
+                    variant="primary"
+                    onClick={() => (window.location.href = "/my-tournaments")}
+                    className="my-tournaments-btn-prominent"
+                  >
+                    <span className="button-icon">🏆</span>
+                    <span className="button-text">My Tournaments</span>
+                    <span className="button-arrow">→</span>
+                  </Button>
+                ) : (
+                  <Button
+                    variant="secondary"
+                    onClick={() => (window.location.href = "/login")}
+                    className="my-tournaments-btn-prominent"
+                  >
+                    <span className="button-icon">🔐</span>
+                    <span className="button-text">Sign In</span>
+                    <span className="button-arrow">→</span>
+                  </Button>
+                )}
               </div>
             </div>
           </div>
+
+          {!user && (
+            <div className="signin-notice">
+              <div className="notice-content">
+                <span className="notice-icon">ℹ️</span>
+                <span className="notice-text">
+                  You can browse all tournaments. Sign in to join tournaments
+                  and access your tournament history.
+                </span>
+                <Button
+                  variant="primary"
+                  onClick={() => (window.location.href = "/login")}
+                  className="notice-signin-btn"
+                >
+                  Sign In
+                </Button>
+              </div>
+            </div>
+          )}
 
           <div className="tournament-filters">
             <div className="search-container">
@@ -652,11 +748,8 @@ const TournamentBrowser = () => {
                     {!user ? (
                       <Button
                         variant="primary"
-                        onClick={() =>
-                          alert("Please sign in to join tournaments")
-                        }
+                        onClick={() => (window.location.href = "/login")}
                         className="join-btn"
-                        disabled
                       >
                         Sign In to Join
                       </Button>
@@ -678,6 +771,10 @@ const TournamentBrowser = () => {
                         {joiningTournament === tournament.tournament_id
                           ? "Leaving..."
                           : "Leave Tournament"}
+                      </Button>
+                    ) : profileLoading ? (
+                      <Button variant="primary" className="join-btn" disabled>
+                        Loading...
                       </Button>
                     ) : (
                       <Button
@@ -713,16 +810,18 @@ const TournamentBrowser = () => {
       </div>
 
       {/* Floating Action Button for My Tournaments */}
-      <div className="floating-my-tournaments">
-        <Button
-          variant="primary"
-          onClick={() => (window.location.href = "/my-tournaments")}
-          className="floating-my-tournaments-btn"
-          title="My Tournaments"
-        >
-          <span className="floating-icon">🏆</span>
-        </Button>
-      </div>
+      {user && (
+        <div className="floating-my-tournaments">
+          <Button
+            variant="primary"
+            onClick={() => (window.location.href = "/my-tournaments")}
+            className="floating-my-tournaments-btn"
+            title="My Tournaments"
+          >
+            <span className="floating-icon">🏆</span>
+          </Button>
+        </div>
+      )}
 
       {/* Join Tournament Confirmation Modal */}
       <ConfirmationModal
@@ -778,9 +877,7 @@ Are you sure you want to proceed?`
         title="⚠️ Tournament Locked"
         message={
           penaltyTournament
-            ? `You cannot leave "${
-                penaltyTournament.name
-              }" at this time.
+            ? `You cannot leave "${penaltyTournament.name}" at this time.
 
 The tournament starts in ${Math.max(
                 0,
@@ -798,6 +895,32 @@ Please ensure you are ready to participate in the tournament.`
         }
         confirmText="I Understand"
         cancelText=""
+        confirmButtonClass="confirm-btn"
+        cancelButtonClass="cancel-btn"
+      />
+
+      {/* Profile Completion Modal */}
+      <ConfirmationModal
+        isOpen={showProfileModal}
+        onClose={() => setShowProfileModal(false)}
+        onConfirm={() => {
+          setShowProfileModal(false);
+          window.location.href = "/player-form";
+        }}
+        title="⚠️ Profile Incomplete"
+        message={
+          userProfile
+            ? `To join Valorant tournaments, you need to complete your profile.
+
+${getProfileCompletionMessage(userProfile)}
+
+Please complete your profile to continue.`
+            : `To join Valorant tournaments, you need to complete your profile.
+
+Please fill in your basic information and Valorant details to continue.`
+        }
+        confirmText="Complete Profile"
+        cancelText="Cancel"
         confirmButtonClass="confirm-btn"
         cancelButtonClass="cancel-btn"
       />

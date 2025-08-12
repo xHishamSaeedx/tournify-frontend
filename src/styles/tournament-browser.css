@@ -1648,3 +1648,84 @@
     font-size: 1rem;
   }
 }
+
+/* Sign In Notice Styles */
+.signin-notice {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 107, 107, 0.1),
+    rgba(78, 205, 196, 0.1)
+  );
+  border: 2px solid rgba(78, 205, 196, 0.3);
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 30px;
+  backdrop-filter: blur(10px);
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.notice-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.notice-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.notice-text {
+  color: #e2e8f0;
+  font-size: 1rem;
+  flex: 1;
+  min-width: 200px;
+}
+
+.notice-signin-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #4ecdc4, #45b7d1);
+  border: none;
+  border-radius: 25px;
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.notice-signin-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+}
+
+/* Responsive styles for signin and profile notices */
+@media (max-width: 768px) {
+  .notice-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .notice-text {
+    min-width: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .signin-notice {
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+
+  .notice-text {
+    font-size: 0.9rem;
+  }
+
+  .notice-signin-btn {
+    padding: 8px 16px;
+    font-size: 0.8rem;
+  }
+}

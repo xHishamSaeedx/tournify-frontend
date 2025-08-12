@@ -2134,11 +2134,20 @@
   box-shadow: var(--shadow-glow);
 }
 
-.create-form-modal {
-  max-width: 1000px;
-  width: 95vw;
+.modal-content.create-form-modal {
+  max-width: 1400px !important;
+  width: 98vw !important;
   max-height: 95vh;
   overflow-y: auto;
+  border: 3px solid blue !important; /* Debug border */
+}
+
+/* Force the create tournament form to use full width */
+.create-tournament-form {
+  max-width: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  border: 3px solid red !important; /* Debug border */
 }
 
 /* Tournament Details Modal Styles */
@@ -2346,7 +2355,8 @@
   padding: 2rem;
   backdrop-filter: blur(20px);
   box-shadow: var(--shadow-card);
-  max-width: 800px;
+  max-width: 100%;
+  width: 100%;
   margin: 0 auto;
 }
 
@@ -2392,6 +2402,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
+  width: 100%;
 }
 
 .form-group {
@@ -2419,6 +2430,8 @@
   font-size: 1rem;
   transition: var(--transition);
   backdrop-filter: blur(10px);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-group input:focus,
@@ -2673,7 +2686,8 @@
 @media (max-width: 768px) {
   .create-tournament-form {
     padding: 1.5rem;
-    margin: 0 1rem;
+    margin: 0;
+    width: 100%;
   }
 
   .form-row {
