@@ -620,12 +620,29 @@ const TournamentBrowser = () => {
                     <div className="tournament-name-host">
                       <h3 className="tournament-name">{tournament.name}</h3>
                       <div className="host-info">
-                        <span className="host-label">Hosted by:</span>
-                        <span className="host-name">
-                          {tournament.host?.display_name ||
-                            tournament.host?.username ||
-                            "Unknown Host"}
-                        </span>
+                        <div className="host-avatar">
+                          {tournament.host?.avatar_url ? (
+                            <img
+                              src={tournament.host.avatar_url}
+                              alt={`${tournament.host?.display_name || tournament.host?.username || 'Host'} avatar`}
+                              className="host-avatar-img"
+                            />
+                          ) : (
+                            <div className="host-avatar-placeholder">
+                              {tournament.host?.display_name?.charAt(0) || 
+                               tournament.host?.username?.charAt(0) || 
+                               '?'}
+                            </div>
+                          )}
+                        </div>
+                        <div className="host-details">
+                          <span className="host-label">Hosted by:</span>
+                          <span className="host-name">
+                            {tournament.host?.display_name ||
+                              tournament.host?.username ||
+                              "Unknown Host"}
+                          </span>
+                        </div>
                       </div>
                     </div>
                     <div className="tournament-status">

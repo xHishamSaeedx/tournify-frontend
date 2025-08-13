@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import api from '../utils/api';
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import api from "../utils/api";
 
 function TournamentList() {
   const [tournaments, setTournaments] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const { user } = useAuth();
 
   useEffect(() => {
@@ -15,13 +15,13 @@ function TournamentList() {
   const fetchTournaments = async () => {
     try {
       setLoading(true);
-      setError('');
-      
+      setError("");
+
       const response = await api.getTournaments();
       setTournaments(response.data || []);
     } catch (err) {
-      console.error('Error fetching tournaments:', err);
-      setError(err.message || 'Failed to fetch tournaments');
+      console.error("Error fetching tournaments:", err);
+      setError(err.message || "Failed to fetch tournaments");
     } finally {
       setLoading(false);
     }
@@ -30,14 +30,14 @@ function TournamentList() {
   const createTournament = async (tournamentData) => {
     try {
       const response = await api.createTournament(tournamentData);
-      console.log('Tournament created:', response.data);
-      
+      console.log("Tournament created:", response.data);
+
       // Refresh the list
       await fetchTournaments();
-      
+
       return response.data;
     } catch (err) {
-      console.error('Error creating tournament:', err);
+      console.error("Error creating tournament:", err);
       throw err;
     }
   };
@@ -45,12 +45,12 @@ function TournamentList() {
   const deleteTournament = async (tournamentId) => {
     try {
       await api.deleteTournament(tournamentId);
-      console.log('Tournament deleted successfully');
-      
+      console.log("Tournament deleted successfully");
+
       // Refresh the list
       await fetchTournaments();
     } catch (err) {
-      console.error('Error deleting tournament:', err);
+      console.error("Error deleting tournament:", err);
       throw err;
     }
   };
@@ -86,7 +86,7 @@ function TournamentList() {
   return (
     <div className="tournament-list">
       <h2>Tournaments</h2>
-      
+
       {tournaments.length === 0 ? (
         <p>No tournaments found.</p>
       ) : (
@@ -101,12 +101,37 @@ function TournamentList() {
                 {tournament.max_participants && (
                   <span>Max: {tournament.max_participants}</span>
                 )}
-                <span>Host: {tournament.host?.display_name || tournament.host?.username || "Unknown Host"}</span>
+                <div className="host-info">
+                  <div className="host-avatar">
+                    {tournament.host?.avatar_url ? (
+                      <img
+                        src={tournament.host.avatar_url}
+                        alt={`${
+                          tournament.host?.display_name ||
+                          tournament.host?.username ||
+                          "Host"
+                        } avatar`}
+                        className="host-avatar-img"
+                      />
+                    ) : (
+                      <div className="host-avatar-placeholder">
+                        {tournament.host?.display_name?.charAt(0) ||
+                          tournament.host?.username?.charAt(0) ||
+                          "?"}
+                      </div>
+                    )}
+                  </div>
+                  <span className="host-name">
+                    {tournament.host?.display_name ||
+                      tournament.host?.username ||
+                      "Unknown Host"}
+                  </span>
+                </div>
               </div>
-              
+
               {/* Only show delete button if user is the creator */}
               {tournament.created_by === user.id && (
-                <button 
+                <button
                   onClick={() => deleteTournament(tournament.id)}
                   className="delete-btn"
                 >
@@ -121,4 +146,4 @@ function TournamentList() {
   );
 }
 
-export default TournamentList; 
+export default TournamentList;

@@ -346,7 +346,7 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
       newErrors.region = "Region is required";
     }
 
-    if (!formData.match_map || formData.match_map.trim() === "") {
+    if (!formData.match_map || formData.match_map === "") {
       newErrors.match_map = "Match map is required";
     }
 
@@ -397,7 +397,7 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
         party_join_time: new Date(formData.party_join_time).toISOString(),
         platform: formData.platform,
         region: formData.region,
-        match_map: formData.match_map || null, // Add map field
+        match_map: formData.match_map, // Add map field
 
         // Add host ID (user ID)
         host_id: user.id,

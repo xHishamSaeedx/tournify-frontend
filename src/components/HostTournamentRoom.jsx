@@ -690,12 +690,33 @@ const HostTournamentRoom = () => {
               <div className="tournament-title-section">
                 <h1 className="tournament-name">{tournament.name}</h1>
                 <div className="tournament-meta">
-                  <span className="host-info">
-                    Hosted by:{" "}
-                    {tournament.host?.display_name ||
-                      tournament.host?.username ||
-                      "You"}
-                  </span>
+                  <div className="host-info">
+                    <div className="host-avatar">
+                      {tournament.host?.avatar_url ? (
+                        <img
+                          src={tournament.host.avatar_url}
+                          alt={`${
+                            tournament.host?.display_name ||
+                            tournament.host?.username ||
+                            "Host"
+                          } avatar`}
+                          className="host-avatar-img"
+                        />
+                      ) : (
+                        <div className="host-avatar-placeholder">
+                          {tournament.host?.display_name?.charAt(0) ||
+                            tournament.host?.username?.charAt(0) ||
+                            "?"}
+                        </div>
+                      )}
+                    </div>
+                    <span className="host-name">
+                      Hosted by:{" "}
+                      {tournament.host?.display_name ||
+                        tournament.host?.username ||
+                        "You"}
+                    </span>
+                  </div>
                   <span className="tournament-id">
                     ID: {tournament.tournament_id}
                   </span>
@@ -1086,9 +1107,9 @@ const HostTournamentRoom = () => {
                       fontWeight: "600",
                     }}
                   >
-                                {tournament.joining_fee
-              ? `${tournament.joining_fee} credits`
-              : "Free"}
+                    {tournament.joining_fee
+                      ? `${tournament.joining_fee} credits`
+                      : "Free"}
                   </div>
                 </div>
               </div>

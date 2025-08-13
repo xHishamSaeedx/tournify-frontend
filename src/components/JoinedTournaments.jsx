@@ -173,7 +173,7 @@ const JoinedTournaments = () => {
           prev.filter((t) => t.tournament_id !== tournament.tournament_id)
         );
         // Ask other parts of the app (Navbar, Wallet page) to refresh balances/transactions
-        window.dispatchEvent(new Event('wallet:updated'));
+        window.dispatchEvent(new Event("wallet:updated"));
         alert(response.message || "Successfully left tournament!");
       } else {
         alert(response.message || "Failed to leave tournament");
@@ -388,12 +388,33 @@ const JoinedTournaments = () => {
                     <div className="tournament-name-host">
                       <h3 className="tournament-name">{tournament.name}</h3>
                       <div className="host-info">
-                        <span className="host-label">Hosted by:</span>
-                        <span className="host-name">
-                          {tournament.host?.display_name ||
-                            tournament.host?.username ||
-                            "Unknown Host"}
-                        </span>
+                        <div className="host-avatar">
+                          {tournament.host?.avatar_url ? (
+                            <img
+                              src={tournament.host.avatar_url}
+                              alt={`${
+                                tournament.host?.display_name ||
+                                tournament.host?.username ||
+                                "Host"
+                              } avatar`}
+                              className="host-avatar-img"
+                            />
+                          ) : (
+                            <div className="host-avatar-placeholder">
+                              {tournament.host?.display_name?.charAt(0) ||
+                                tournament.host?.username?.charAt(0) ||
+                                "?"}
+                            </div>
+                          )}
+                        </div>
+                        <div className="host-details">
+                          <span className="host-label">Hosted by:</span>
+                          <span className="host-name">
+                            {tournament.host?.display_name ||
+                              tournament.host?.username ||
+                              "Unknown Host"}
+                          </span>
+                        </div>
                       </div>
                       <div className="joined-info">
                         <span className="joined-label">Joined:</span>
@@ -544,17 +565,17 @@ const JoinedTournaments = () => {
         </div>
       </div>
 
-             {/* Leave Tournament Confirmation Modal */}
-       <ConfirmationModal
-         isOpen={showLeaveConfirmation}
-         onClose={() => setShowLeaveConfirmation(false)}
-         onConfirm={handleConfirmLeaveTournament}
-         title="Confirm Tournament Cancellation"
-         message={
-           pendingLeaveTournament
-             ? `⚠️ Are you sure you want to leave "${
-                 pendingLeaveTournament.name
-               }"?
+      {/* Leave Tournament Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showLeaveConfirmation}
+        onClose={() => setShowLeaveConfirmation(false)}
+        onConfirm={handleConfirmLeaveTournament}
+        title="Confirm Tournament Cancellation"
+        message={
+          pendingLeaveTournament
+            ? `⚠️ Are you sure you want to leave "${
+                pendingLeaveTournament.name
+              }"?
 
 • You will be refunded only 50% of your joining fee (${Math.floor(
                 (pendingLeaveTournament.joining_fee || 0) * 0.5
@@ -563,47 +584,45 @@ const JoinedTournaments = () => {
 • You will lose your tournament spot
 
 Are you sure you want to proceed?`
-             : ""
-         }
-         confirmText="Leave Tournament"
-         cancelText="Stay in Tournament"
-         confirmButtonClass="confirm-btn"
-         cancelButtonClass="cancel-btn"
-       />
+            : ""
+        }
+        confirmText="Leave Tournament"
+        cancelText="Stay in Tournament"
+        confirmButtonClass="confirm-btn"
+        cancelButtonClass="cancel-btn"
+      />
 
-       {/* Penalty Warning Modal */}
-       <ConfirmationModal
-         isOpen={showPenaltyWarning}
-         onClose={() => setShowPenaltyWarning(false)}
-         onConfirm={() => setShowPenaltyWarning(false)}
-         title="⚠️ Tournament Locked"
-         message={
-           penaltyTournament
-             ? `You cannot leave "${
-                 penaltyTournament.name
-               }" at this time.
+      {/* Penalty Warning Modal */}
+      <ConfirmationModal
+        isOpen={showPenaltyWarning}
+        onClose={() => setShowPenaltyWarning(false)}
+        onConfirm={() => setShowPenaltyWarning(false)}
+        title="⚠️ Tournament Locked"
+        message={
+          penaltyTournament
+            ? `You cannot leave "${penaltyTournament.name}" at this time.
 
 The tournament starts in ${Math.max(
-                 0,
-                 Math.floor(
-                   (new Date(penaltyTournament.match_start_time).getTime() -
-                     new Date().getTime()) /
-                     (1000 * 60)
-                 )
-               )} minutes.
+                0,
+                Math.floor(
+                  (new Date(penaltyTournament.match_start_time).getTime() -
+                    new Date().getTime()) /
+                    (1000 * 60)
+                )
+              )} minutes.
 
 🚨 **IMPORTANT**: If you are found not joining the match, you will be issued a penalty that may affect your future tournament participation.
 
 Please ensure you are ready to participate in the tournament.`
-             : ""
-         }
-         confirmText="I Understand"
-         cancelText=""
-         confirmButtonClass="confirm-btn"
-         cancelButtonClass="cancel-btn"
-       />
-     </>
-   );
+            : ""
+        }
+        confirmText="I Understand"
+        cancelText=""
+        confirmButtonClass="confirm-btn"
+        cancelButtonClass="cancel-btn"
+      />
+    </>
+  );
 };
 
 export default JoinedTournaments;
