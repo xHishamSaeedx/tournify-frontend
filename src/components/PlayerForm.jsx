@@ -58,16 +58,21 @@ const PlayerForm = () => {
           if (isMounted) {
             setExistingPlayer(cachedResult);
             if (cachedResult) {
+              // Get Valorant data from the valorant_users array
+              const valorantData = cachedResult.valorant_users && cachedResult.valorant_users.length > 0 
+                ? cachedResult.valorant_users[0] 
+                : null;
+              
               setFormData({
                 display_name: cachedResult.display_name || "",
                 username: cachedResult.username || "",
                 DOB: cachedResult.DOB || "",
-                selected_game: cachedResult.valorant_data ? "valorant" : "",
-                valo_name: cachedResult.valorant_data?.valorant_name || "",
-                valo_tag: cachedResult.valorant_data?.valorant_tag || "",
+                selected_game: valorantData ? "valorant" : "",
+                valo_name: valorantData?.valorant_name || "",
+                valo_tag: valorantData?.valorant_tag || "",
                 VPA: cachedResult.VPA || "",
-                platform: cachedResult.valorant_data?.platform || "",
-                region: cachedResult.valorant_data?.region || "",
+                platform: valorantData?.platform || "",
+                region: valorantData?.region || "",
               });
             }
           }
@@ -88,16 +93,21 @@ const PlayerForm = () => {
             );
             playerCheckCache.set(userId, response.data);
             setExistingPlayer(response.data);
+            // Get Valorant data from the valorant_users array
+            const valorantData = response.data.valorant_users && response.data.valorant_users.length > 0 
+              ? response.data.valorant_users[0] 
+              : null;
+            
             setFormData({
               display_name: response.data.display_name || "",
               username: response.data.username || "",
               DOB: response.data.DOB || "",
-              selected_game: response.data.valorant_data ? "valorant" : "",
-              valo_name: response.data.valorant_data?.valorant_name || "",
-              valo_tag: response.data.valorant_data?.valorant_tag || "",
+              selected_game: valorantData ? "valorant" : "",
+              valo_name: valorantData?.valorant_name || "",
+              valo_tag: valorantData?.valorant_tag || "",
               VPA: response.data.VPA || "",
-              platform: response.data.valorant_data?.platform || "",
-              region: response.data.valorant_data?.region || "",
+              platform: valorantData?.platform || "",
+              region: valorantData?.region || "",
             });
           } else if (isMounted) {
             // Cache the null result to prevent future calls
@@ -201,17 +211,22 @@ const PlayerForm = () => {
         setMessage("Player information saved successfully!");
       }
 
+      // Get Valorant data from the valorant_users array
+      const valorantData = result.valorant_users && result.valorant_users.length > 0 
+        ? result.valorant_users[0] 
+        : null;
+      
       // Update form data with the returned data
       setFormData({
         display_name: result.display_name,
         username: result.username,
         DOB: result.DOB,
-        selected_game: result.valorant_data ? "valorant" : "",
-        valo_name: result.valorant_data?.valorant_name || "",
-        valo_tag: result.valorant_data?.valorant_tag || "",
+        selected_game: valorantData ? "valorant" : "",
+        valo_name: valorantData?.valorant_name || "",
+        valo_tag: valorantData?.valorant_tag || "",
         VPA: result.VPA,
-        platform: result.valorant_data?.platform || "",
-        region: result.valorant_data?.region || "",
+        platform: valorantData?.platform || "",
+        region: valorantData?.region || "",
       });
     } catch (error) {
       console.error("Error saving player data:", error);

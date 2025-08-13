@@ -87,18 +87,6 @@ const Navbar = () => {
     setIsProfileDropdownOpen(!isProfileDropdownOpen);
   };
 
-  const handleProfile = () => {
-    navigate("/profile");
-    setIsProfileDropdownOpen(false);
-    setIsMobileMenuOpen(false);
-  };
-
-  const handlePlayerForm = () => {
-    navigate("/player-form");
-    setIsProfileDropdownOpen(false);
-    setIsMobileMenuOpen(false);
-  };
-
   const handleSettings = () => {
     navigate("/settings");
     setIsProfileDropdownOpen(false);
@@ -226,26 +214,6 @@ const Navbar = () => {
                     </div>
 
                     <div className="dropdown-menu">
-                      <div className="dropdown-item-group">
-                        <button
-                          className="dropdown-item"
-                          onClick={handleProfile}
-                        >
-                          <span className="item-icon">👤</span>
-                          <span className="item-text">View Profile</span>
-                          <span className="submenu-arrow">▶</span>
-                        </button>
-                        <div className="submenu">
-                          <button
-                            className="submenu-item"
-                            onClick={handlePlayerForm}
-                          >
-                            <span className="item-icon">🎮</span>
-                            <span className="item-text">Player Form</span>
-                          </button>
-                        </div>
-                      </div>
-
                       <button
                         className="dropdown-item"
                         onClick={handleMyTournaments}
@@ -354,20 +322,6 @@ const Navbar = () => {
             </div>
 
             <div className="mobile-profile-actions">
-              <Button
-                variant="secondary"
-                className="mobile-nav-btn"
-                onClick={handleProfile}
-              >
-                👤 View Profile
-              </Button>
-              <Button
-                variant="secondary"
-                className="mobile-nav-btn"
-                onClick={handlePlayerForm}
-              >
-                🎮 Player Form
-              </Button>
               <Button
                 variant="secondary"
                 className="mobile-nav-btn"

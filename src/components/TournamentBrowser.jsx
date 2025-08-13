@@ -333,7 +333,7 @@ const TournamentBrowser = () => {
       if (error.message) {
         if (error.message.includes("Profile incomplete")) {
           errorMessage =
-            "Please complete your profile before joining tournaments. Go to your profile and fill in your username, Valorant ID, and VPA.";
+            "Please complete your profile before joining tournaments. Go to Settings and fill in your username, Valorant ID, and VPA.";
         } else if (error.message.includes("Tournament closed")) {
           errorMessage =
             "Tournament registration is closed. It starts in less than 5 minutes.";
@@ -905,7 +905,7 @@ Please ensure you are ready to participate in the tournament.`
         onClose={() => setShowProfileModal(false)}
         onConfirm={() => {
           setShowProfileModal(false);
-          window.location.href = "/player-form";
+                          window.location.href = "/settings";
         }}
         title="⚠️ Profile Incomplete"
         message={

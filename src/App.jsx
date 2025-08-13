@@ -13,6 +13,7 @@ import Login from "./components/Login";
 import AuthHandler from "./components/AuthHandler";
 import UserProfile from "./components/UserProfile";
 import PlayerForm from "./components/PlayerForm";
+import Settings from "./components/Settings";
 import BackButton from "./components/BackButton";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ValorantPage from "./components/ValorantPage";
@@ -59,14 +60,7 @@ const App = () => {
                 path="/settings"
                 element={
                   <ProtectedRoute>
-                    <div className="settings-page">
-                      <Navbar />
-                      <div className="settings-container">
-                        <BackButton />
-                        <h1>Settings</h1>
-                        <p>Settings page coming soon...</p>
-                      </div>
-                    </div>
+                    <Settings />
                   </ProtectedRoute>
                 }
               />
