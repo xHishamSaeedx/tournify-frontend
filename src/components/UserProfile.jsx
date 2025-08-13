@@ -1,30 +1,39 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import BackButton from "./BackButton";
+import ProfilePictureUpload from "./ProfilePictureUpload";
 import api from "../utils/api";
 
 function UserProfile() {
   const { user, signOut } = useAuth();
   const [playerData, setPlayerData] = useState(null);
+  const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchPlayerData = async () => {
+    const fetchData = async () => {
       if (user) {
         try {
-          const response = await api.getPlayer(user.id);
-          if (response.success) {
-            setPlayerData(response.data);
+          // Fetch player data
+          const playerResponse = await api.getPlayer(user.id);
+          if (playerResponse.success) {
+            setPlayerData(playerResponse.data);
+          }
+
+          // Fetch user data for avatar
+          const userResponse = await api.getUser(user.id);
+          if (userResponse.success) {
+            setUserData(userResponse.data);
           }
         } catch (error) {
-          console.error("Error fetching player data:", error);
+          console.error("Error fetching data:", error);
         } finally {
           setLoading(false);
         }
       }
     };
 
-    fetchPlayerData();
+    fetchData();
   }, [user]);
 
   if (!user) {
@@ -42,6 +51,13 @@ function UserProfile() {
   const getInitials = (email) => {
     if (!email) return "U";
     return email.charAt(0).toUpperCase();
+  };
+
+  const handleProfilePictureUpdate = (newAvatarUrl) => {
+    setUserData(prev => ({
+      ...prev,
+      avatar_url: newAvatarUrl
+    }));
   };
 
   if (loading) {
@@ -67,7 +83,15 @@ function UserProfile() {
         <div className="profile-card">
           <div className="profile-header">
             <div className="profile-avatar-large">
-              {getInitials(user.email)}
+              {userData?.avatar_url ? (
+                <img 
+                  src={userData.avatar_url} 
+                  alt="Profile picture" 
+                  className="profile-avatar-image"
+                />
+              ) : (
+                getInitials(user.email)
+              )}
             </div>
             <div className="profile-info">
               <h1 className="profile-name">
@@ -79,6 +103,13 @@ function UserProfile() {
               <p className="profile-role">Player</p>
             </div>
           </div>
+
+          {/* Profile Picture Upload Section */}
+          <ProfilePictureUpload 
+            onUploadSuccess={handleProfilePictureUpdate}
+            currentAvatarUrl={userData?.avatar_url}
+            userId={user.id}
+          />
 
           {playerData && (
             <div className="profile-details">

@@ -13,6 +13,7 @@ const Navbar = () => {
   const [walletBalance, setWalletBalance] = useState(0);
   const [showCreditPackages, setShowCreditPackages] = useState(false);
   const [showComingSoon, setShowComingSoon] = useState(false);
+  const [userData, setUserData] = useState(null);
   const profileDropdownRef = useRef(null);
 
   // Predefined credit packages
@@ -35,10 +36,11 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Fetch wallet balance when user changes
+  // Fetch wallet balance and user data when user changes
   useEffect(() => {
     if (user) {
       fetchWalletBalance();
+      fetchUserData();
     }
   }, [user]);
 
@@ -76,6 +78,17 @@ const Navbar = () => {
       }
     } catch (err) {
       console.error("Error fetching wallet balance:", err);
+    }
+  };
+
+  const fetchUserData = async () => {
+    try {
+      const response = await api.getUser(user.id);
+      if (response.success) {
+        setUserData(response.data);
+      }
+    } catch (err) {
+      console.error("Error fetching user data:", err);
     }
   };
 
@@ -187,7 +200,15 @@ const Navbar = () => {
                   onClick={toggleProfileDropdown}
                 >
                   <span className="profile-avatar">
-                    {getInitials(user.email)}
+                    {userData?.avatar_url ? (
+                      <img
+                        src={userData.avatar_url}
+                        alt="Profile picture"
+                        className="profile-avatar-image"
+                      />
+                    ) : (
+                      getInitials(user.email)
+                    )}
                   </span>
                   <span className="profile-text">Profile</span>
                   <span
@@ -204,7 +225,15 @@ const Navbar = () => {
                     <div className="dropdown-header">
                       <div className="user-info">
                         <div className="user-avatar">
-                          {getInitials(user.email)}
+                          {userData?.avatar_url ? (
+                            <img
+                              src={userData.avatar_url}
+                              alt="Profile picture"
+                              className="user-avatar-image"
+                            />
+                          ) : (
+                            getInitials(user.email)
+                          )}
                         </div>
                         <div className="user-details">
                           <div className="user-name">{user.email}</div>
@@ -301,7 +330,15 @@ const Navbar = () => {
           <div className="mobile-profile-section">
             <div className="mobile-user-info">
               <div className="mobile-user-avatar">
-                {getInitials(user.email)}
+                {userData?.avatar_url ? (
+                  <img
+                    src={userData.avatar_url}
+                    alt="Profile picture"
+                    className="mobile-user-avatar-image"
+                  />
+                ) : (
+                  getInitials(user.email)
+                )}
               </div>
               <div className="mobile-user-details">
                 <div className="mobile-user-name">{user.email}</div>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import BackButton from "./BackButton";
+import ProfilePictureUpload from "./ProfilePictureUpload";
 import api from "../utils/api";
 import "./Settings.css";
 
@@ -8,6 +9,7 @@ const Settings = () => {
   const { user, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState("profile");
   const [playerData, setPlayerData] = useState(null);
+  const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [walletBalance, setWalletBalance] = useState(0);
@@ -62,31 +64,38 @@ const Settings = () => {
   const fetchPlayerData = async () => {
     if (user) {
       try {
-        const response = await api.getPlayer(user.id);
-        if (response.success) {
-          setPlayerData(response.data);
+        // Fetch player data
+        const playerResponse = await api.getPlayer(user.id);
+        if (playerResponse.success) {
+          setPlayerData(playerResponse.data);
 
           // Get Valorant data from the valorant_users array
           const valorantData =
-            response.data.valorant_users &&
-            response.data.valorant_users.length > 0
-              ? response.data.valorant_users[0]
+            playerResponse.data.valorant_users &&
+            playerResponse.data.valorant_users.length > 0
+              ? playerResponse.data.valorant_users[0]
               : null;
 
           setFormData({
-            display_name: response.data.display_name || "",
-            username: response.data.username || "",
-            DOB: response.data.DOB || "",
+            display_name: playerResponse.data.display_name || "",
+            username: playerResponse.data.username || "",
+            DOB: playerResponse.data.DOB || "",
             selected_game: valorantData ? "valorant" : "",
             valo_name: valorantData?.valorant_name || "",
             valo_tag: valorantData?.valorant_tag || "",
-            VPA: response.data.VPA || "",
+            VPA: playerResponse.data.VPA || "",
             platform: valorantData?.platform || "",
             region: valorantData?.region || "",
           });
         }
+
+        // Fetch user data for avatar
+        const userResponse = await api.getUser(user.id);
+        if (userResponse.success) {
+          setUserData(userResponse.data);
+        }
       } catch (error) {
-        console.error("Error fetching player data:", error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
@@ -188,6 +197,13 @@ const Settings = () => {
     return email.charAt(0).toUpperCase();
   };
 
+  const handleProfilePictureUpdate = (newAvatarUrl) => {
+    setUserData(prev => ({
+      ...prev,
+      avatar_url: newAvatarUrl
+    }));
+  };
+
   const getTransactionIcon = (type) => {
     switch (type) {
       case "credit":
@@ -223,7 +239,17 @@ const Settings = () => {
         <BackButton />
 
         <div className="settings-header">
-          <div className="settings-avatar">{getInitials(user.email)}</div>
+          <div className="settings-avatar">
+            {userData?.avatar_url ? (
+              <img 
+                src={userData.avatar_url} 
+                alt="Profile picture" 
+                className="settings-avatar-image"
+              />
+            ) : (
+              getInitials(user.email)
+            )}
+          </div>
           <div className="settings-user-info">
             <h1 className="settings-title">Settings</h1>
             <p className="settings-subtitle">
@@ -269,6 +295,13 @@ const Settings = () => {
                 <p className="section-description">
                   Update your personal information and game details
                 </p>
+
+                {/* Profile Picture Upload Section */}
+                <ProfilePictureUpload 
+                  onUploadSuccess={handleProfilePictureUpdate}
+                  currentAvatarUrl={userData?.avatar_url}
+                  userId={user.id}
+                />
 
                 <form onSubmit={handleProfileSubmit} className="profile-form">
                   <div className="form-grid">

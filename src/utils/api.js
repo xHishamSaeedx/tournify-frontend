@@ -268,6 +268,41 @@ export const api = {
       method: "POST",
       body: JSON.stringify(data),
     }),
+
+  // Profile picture endpoints
+  uploadProfilePicture: async (file) => {
+    const formData = new FormData();
+    formData.append("profilePicture", file);
+    
+    try {
+      const headers = await getAuthHeaders();
+      // Remove Content-Type to let browser set it for FormData
+      delete headers["Content-Type"];
+      
+      const response = await fetch(`${API_BASE_URL}/api/profile-pictures/upload`, {
+        method: "POST",
+        headers,
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Profile picture upload error:", error);
+      throw error;
+    }
+  },
+  deleteProfilePicture: () =>
+    authenticatedApiCall("/api/profile-pictures/delete", {
+      method: "DELETE",
+    }),
+  getProfilePictureUrl: (userId) =>
+    publicApiCall(`/api/profile-pictures/url/${userId}`),
 };
 
 export default api;

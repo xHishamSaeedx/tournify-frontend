@@ -13,6 +13,7 @@ import Login from "./components/Login";
 import AuthHandler from "./components/AuthHandler";
 import UserProfile from "./components/UserProfile";
 import PlayerForm from "./components/PlayerForm";
+import ProfileForm from "./components/ProfileForm";
 import Settings from "./components/Settings";
 import BackButton from "./components/BackButton";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -53,6 +54,22 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <PlayerForm />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile-form"
+                element={
+                  <ProtectedRoute>
+                    <ProfileForm mode="create" />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile-form/edit"
+                element={
+                  <ProtectedRoute>
+                    <ProfileForm mode="edit" />
                   </ProtectedRoute>
                 }
               />
