@@ -45,12 +45,12 @@ const ValorantHeroSection = ({ onShowCreateForm }) => {
     if (onShowCreateForm) {
       onShowCreateForm();
     } else {
-      navigate("/host-dashboard");
+      navigate("/valorant/host-dashboard");
     }
   };
 
   const handleMyCreatedTournaments = () => {
-    navigate("/host-dashboard");
+    navigate("/valorant/host-dashboard");
   };
 
   const handleCreateHosts = () => {

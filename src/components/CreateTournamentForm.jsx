@@ -3,7 +3,7 @@ import Button from "./Button";
 import { useAuth } from "../contexts/AuthContext";
 import { api } from "../utils/api";
 
-const CreateTournamentForm = ({ onClose, onSuccess }) => {
+const CreateTournamentForm = ({ onClose, onSuccess, game = "valorant" }) => {
   const [formData, setFormData] = useState({
     name: "",
     match_start_time: "",
@@ -18,6 +18,7 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
     platform: "pc", // Default to PC
     region: "eu", // Default to EU
     match_map: "", // Default empty for map selection
+    game: game, // Add game field
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
@@ -398,6 +399,7 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
         platform: formData.platform,
         region: formData.region,
         match_map: formData.match_map, // Add map field
+        game: formData.game, // Add game field
 
         // Add host ID (user ID)
         host_id: user.id,
@@ -425,7 +427,7 @@ const CreateTournamentForm = ({ onClose, onSuccess }) => {
   return (
     <div className="create-tournament-form">
       <div className="form-header">
-        <h3>Create New Tournament</h3>
+        <h3>Create New {game.charAt(0).toUpperCase() + game.slice(1)} Tournament</h3>
         <Button variant="secondary" onClick={onClose} type="button">
           ✕
         </Button>

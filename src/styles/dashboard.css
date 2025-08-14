@@ -2783,3 +2783,46 @@
     padding: 1rem;
   }
 }
+
+/* Access Denied Styles */
+.access-denied-message {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--border-radius);
+  border: 2px solid var(--border-color);
+  backdrop-filter: blur(10px);
+  margin: 2rem 0;
+}
+
+.access-denied-message p {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.access-denied-message p:last-of-type {
+  margin-bottom: 2rem;
+}
+
+.access-denied-message button {
+  margin-top: 1rem;
+}
+
+.loading-message {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: var(--border-radius);
+  border: 2px solid var(--border-color);
+  backdrop-filter: blur(10px);
+  margin: 2rem 0;
+}
+
+.loading-message p {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}

@@ -240,9 +240,12 @@ export const api = {
     }),
 
   // Wallet endpoints
-  getWalletBalance: (userId) => authenticatedApiCall(`/api/wallets/balance/${userId}`),
+  getWalletBalance: (userId) =>
+    authenticatedApiCall(`/api/wallets/balance/${userId}`),
   getWalletTransactions: (userId, page = 1, limit = 20) =>
-    authenticatedApiCall(`/api/wallets/transactions/${userId}?page=${page}&limit=${limit}`),
+    authenticatedApiCall(
+      `/api/wallets/transactions/${userId}?page=${page}&limit=${limit}`
+    ),
   createTransaction: (data) =>
     authenticatedApiCall("/api/wallets/transactions", {
       method: "POST",
@@ -273,21 +276,26 @@ export const api = {
   uploadProfilePicture: async (file) => {
     const formData = new FormData();
     formData.append("profilePicture", file);
-    
+
     try {
       const headers = await getAuthHeaders();
       // Remove Content-Type to let browser set it for FormData
       delete headers["Content-Type"];
-      
-      const response = await fetch(`${API_BASE_URL}/api/profile-pictures/upload`, {
-        method: "POST",
-        headers,
-        body: formData,
-      });
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/profile-pictures/upload`,
+        {
+          method: "POST",
+          headers,
+          body: formData,
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+        throw new Error(
+          errorData.message || `HTTP error! status: ${response.status}`
+        );
       }
 
       const data = await response.json();
@@ -303,6 +311,13 @@ export const api = {
     }),
   getProfilePictureUrl: (userId) =>
     publicApiCall(`/api/profile-pictures/url/${userId}`),
+
+  // User roles endpoints
+  checkHostForGame: (userId, game) =>
+    authenticatedApiCall(`/api/user-roles/${userId}/host-for-game/${game}`),
+  getUserRoles: (userId) => authenticatedApiCall(`/api/user-roles/${userId}`),
+  getUserRolesDetailed: (userId) =>
+    authenticatedApiCall(`/api/user-roles/${userId}/detailed`),
 };
 
 export default api;
