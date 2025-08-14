@@ -1930,6 +1930,7 @@
   justify-content: center;
   gap: 1rem;
   margin-bottom: 3rem;
+  flex-wrap: wrap;
 }
 
 .tab-button {
@@ -1946,12 +1947,16 @@
   cursor: pointer;
   transition: var(--transition);
   backdrop-filter: blur(10px);
+  min-width: 180px;
+  justify-content: center;
 }
 
 .tab-button:hover {
   border-color: var(--primary-color);
   background: rgba(255, 70, 85, 0.1);
   color: var(--text-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(255, 70, 85, 0.2);
 }
 
 .tab-button.active {
@@ -1959,10 +1964,22 @@
   border-color: var(--primary-color);
   color: white;
   box-shadow: var(--shadow-glow);
+  transform: translateY(-2px);
+}
+
+.tab-button.active:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-glow), 0 8px 25px rgba(255, 70, 85, 0.3);
 }
 
 .tab-icon {
   font-size: 1.2rem;
+}
+
+.tab-label {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .dashboard-content {
@@ -2716,6 +2733,31 @@
   }
 }
 
+/* Embedded Components Styles */
+.embedded-tournament-browser,
+.embedded-joined-tournaments {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.embedded-tournament-browser .tournament-browser-container,
+.embedded-joined-tournaments .joined-tournaments-container {
+  padding: 0;
+  max-width: none;
+  width: 100%;
+}
+
+.embedded-tournament-browser .tournament-browser-header,
+.embedded-joined-tournaments .joined-tournaments-header {
+  margin-bottom: 2rem;
+}
+
+.embedded-tournament-browser .tournament-browser-header .header-actions,
+.embedded-joined-tournaments .joined-tournaments-header .header-actions {
+  display: none; /* Hide the header actions when embedded */
+}
+
 /* Responsive Design for Host Dashboard */
 @media (max-width: 768px) {
   .host-dashboard {
@@ -2767,6 +2809,16 @@
 
   .tournament-actions {
     flex-direction: column;
+  }
+
+  .dashboard-tabs {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .tab-button {
+    min-width: 100%;
+    max-width: 300px;
   }
 }
 

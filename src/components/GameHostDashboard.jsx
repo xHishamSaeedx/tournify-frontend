@@ -5,10 +5,12 @@ import BackButton from "./BackButton";
 import { useAuth } from "../contexts/AuthContext";
 import { useUserRoles } from "../contexts/UserRolesContext";
 import CreateTournamentForm from "./CreateTournamentForm";
+import ConfirmationModal from "./ConfirmationModal";
 import { api } from "../utils/api";
 import {
   getStatusDisplay,
   formatMatchStartTime,
+  getTournamentStatus,
 } from "../utils/tournamentStatus";
 
 const GameHostDashboard = () => {
@@ -26,6 +28,13 @@ const GameHostDashboard = () => {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [hasGameAccess, setHasGameAccess] = useState(false);
   const [checkingAccess, setCheckingAccess] = useState(true);
+  const [participationStatus, setParticipationStatus] = useState({});
+  const [joiningTournament, setJoiningTournament] = useState(null);
+  const [loadingParticipation, setLoadingParticipation] = useState(false);
+  const [showJoinConfirmation, setShowJoinConfirmation] = useState(false);
+  const [showLeaveConfirmation, setShowLeaveConfirmation] = useState(false);
+  const [pendingTournamentId, setPendingTournamentId] = useState(null);
+  const [pendingLeaveTournament, setPendingLeaveTournament] = useState(null);
 
   const tabs = [
     { id: "my-tournaments", label: "My Created Tournaments", icon: "🏆" },
@@ -68,6 +77,13 @@ const GameHostDashboard = () => {
     }
   }, [user, activeTab, hasGameAccess]);
 
+  // Check participation status for tournaments
+  useEffect(() => {
+    if (tournaments.length > 0 && user) {
+      fetchParticipationStatus();
+    }
+  }, [tournaments, user]);
+
   const fetchHostTournaments = async () => {
     if (!user) return;
 
@@ -97,9 +113,257 @@ const GameHostDashboard = () => {
     }
   };
 
+  const fetchParticipationStatus = async () => {
+    try {
+      setLoadingParticipation(true);
+      const statusPromises = tournaments.map(async (tournament) => {
+        const tournamentId = tournament.tournament_id;
+        if (!tournamentId) {
+          console.warn("Tournament missing tournament_id:", tournament);
+          return {
+            tournamentId: null,
+            isParticipant: false,
+          };
+        }
+        try {
+          const response = await api.getParticipationStatus(tournamentId);
+          return {
+            tournamentId: tournamentId,
+            isParticipant: response.success
+              ? response.data.isParticipant
+              : false,
+          };
+        } catch (error) {
+          console.error(
+            `Error fetching participation status for tournament ${tournamentId}:`,
+            error
+          );
+          return {
+            tournamentId: tournamentId,
+            isParticipant: false,
+          };
+        }
+      });
+
+      const statuses = await Promise.all(statusPromises);
+      const statusMap = {};
+      statuses.forEach((status) => {
+        statusMap[status.tournamentId] = status.isParticipant;
+      });
+      setParticipationStatus(statusMap);
+    } catch (error) {
+      console.error("Error fetching participation statuses:", error);
+    } finally {
+      setLoadingParticipation(false);
+    }
+  };
+
   const handleViewDetails = (tournament) => {
     // Navigate to host tournament room page
     window.location.href = `/host/tournament/${tournament.tournament_id}`;
+  };
+
+  const handleJoinTournament = async (tournamentId) => {
+    if (!user) {
+      alert("Please sign in to join tournaments");
+      return;
+    }
+
+    if (!tournamentId) {
+      alert("Invalid tournament ID");
+      return;
+    }
+
+    // Show confirmation modal first
+    setPendingTournamentId(tournamentId);
+    setShowJoinConfirmation(true);
+  };
+
+  const handleConfirmJoinTournament = async () => {
+    const tournamentId = pendingTournamentId;
+    const tournament = tournaments.find(
+      (t) => t.tournament_id === tournamentId
+    );
+
+    if (!tournament) {
+      alert("Tournament not found");
+      return;
+    }
+
+    try {
+      setJoiningTournament(tournamentId);
+
+      // First, process the tournament entry fee through wallet
+      if (tournament.joining_fee && tournament.joining_fee > 0) {
+        const userId = user.player_id || user.id;
+        const walletResponse = await api.processTournamentEntry({
+          user_id: userId,
+          tournament_id: tournamentId,
+          entry_fee: tournament.joining_fee,
+        });
+
+        if (!walletResponse.success) {
+          if (walletResponse.error === "Insufficient balance") {
+            alert(
+              `Insufficient credits! You need ${tournament.joining_fee} credits but don't have enough. Please add credits to your wallet.`
+            );
+          } else {
+            alert(walletResponse.message || "Failed to process entry fee");
+          }
+          return;
+        }
+      }
+
+      // Then join the tournament
+      const response = await api.joinTournament(tournamentId);
+
+      if (response.success) {
+        // Update participation status
+        setParticipationStatus((prev) => ({
+          ...prev,
+          [tournamentId]: true,
+        }));
+
+        // Update tournament current_players count
+        setTournaments((prev) =>
+          prev.map((tournament) =>
+            tournament.tournament_id === tournamentId
+              ? {
+                  ...tournament,
+                  current_players: (tournament.current_players || 0) + 1,
+                }
+              : tournament
+          )
+        );
+
+        // Ask other parts of the app to refresh balances/transactions after entry fee deduction
+        if (tournament.joining_fee && tournament.joining_fee > 0) {
+          window.dispatchEvent(new Event("wallet:updated"));
+        }
+
+        const feeMessage =
+          tournament.joining_fee && tournament.joining_fee > 0
+            ? ` Entry fee of ${tournament.joining_fee} credits has been deducted from your wallet.`
+            : "";
+
+        alert(`Successfully joined tournament!${feeMessage}`);
+      } else {
+        alert(response.message || "Failed to join tournament");
+      }
+    } catch (error) {
+      console.error("Error joining tournament:", error);
+      let errorMessage = "Failed to join tournament";
+
+      if (error.message) {
+        if (error.message.includes("Profile incomplete")) {
+          errorMessage =
+            "Please complete your profile before joining tournaments. Go to Settings and fill in your username, Valorant ID, and VPA.";
+        } else if (error.message.includes("Tournament closed")) {
+          errorMessage = "This tournament is no longer accepting participants.";
+        } else if (error.message.includes("already registered")) {
+          errorMessage = "You are already registered for this tournament.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
+      alert(errorMessage);
+    } finally {
+      setJoiningTournament(null);
+      setShowJoinConfirmation(false);
+      setPendingTournamentId(null);
+    }
+  };
+
+  const handleLeaveTournament = async (tournamentId) => {
+    if (!user) {
+      alert("Please sign in to leave tournaments");
+      return;
+    }
+
+    // Find the tournament to check match start time
+    const tournament = tournaments.find(
+      (t) => t.tournament_id === tournamentId
+    );
+    if (!tournament) {
+      alert("Tournament not found");
+      return;
+    }
+
+    // Check if match starts within 15 minutes
+    const matchStartTime = new Date(tournament.match_start_time);
+    const currentTime = new Date();
+    const timeDifference = matchStartTime.getTime() - currentTime.getTime();
+    const minutesUntilMatch = Math.floor(timeDifference / (1000 * 60));
+
+    if (minutesUntilMatch <= 15) {
+      alert("Cannot leave tournament within 15 minutes of match start time.");
+      return;
+    }
+
+    // Show confirmation modal
+    setPendingLeaveTournament(tournament);
+    setShowLeaveConfirmation(true);
+  };
+
+  const handleConfirmLeaveTournament = async () => {
+    const tournament = pendingLeaveTournament;
+    if (!tournament) return;
+
+    try {
+      setJoiningTournament(tournament.tournament_id);
+      const response = await api.leaveTournament(tournament.tournament_id);
+
+      if (response.success) {
+        // Update participation status
+        setParticipationStatus((prev) => ({
+          ...prev,
+          [tournament.tournament_id]: false,
+        }));
+
+        // Update tournament current_players count
+        setTournaments((prev) =>
+          prev.map((t) =>
+            t.tournament_id === tournament.tournament_id
+              ? {
+                  ...t,
+                  current_players: Math.max(0, (t.current_players || 0) - 1),
+                }
+              : t
+          )
+        );
+
+        // Ask other parts of the app (Navbar, Wallet page) to refresh balances/transactions
+        window.dispatchEvent(new Event("wallet:updated"));
+        alert(response.message || "Successfully left tournament!");
+      } else {
+        alert(response.message || "Failed to leave tournament");
+      }
+    } catch (error) {
+      console.error("Error leaving tournament:", error);
+      let errorMessage = "Failed to leave tournament";
+
+      if (error.message) {
+        if (error.message.includes("Not a participant")) {
+          errorMessage = "You are not registered for this tournament.";
+        } else if (
+          error.message.includes("Cannot leave tournament within 15 minutes")
+        ) {
+          errorMessage =
+            "Cannot leave tournament within 15 minutes of match start time.";
+        } else if (error.message.includes("Tournament not found")) {
+          errorMessage = "Tournament not found.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
+      alert(errorMessage);
+    } finally {
+      setJoiningTournament(null);
+      setShowLeaveConfirmation(false);
+      setPendingLeaveTournament(null);
+    }
   };
 
   const closeDetailsModal = () => {
@@ -167,99 +431,153 @@ const GameHostDashboard = () => {
   }
 
   const renderTabContent = () => {
-    return (
-      <div className="tab-content">
-        <div className="section-header">
-          <h3>My Created Tournaments</h3>
-          <div className="section-actions">
-            <Button
-              variant="primary"
-              onClick={() => setShowCreateForm(true)}
-              className="create-tournament-btn"
-            >
-              <span className="btn-icon">➕</span>
-              Create Tournament
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={fetchHostTournaments}
-              disabled={loading}
-            >
-              {loading ? "Loading..." : "Refresh"}
-            </Button>
-          </div>
-        </div>
+    switch (activeTab) {
+      case "my-tournaments":
+        return (
+          <div className="tab-content">
+            <div className="section-header">
+              <h3>My Created Tournaments</h3>
+              <div className="section-actions">
+                <Button
+                  variant="primary"
+                  onClick={() => setShowCreateForm(true)}
+                  className="create-tournament-btn"
+                >
+                  <span className="btn-icon">➕</span>
+                  Create Tournament
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={fetchHostTournaments}
+                  disabled={loading}
+                >
+                  {loading ? "Loading..." : "Refresh"}
+                </Button>
+              </div>
+            </div>
 
-        {error && (
-          <div className="error-message">
-            <p>{error}</p>
-          </div>
-        )}
+            {error && (
+              <div className="error-message">
+                <p>{error}</p>
+              </div>
+            )}
 
-        {loading ? (
-          <div className="loading-message">
-            <p>Loading tournaments...</p>
-          </div>
-        ) : tournaments.length === 0 ? (
-          <div className="empty-state">
-            <p>No tournaments created yet.</p>
-          </div>
-        ) : (
-          <div className="tournaments-grid">
-            {tournaments.map((tournament) => {
-              const statusDisplay = getStatusDisplay(
-                tournament.match_start_time
-              );
-              return (
-                <div key={tournament.tournament_id} className="tournament-card">
-                  <div className="tournament-header">
-                    <h4>{tournament.name}</h4>
-                    <span className={statusDisplay.className}>
-                      {statusDisplay.text}
-                    </span>
-                  </div>
-                  <div className="tournament-details">
-                    <p>
-                      <strong>Prize Pool:</strong>{" "}
-                      {tournament.prize_pool
-                        ? `${tournament.prize_pool} credits`
-                        : "TBD"}
-                    </p>
-                    <p>
-                      <strong>Capacity:</strong> {tournament.capacity || "N/A"}
-                    </p>
-                    <p>
-                      <strong>Start Time:</strong>{" "}
-                      {formatMatchStartTime(tournament.match_start_time)}
-                    </p>
-                    <p>
-                      <strong>Platform:</strong> {tournament.platform || "N/A"}
-                    </p>
-                    <p>
-                      <strong>Region:</strong> {tournament.region || "N/A"}
-                    </p>
-                    <p>
-                      <strong>Joining Fee:</strong>{" "}
-                      {tournament.joining_fee
-                        ? `${tournament.joining_fee} credits`
-                        : "Free"}
-                    </p>
-                  </div>
-                  <div className="tournament-actions">
-                    <Button
-                      variant="secondary"
-                      onClick={() => handleViewDetails(tournament)}
+            {loading ? (
+              <div className="loading-message">
+                <p>Loading tournaments...</p>
+              </div>
+            ) : tournaments.length === 0 ? (
+              <div className="empty-state">
+                <p>No tournaments created yet.</p>
+              </div>
+            ) : (
+              <div className="tournaments-grid">
+                {tournaments.map((tournament) => {
+                  const statusDisplay = getStatusDisplay(
+                    tournament.match_start_time
+                  );
+                  return (
+                    <div
+                      key={tournament.tournament_id}
+                      className="tournament-card"
                     >
-                      View Details
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
+                      <div className="tournament-header">
+                        <h4>{tournament.name}</h4>
+                        <span className={statusDisplay.className}>
+                          {statusDisplay.text}
+                        </span>
+                      </div>
+                      <div className="tournament-details">
+                        <p>
+                          <strong>Prize Pool:</strong>{" "}
+                          {tournament.prize_pool
+                            ? `${tournament.prize_pool} credits`
+                            : "TBD"}
+                        </p>
+                        <p>
+                          <strong>Capacity:</strong>{" "}
+                          {tournament.capacity || "N/A"}
+                        </p>
+                        <p>
+                          <strong>Start Time:</strong>{" "}
+                          {formatMatchStartTime(tournament.match_start_time)}
+                        </p>
+                        <p>
+                          <strong>Platform:</strong>{" "}
+                          {tournament.platform || "N/A"}
+                        </p>
+                        <p>
+                          <strong>Region:</strong> {tournament.region || "N/A"}
+                        </p>
+                        <p>
+                          <strong>Joining Fee:</strong>{" "}
+                          {tournament.joining_fee
+                            ? `${tournament.joining_fee} credits`
+                            : "Free"}
+                        </p>
+                      </div>
+                      <div className="tournament-actions">
+                        <Button
+                          variant="secondary"
+                          onClick={() => handleViewDetails(tournament)}
+                        >
+                          View Details
+                        </Button>
+                        {(() => {
+                          const isJoined =
+                            participationStatus[tournament.tournament_id];
+                          const isCompleted =
+                            getTournamentStatus(tournament.match_start_time) ===
+                            "done";
+                          const isJoining =
+                            joiningTournament === tournament.tournament_id;
+
+                          if (isCompleted) {
+                            return (
+                              <Button variant="disabled" disabled>
+                                Tournament Completed
+                              </Button>
+                            );
+                          } else if (isJoined) {
+                            return (
+                              <Button
+                                variant="danger"
+                                onClick={() =>
+                                  handleLeaveTournament(
+                                    tournament.tournament_id
+                                  )
+                                }
+                                disabled={isJoining}
+                              >
+                                {isJoining ? "Leaving..." : "Leave Tournament"}
+                              </Button>
+                            );
+                          } else {
+                            return (
+                              <Button
+                                variant="primary"
+                                onClick={() =>
+                                  handleJoinTournament(tournament.tournament_id)
+                                }
+                                disabled={isJoining || loadingParticipation}
+                              >
+                                {isJoining ? "Joining..." : "Join Tournament"}
+                              </Button>
+                            );
+                          }
+                        })()}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        )}
-      </div>
-    );
+        );
+
+      default:
+        return null;
+    }
   };
 
   return (
@@ -281,7 +599,23 @@ const GameHostDashboard = () => {
         </div>
       </div>
 
-      <div className="dashboard-content">{renderTabContent()}</div>
+      <div className="dashboard-content">
+        {/* Tab Navigation */}
+        <div className="dashboard-tabs">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              className={`tab-button ${activeTab === tab.id ? "active" : ""}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              <span className="tab-icon">{tab.icon}</span>
+              <span className="tab-label">{tab.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {renderTabContent()}
+      </div>
 
       {/* Create Tournament Form Modal */}
       {showCreateForm && (
@@ -475,6 +809,58 @@ const GameHostDashboard = () => {
           </div>
         </div>
       )}
+
+      {/* Join Tournament Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showJoinConfirmation}
+        onClose={() => {
+          setShowJoinConfirmation(false);
+          setPendingTournamentId(null);
+        }}
+        onConfirm={handleConfirmJoinTournament}
+        title="Confirm Tournament Registration"
+        message="⚠️ Important: By joining this tournament, you agree to the following terms:
+
+• If you leave the tournament, there will be a 50% cancellation fee
+• You will only receive half of your credits back upon cancellation
+• No cancellations are allowed within 15 minutes of the match start time
+
+Are you sure you want to join this tournament?"
+        confirmText="Join Tournament"
+        cancelText="Cancel"
+        confirmButtonClass="confirm-btn"
+        cancelButtonClass="cancel-btn"
+      />
+
+      {/* Leave Tournament Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showLeaveConfirmation}
+        onClose={() => {
+          setShowLeaveConfirmation(false);
+          setPendingLeaveTournament(null);
+        }}
+        onConfirm={handleConfirmLeaveTournament}
+        title="Confirm Tournament Cancellation"
+        message={
+          pendingLeaveTournament
+            ? `⚠️ Are you sure you want to leave "${
+                pendingLeaveTournament.name
+              }"?
+
+• You will be refunded only 50% of your joining fee (${Math.floor(
+                (pendingLeaveTournament.joining_fee || 0) * 0.5
+              )} credits)
+• This action cannot be undone
+• You will lose your tournament spot
+
+Are you sure you want to proceed?`
+            : ""
+        }
+        confirmText="Leave Tournament"
+        cancelText="Stay in Tournament"
+        confirmButtonClass="confirm-btn"
+        cancelButtonClass="cancel-btn"
+      />
     </div>
   );
 };

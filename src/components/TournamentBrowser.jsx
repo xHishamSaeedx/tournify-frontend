@@ -10,7 +10,7 @@ import {
   getProfileCompletionMessage,
 } from "../utils/profileValidation";
 
-const TournamentBrowser = ({ game = "valorant" }) => {
+const TournamentBrowser = ({ game = "valorant", embedded = false }) => {
   const { user } = useAuth();
   const [tournaments, setTournaments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -59,7 +59,9 @@ const TournamentBrowser = ({ game = "valorant" }) => {
         console.log("User profile loaded:", response.data);
         console.log("Profile validation check:", {
           isBasicComplete: isValorantProfileComplete(response.data),
-          hasValorantData: !!response.data.valorant_users && response.data.valorant_users.length > 0,
+          hasValorantData:
+            !!response.data.valorant_users &&
+            response.data.valorant_users.length > 0,
           valorantFields: {
             valorant_name: response.data.valorant_users?.[0]?.valorant_name,
             valorant_tag: response.data.valorant_users?.[0]?.valorant_tag,
@@ -94,9 +96,9 @@ const TournamentBrowser = ({ game = "valorant" }) => {
           console.log("Tournament ID field:", response.data[0].tournament_id);
         }
         // Add game field to tournaments for filtering
-        const tournamentsWithGame = (response.data || []).map(tournament => ({
+        const tournamentsWithGame = (response.data || []).map((tournament) => ({
           ...tournament,
-          game: game
+          game: game,
         }));
         setTournaments(tournamentsWithGame);
       } else {
@@ -463,12 +465,18 @@ const TournamentBrowser = ({ game = "valorant" }) => {
   if (loading) {
     return (
       <>
-        <Navbar />
-        <div className="tournament-browser-page">
-          <BackButton
-            destination="/valorant"
-            buttonText="Back to Valorant Page"
-          />
+        {!embedded && <Navbar />}
+        <div
+          className={
+            embedded ? "embedded-tournament-browser" : "tournament-browser-page"
+          }
+        >
+          {!embedded && (
+            <BackButton
+              destination="/valorant"
+              buttonText="Back to Valorant Page"
+            />
+          )}
           <div className="loading-container">
             <div className="loading-spinner"></div>
             <p>Loading tournaments...</p>
@@ -481,12 +489,18 @@ const TournamentBrowser = ({ game = "valorant" }) => {
   if (error) {
     return (
       <>
-        <Navbar />
-        <div className="tournament-browser-page">
-          <BackButton
-            destination="/valorant"
-            buttonText="Back to Valorant Page"
-          />
+        {!embedded && <Navbar />}
+        <div
+          className={
+            embedded ? "embedded-tournament-browser" : "tournament-browser-page"
+          }
+        >
+          {!embedded && (
+            <BackButton
+              destination="/valorant"
+              buttonText="Back to Valorant Page"
+            />
+          )}
           <div className="error-container">
             <h2>Error Loading Tournaments</h2>
             <p>{error}</p>
@@ -501,12 +515,20 @@ const TournamentBrowser = ({ game = "valorant" }) => {
 
   return (
     <>
-      <Navbar />
-      <div className="tournament-browser-page">
-        <BackButton
-          destination={`/${game}`}
-          buttonText={`Back to ${game.charAt(0).toUpperCase() + game.slice(1)} Page`}
-        />
+      {!embedded && <Navbar />}
+      <div
+        className={
+          embedded ? "embedded-tournament-browser" : "tournament-browser-page"
+        }
+      >
+        {!embedded && (
+          <BackButton
+            destination={`/${game}`}
+            buttonText={`Back to ${
+              game.charAt(0).toUpperCase() + game.slice(1)
+            } Page`}
+          />
+        )}
 
         <div className="tournament-browser-container">
           <div className="tournament-browser-header">
@@ -515,15 +537,21 @@ const TournamentBrowser = ({ game = "valorant" }) => {
                 <h1>Browse Tournaments</h1>
                 <p>
                   {user
-                    ? `Find and join exciting ${game.charAt(0).toUpperCase() + game.slice(1)} tournaments`
-                    : `Browse exciting ${game.charAt(0).toUpperCase() + game.slice(1)} tournaments - Sign in to join!`}
+                    ? `Find and join exciting ${
+                        game.charAt(0).toUpperCase() + game.slice(1)
+                      } tournaments`
+                    : `Browse exciting ${
+                        game.charAt(0).toUpperCase() + game.slice(1)
+                      } tournaments - Sign in to join!`}
                 </p>
               </div>
               <div className="header-actions">
                 {user ? (
                   <Button
                     variant="primary"
-                    onClick={() => (window.location.href = `/${game}/my-tournaments`)}
+                    onClick={() =>
+                      (window.location.href = `/${game}/my-tournaments`)
+                    }
                     className="my-tournaments-btn-prominent"
                   >
                     <span className="button-icon">🏆</span>
@@ -634,14 +662,18 @@ const TournamentBrowser = ({ game = "valorant" }) => {
                           {tournament.host?.avatar_url ? (
                             <img
                               src={tournament.host.avatar_url}
-                              alt={`${tournament.host?.display_name || tournament.host?.username || 'Host'} avatar`}
+                              alt={`${
+                                tournament.host?.display_name ||
+                                tournament.host?.username ||
+                                "Host"
+                              } avatar`}
                               className="host-avatar-img"
                             />
                           ) : (
                             <div className="host-avatar-placeholder">
-                              {tournament.host?.display_name?.charAt(0) || 
-                               tournament.host?.username?.charAt(0) || 
-                               '?'}
+                              {tournament.host?.display_name?.charAt(0) ||
+                                tournament.host?.username?.charAt(0) ||
+                                "?"}
                             </div>
                           )}
                         </div>
@@ -836,8 +868,8 @@ const TournamentBrowser = ({ game = "valorant" }) => {
         </div>
       </div>
 
-      {/* Floating Action Button for My Tournaments */}
-      {user && (
+      {/* Floating Action Button for My Tournaments - only show when not embedded */}
+      {user && !embedded && (
         <div className="floating-my-tournaments">
           <Button
             variant="primary"
@@ -932,7 +964,7 @@ Please ensure you are ready to participate in the tournament.`
         onClose={() => setShowProfileModal(false)}
         onConfirm={() => {
           setShowProfileModal(false);
-                          window.location.href = "/settings";
+          window.location.href = "/settings";
         }}
         title="⚠️ Profile Incomplete"
         message={

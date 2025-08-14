@@ -2,11 +2,23 @@
 
 /* Hero Action Buttons */
 .hero-actions {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
   margin: 2rem 0;
-  flex-wrap: wrap;
   justify-content: center;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Responsive design for smaller screens */
+@media (max-width: 768px) {
+  .hero-actions {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+    gap: 1rem;
+  }
 }
 
 .hero-button {

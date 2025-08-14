@@ -3,6 +3,8 @@ import Button from "./Button";
 import BackButton from "./BackButton";
 import { useAuth } from "../contexts/AuthContext";
 import CreateTournamentForm from "./CreateTournamentForm";
+import TournamentBrowser from "./TournamentBrowser";
+import JoinedTournaments from "./JoinedTournaments";
 import { api } from "../utils/api";
 import {
   getStatusDisplay,
@@ -21,6 +23,8 @@ const HostDashboard = () => {
 
   const tabs = [
     { id: "my-tournaments", label: "My Created Tournaments", icon: "🏆" },
+    { id: "browse-tournaments", label: "Browse Tournaments", icon: "🔍" },
+    { id: "joined-tournaments", label: "My Joined Tournaments", icon: "📋" },
   ];
 
   // Fetch tournaments when component mounts or when user changes
@@ -59,95 +63,128 @@ const HostDashboard = () => {
   };
 
   const renderTabContent = () => {
-    return (
-      <div className="tab-content">
-        <div className="section-header">
-          <h3>My Created Tournaments</h3>
-          <div className="section-actions">
-            <Button
-              variant="primary"
-              onClick={() => setShowCreateForm(true)}
-              className="create-tournament-btn"
-            >
-              <span className="btn-icon">➕</span>
-              Create Tournament
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={fetchHostTournaments}
-              disabled={loading}
-            >
-              {loading ? "Loading..." : "Refresh"}
-            </Button>
-          </div>
-        </div>
+    switch (activeTab) {
+      case "my-tournaments":
+        return (
+          <div className="tab-content">
+            <div className="section-header">
+              <h3>My Created Tournaments</h3>
+              <div className="section-actions">
+                <Button
+                  variant="primary"
+                  onClick={() => setShowCreateForm(true)}
+                  className="create-tournament-btn"
+                >
+                  <span className="btn-icon">➕</span>
+                  Create Tournament
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={fetchHostTournaments}
+                  disabled={loading}
+                >
+                  {loading ? "Loading..." : "Refresh"}
+                </Button>
+              </div>
+            </div>
 
-        {error && (
-          <div className="error-message">
-            <p>{error}</p>
-          </div>
-        )}
+            {error && (
+              <div className="error-message">
+                <p>{error}</p>
+              </div>
+            )}
 
-        {loading ? (
-          <div className="loading-message">
-            <p>Loading tournaments...</p>
-          </div>
-        ) : tournaments.length === 0 ? (
-          <div className="empty-state">
-            <p>No tournaments created yet.</p>
-          </div>
-        ) : (
-          <div className="tournaments-grid">
-            {tournaments.map((tournament) => {
-              const statusDisplay = getStatusDisplay(
-                tournament.match_start_time
-              );
-              return (
-                <div key={tournament.tournament_id} className="tournament-card">
-                  <div className="tournament-header">
-                    <h4>{tournament.name}</h4>
-                    <span className={statusDisplay.className}>
-                      {statusDisplay.text}
-                    </span>
-                  </div>
-                  <div className="tournament-details">
-                    <p>
-                      <strong>Prize Pool:</strong>{" "}
-                      {tournament.prize_pool ? `${tournament.prize_pool} credits` : "TBD"}
-                    </p>
-                    <p>
-                      <strong>Capacity:</strong> {tournament.capacity || "N/A"}
-                    </p>
-                    <p>
-                      <strong>Start Time:</strong>{" "}
-                      {formatMatchStartTime(tournament.match_start_time)}
-                    </p>
-                    <p>
-                      <strong>Platform:</strong> {tournament.platform || "N/A"}
-                    </p>
-                    <p>
-                      <strong>Region:</strong> {tournament.region || "N/A"}
-                    </p>
-                    <p>
-                      <strong>Joining Fee:</strong>{" "}
-                      {tournament.joining_fee ? `${tournament.joining_fee} credits` : "Free"}
-                    </p>
-                  </div>
-                  <div className="tournament-actions">
-                    <Button
-                      variant="secondary"
-                      onClick={() => handleViewDetails(tournament)}
+            {loading ? (
+              <div className="loading-message">
+                <p>Loading tournaments...</p>
+              </div>
+            ) : tournaments.length === 0 ? (
+              <div className="empty-state">
+                <p>No tournaments created yet.</p>
+              </div>
+            ) : (
+              <div className="tournaments-grid">
+                {tournaments.map((tournament) => {
+                  const statusDisplay = getStatusDisplay(
+                    tournament.match_start_time
+                  );
+                  return (
+                    <div
+                      key={tournament.tournament_id}
+                      className="tournament-card"
                     >
-                      View Details
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
+                      <div className="tournament-header">
+                        <h4>{tournament.name}</h4>
+                        <span className={statusDisplay.className}>
+                          {statusDisplay.text}
+                        </span>
+                      </div>
+                      <div className="tournament-details">
+                        <p>
+                          <strong>Prize Pool:</strong>{" "}
+                          {tournament.prize_pool
+                            ? `${tournament.prize_pool} credits`
+                            : "TBD"}
+                        </p>
+                        <p>
+                          <strong>Capacity:</strong>{" "}
+                          {tournament.capacity || "N/A"}
+                        </p>
+                        <p>
+                          <strong>Start Time:</strong>{" "}
+                          {formatMatchStartTime(tournament.match_start_time)}
+                        </p>
+                        <p>
+                          <strong>Platform:</strong>{" "}
+                          {tournament.platform || "N/A"}
+                        </p>
+                        <p>
+                          <strong>Region:</strong> {tournament.region || "N/A"}
+                        </p>
+                        <p>
+                          <strong>Joining Fee:</strong>{" "}
+                          {tournament.joining_fee
+                            ? `${tournament.joining_fee} credits`
+                            : "Free"}
+                        </p>
+                      </div>
+                      <div className="tournament-actions">
+                        <Button
+                          variant="secondary"
+                          onClick={() => handleViewDetails(tournament)}
+                        >
+                          View Details
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        )}
-      </div>
-    );
+        );
+
+      case "browse-tournaments":
+        return (
+          <div className="tab-content">
+            <div className="embedded-tournament-browser">
+              <TournamentBrowser game="valorant" embedded={true} />
+            </div>
+          </div>
+        );
+
+      case "joined-tournaments":
+        return (
+          <div className="tab-content">
+            <div className="tab-content">
+              <JoinedTournaments game="valorant" embedded={true} />
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
   };
 
   return (
@@ -162,7 +199,23 @@ const HostDashboard = () => {
         </div>
       </div>
 
-      <div className="dashboard-content">{renderTabContent()}</div>
+      <div className="dashboard-content">
+        {/* Tab Navigation */}
+        <div className="dashboard-tabs">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              className={`tab-button ${activeTab === tab.id ? "active" : ""}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              <span className="tab-icon">{tab.icon}</span>
+              <span className="tab-label">{tab.label}</span>
+            </button>
+          ))}
+        </div>
+
+        {renderTabContent()}
+      </div>
 
       {/* Create Tournament Form Modal */}
       {showCreateForm && (
@@ -269,13 +322,17 @@ const HostDashboard = () => {
                   <div className="detail-item">
                     <span className="detail-label">Joining Fee:</span>
                     <span className="detail-value">
-                      {selectedTournament.joining_fee ? `${selectedTournament.joining_fee} credits` : "Free"}
+                      {selectedTournament.joining_fee
+                        ? `${selectedTournament.joining_fee} credits`
+                        : "Free"}
                     </span>
                   </div>
                   <div className="detail-item">
                     <span className="detail-label">Prize Pool:</span>
                     <span className="detail-value">
-                      {selectedTournament.prize_pool ? `${selectedTournament.prize_pool} credits` : "TBD"}
+                      {selectedTournament.prize_pool
+                        ? `${selectedTournament.prize_pool} credits`
+                        : "TBD"}
                     </span>
                   </div>
                   <div className="detail-item">

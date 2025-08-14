@@ -6,7 +6,7 @@ import ConfirmationModal from "./ConfirmationModal";
 import { api } from "../utils/api";
 import { useAuth } from "../contexts/AuthContext";
 
-const JoinedTournaments = ({ game = "valorant" }) => {
+const JoinedTournaments = ({ game = "valorant", embedded = false }) => {
   const { user } = useAuth();
   const [joinedTournaments, setJoinedTournaments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -40,9 +40,9 @@ const JoinedTournaments = ({ game = "valorant" }) => {
       if (response.success) {
         console.log("Joined tournaments data:", response.data);
         // Add game field to tournaments for filtering
-        const tournamentsWithGame = (response.data || []).map(tournament => ({
+        const tournamentsWithGame = (response.data || []).map((tournament) => ({
           ...tournament,
-          game: game
+          game: game,
         }));
         setJoinedTournaments(tournamentsWithGame);
       } else {
@@ -221,12 +221,18 @@ const JoinedTournaments = ({ game = "valorant" }) => {
   if (!user) {
     return (
       <>
-        <Navbar />
-        <div className="joined-tournaments-page">
-          <BackButton
-            destination="/valorant"
-            buttonText="Back to Valorant Page"
-          />
+        {!embedded && <Navbar />}
+        <div
+          className={
+            embedded ? "embedded-joined-tournaments" : "joined-tournaments-page"
+          }
+        >
+          {!embedded && (
+            <BackButton
+              destination="/valorant"
+              buttonText="Back to Valorant Page"
+            />
+          )}
           <div className="signin-prompt-container">
             <div className="signin-hero">
               <div className="signin-icon">🎯</div>
@@ -256,12 +262,18 @@ const JoinedTournaments = ({ game = "valorant" }) => {
   if (loading) {
     return (
       <>
-        <Navbar />
-        <div className="joined-tournaments-page">
-          <BackButton
-            destination="/valorant"
-            buttonText="Back to Valorant Page"
-          />
+        {!embedded && <Navbar />}
+        <div
+          className={
+            embedded ? "embedded-joined-tournaments" : "joined-tournaments-page"
+          }
+        >
+          {!embedded && (
+            <BackButton
+              destination="/valorant"
+              buttonText="Back to Valorant Page"
+            />
+          )}
           <div className="loading-container">
             <div className="loading-spinner"></div>
             <p>Loading your joined tournaments...</p>
@@ -274,12 +286,18 @@ const JoinedTournaments = ({ game = "valorant" }) => {
   if (error) {
     return (
       <>
-        <Navbar />
-        <div className="joined-tournaments-page">
-          <BackButton
-            destination="/valorant"
-            buttonText="Back to Valorant Page"
-          />
+        {!embedded && <Navbar />}
+        <div
+          className={
+            embedded ? "embedded-joined-tournaments" : "joined-tournaments-page"
+          }
+        >
+          {!embedded && (
+            <BackButton
+              destination="/valorant"
+              buttonText="Back to Valorant Page"
+            />
+          )}
           <div className="error-container">
             <h2>Error Loading Joined Tournaments</h2>
             <p>{error}</p>
@@ -294,14 +312,16 @@ const JoinedTournaments = ({ game = "valorant" }) => {
 
   return (
     <>
-      <Navbar />
-      <div className="joined-tournaments-page">
-        <BackButton
-          destination={`/${game}`}
-          buttonText={`Back to ${
-            game.charAt(0).toUpperCase() + game.slice(1)
-          } Page`}
-        />
+      {!embedded && <Navbar />}
+      <div className={embedded ? "embedded-joined-tournaments" : "joined-tournaments-page"}>
+        {!embedded && (
+          <BackButton
+            destination={`/${game}`}
+            buttonText={`Back to ${
+              game.charAt(0).toUpperCase() + game.slice(1)
+            } Page`}
+          />
+        )}
 
         <div className="joined-tournaments-container">
           <div className="joined-tournaments-header">
