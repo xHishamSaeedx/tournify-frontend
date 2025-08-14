@@ -165,6 +165,22 @@ const ValorantHeroSection = ({ onShowCreateForm }) => {
               <span className="button-text">Browse All Tournaments</span>
               <span className="button-icon">📊</span>
             </Button>
+            <Button
+              variant="primary"
+              onClick={handleBrowseTournaments}
+              className="hero-button primary animate-slide-in-left"
+            >
+              <span className="button-text">Browse Tournaments</span>
+              <span className="button-icon">🏆</span>
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={handleMyTournaments}
+              className="hero-button secondary animate-slide-in-right"
+            >
+              <span className="button-text">My Tournaments</span>
+              <span className="button-icon">🎮</span>
+            </Button>
           </div>
         )}
 
