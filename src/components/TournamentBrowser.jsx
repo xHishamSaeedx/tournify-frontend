@@ -10,7 +10,7 @@ import {
   getProfileCompletionMessage,
 } from "../utils/profileValidation";
 
-const TournamentBrowser = () => {
+const TournamentBrowser = ({ game = "valorant" }) => {
   const { user } = useAuth();
   const [tournaments, setTournaments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -84,7 +84,7 @@ const TournamentBrowser = () => {
   const fetchTournaments = async () => {
     try {
       setLoading(true);
-      const response = await api.getTournaments();
+      const response = await api.getTournaments(game);
 
       if (response.success) {
         console.log("Tournaments data:", response.data);
@@ -93,7 +93,12 @@ const TournamentBrowser = () => {
           console.log("First tournament full object:", response.data[0]);
           console.log("Tournament ID field:", response.data[0].tournament_id);
         }
-        setTournaments(response.data || []);
+        // Add game field to tournaments for filtering
+        const tournamentsWithGame = (response.data || []).map(tournament => ({
+          ...tournament,
+          game: game
+        }));
+        setTournaments(tournamentsWithGame);
       } else {
         setError("Failed to fetch tournaments");
       }
@@ -152,6 +157,11 @@ const TournamentBrowser = () => {
 
   const filterAndSortTournaments = () => {
     let filtered = [...tournaments];
+
+    // Filter by game first
+    filtered = filtered.filter((tournament) => {
+      return tournament.game === game;
+    });
 
     // Filter tournaments that are at least 5 minutes from match_start_time
     const now = new Date();
@@ -494,8 +504,8 @@ const TournamentBrowser = () => {
       <Navbar />
       <div className="tournament-browser-page">
         <BackButton
-          destination="/valorant"
-          buttonText="Back to Valorant Page"
+          destination={`/${game}`}
+          buttonText={`Back to ${game.charAt(0).toUpperCase() + game.slice(1)} Page`}
         />
 
         <div className="tournament-browser-container">
@@ -505,15 +515,15 @@ const TournamentBrowser = () => {
                 <h1>Browse Tournaments</h1>
                 <p>
                   {user
-                    ? "Find and join exciting Valorant tournaments"
-                    : "Browse exciting Valorant tournaments - Sign in to join!"}
+                    ? `Find and join exciting ${game.charAt(0).toUpperCase() + game.slice(1)} tournaments`
+                    : `Browse exciting ${game.charAt(0).toUpperCase() + game.slice(1)} tournaments - Sign in to join!`}
                 </p>
               </div>
               <div className="header-actions">
                 {user ? (
                   <Button
                     variant="primary"
-                    onClick={() => (window.location.href = "/my-tournaments")}
+                    onClick={() => (window.location.href = `/${game}/my-tournaments`)}
                     className="my-tournaments-btn-prominent"
                   >
                     <span className="button-icon">🏆</span>
@@ -831,7 +841,7 @@ const TournamentBrowser = () => {
         <div className="floating-my-tournaments">
           <Button
             variant="primary"
-            onClick={() => (window.location.href = "/my-tournaments")}
+            onClick={() => (window.location.href = `/${game}/my-tournaments`)}
             className="floating-my-tournaments-btn"
             title="My Tournaments"
           >

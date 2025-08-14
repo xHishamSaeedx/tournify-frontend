@@ -34,11 +34,11 @@ const ValorantHeroSection = ({ onShowCreateForm }) => {
   ];
 
   const handleBrowseTournaments = () => {
-    navigate("/browse-tournaments");
+    navigate("/valorant/browse-tournaments");
   };
 
   const handleMyTournaments = () => {
-    navigate("/my-tournaments");
+    navigate("/valorant/my-tournaments");
   };
 
   const handleCreateTournament = () => {
@@ -58,7 +58,7 @@ const ValorantHeroSection = ({ onShowCreateForm }) => {
   };
 
   const handleBrowseAllTournaments = () => {
-    navigate("/browse-tournaments");
+    navigate("/valorant/browse-tournaments");
   };
 
   return (

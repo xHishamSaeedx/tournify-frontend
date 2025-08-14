@@ -143,7 +143,10 @@ export const authenticatedApiCall = async (endpoint, options = {}) => {
 // Specific API functions for your endpoints
 export const api = {
   // Tournament endpoints
-  getTournaments: () => publicApiCall("/api/tournaments"),
+  getTournaments: (game) =>
+    game
+      ? publicApiCall(`/api/tournaments?game=${game}`)
+      : publicApiCall("/api/tournaments"),
   getTournament: (id) => authenticatedApiCall(`/api/tournaments/${id}`),
   getHostTournaments: (hostId) =>
     authenticatedApiCall(`/api/tournaments/host/${hostId}`),
@@ -175,8 +178,10 @@ export const api = {
     authenticatedApiCall(`/api/tournaments/${id}/participants`),
   getParticipationStatus: (id) =>
     authenticatedApiCall(`/api/tournaments/${id}/participation`),
-  getJoinedTournaments: () =>
-    authenticatedApiCall(`/api/tournaments/joined/me`),
+  getJoinedTournaments: (game) =>
+    game
+      ? authenticatedApiCall(`/api/tournaments/joined/me?game=${game}`)
+      : authenticatedApiCall(`/api/tournaments/joined/me`),
 
   // User endpoints
   getUsers: () => authenticatedApiCall("/api/users"),

@@ -6,7 +6,7 @@ import ConfirmationModal from "./ConfirmationModal";
 import { api } from "../utils/api";
 import { useAuth } from "../contexts/AuthContext";
 
-const JoinedTournaments = () => {
+const JoinedTournaments = ({ game = "valorant" }) => {
   const { user } = useAuth();
   const [joinedTournaments, setJoinedTournaments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,11 +35,16 @@ const JoinedTournaments = () => {
   const fetchJoinedTournaments = async () => {
     try {
       setLoading(true);
-      const response = await api.getJoinedTournaments();
+      const response = await api.getJoinedTournaments(game);
 
       if (response.success) {
         console.log("Joined tournaments data:", response.data);
-        setJoinedTournaments(response.data || []);
+        // Add game field to tournaments for filtering
+        const tournamentsWithGame = (response.data || []).map(tournament => ({
+          ...tournament,
+          game: game
+        }));
+        setJoinedTournaments(tournamentsWithGame);
       } else {
         setError("Failed to fetch joined tournaments");
       }
@@ -53,6 +58,11 @@ const JoinedTournaments = () => {
 
   const filterAndSortTournaments = () => {
     let filtered = [...joinedTournaments];
+
+    // Filter by game first
+    filtered = filtered.filter((tournament) => {
+      return tournament.game === game;
+    });
 
     // Apply search filter
     if (searchTerm) {
@@ -287,8 +297,10 @@ const JoinedTournaments = () => {
       <Navbar />
       <div className="joined-tournaments-page">
         <BackButton
-          destination="/valorant"
-          buttonText="Back to Valorant Page"
+          destination={`/${game}`}
+          buttonText={`Back to ${
+            game.charAt(0).toUpperCase() + game.slice(1)
+          } Page`}
         />
 
         <div className="joined-tournaments-container">
@@ -301,7 +313,9 @@ const JoinedTournaments = () => {
               <div className="header-actions">
                 <Button
                   variant="primary"
-                  onClick={() => (window.location.href = "/browse-tournaments")}
+                  onClick={() =>
+                    (window.location.href = `/${game}/browse-tournaments`)
+                  }
                   className="browse-tournaments-btn-prominent"
                 >
                   <span className="button-icon">🔍</span>

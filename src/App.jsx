@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import "./App.css";
 import "./styles/tournament-browser.css";
 import Navbar from "./components/Navbar";
@@ -82,14 +87,31 @@ const App = () => {
                   </ProtectedRoute>
                 }
               />
+
+              {/* Game-specific tournament routes */}
               <Route
-                path="/my-tournaments"
+                path="/valorant/browse-tournaments"
+                element={<TournamentBrowser game="valorant" />}
+              />
+              <Route
+                path="/valorant/my-tournaments"
                 element={
                   <ProtectedRoute>
-                    <JoinedTournaments />
+                    <JoinedTournaments game="valorant" />
                   </ProtectedRoute>
                 }
               />
+
+              {/* Legacy routes - redirect to valorant-specific ones for backward compatibility */}
+              <Route
+                path="/browse-tournaments"
+                element={<Navigate to="/valorant/browse-tournaments" replace />}
+              />
+              <Route
+                path="/my-tournaments"
+                element={<Navigate to="/valorant/my-tournaments" replace />}
+              />
+
               <Route
                 path="/tournament/:tournamentId"
                 element={
@@ -109,7 +131,6 @@ const App = () => {
                 }
               />
               <Route path="/valorant" element={<ValorantPage />} />
-              <Route path="/browse-tournaments" element={<TournamentBrowser />} />
               <Route
                 path="/admin"
                 element={

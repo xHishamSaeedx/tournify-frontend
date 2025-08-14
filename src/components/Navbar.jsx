@@ -107,7 +107,7 @@ const Navbar = () => {
   };
 
   const handleMyTournaments = () => {
-    navigate("/my-tournaments");
+    navigate("/valorant/my-tournaments");
     setIsProfileDropdownOpen(false);
     setIsMobileMenuOpen(false);
   };

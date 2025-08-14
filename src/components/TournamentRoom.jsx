@@ -244,7 +244,7 @@ const TournamentRoom = () => {
         <Navbar />
         <div className="tournament-room-page">
           <BackButton
-            destination="/my-tournaments"
+            destination="/valorant/my-tournaments"
             buttonText="Back to My Tournaments"
           />
           <div className="signin-prompt-container">
@@ -276,7 +276,7 @@ const TournamentRoom = () => {
         <Navbar />
         <div className="tournament-room-page">
           <BackButton
-            destination="/my-tournaments"
+            destination="/valorant/my-tournaments"
             buttonText="Back to My Tournaments"
           />
           <div className="loading-container">
@@ -294,7 +294,7 @@ const TournamentRoom = () => {
         <Navbar />
         <div className="tournament-room-page">
           <BackButton
-            destination="/my-tournaments"
+            destination="/valorant/my-tournaments"
             buttonText="Back to My Tournaments"
           />
           <div className="error-container">
@@ -315,7 +315,7 @@ const TournamentRoom = () => {
         <Navbar />
         <div className="tournament-room-page">
           <BackButton
-            destination="/my-tournaments"
+            destination="/valorant/my-tournaments"
             buttonText="Back to My Tournaments"
           />
           <div className="error-container">
@@ -325,7 +325,7 @@ const TournamentRoom = () => {
               access to it.
             </p>
             <Button
-              onClick={() => navigate("/my-tournaments")}
+              onClick={() => navigate("/valorant/my-tournaments")}
               variant="primary"
             >
               Back to My Tournaments
@@ -1046,7 +1046,7 @@ const TournamentRoom = () => {
             {isParticipant ? (
               <Button
                 variant="secondary"
-                onClick={() => navigate("/my-tournaments")}
+                onClick={() => navigate("/valorant/my-tournaments")}
                 className="back-btn"
               >
                 <span className="button-icon">←</span>
@@ -1055,7 +1055,7 @@ const TournamentRoom = () => {
             ) : (
               <Button
                 variant="primary"
-                onClick={() => navigate("/browse-tournaments")}
+                onClick={() => navigate("/valorant/browse-tournaments")}
                 className="browse-btn"
               >
                 <span className="button-icon">🔍</span>

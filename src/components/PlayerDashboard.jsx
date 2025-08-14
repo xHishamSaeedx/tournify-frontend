@@ -28,15 +28,15 @@ const PlayerDashboard = ({ game }) => {
   }, []);
 
   const handleBrowseTournaments = () => {
-    navigate("/browse-tournaments");
+    navigate(`/${game}/browse-tournaments`);
   };
 
   const handleJoinedTournaments = () => {
     console.log(
-      "My Tournaments button clicked - navigating to /my-tournaments"
+      `My Tournaments button clicked - navigating to /${game}/my-tournaments`
     );
     console.log("Current user:", user);
-    navigate("/my-tournaments");
+    navigate(`/${game}/my-tournaments`);
   };
 
   const handleClaimMoney = () => {

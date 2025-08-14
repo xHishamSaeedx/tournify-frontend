@@ -160,7 +160,7 @@ const TournamentAccessControl = ({ children }) => {
         <Navbar />
         <div className="tournament-room-page">
           <BackButton
-            destination="/my-tournaments"
+            destination="/valorant/my-tournaments"
             buttonText="Back to My Tournaments"
           />
           <div className="signin-prompt-container">
@@ -192,7 +192,7 @@ const TournamentAccessControl = ({ children }) => {
         <Navbar />
         <div className="tournament-room-page">
           <BackButton
-            destination="/my-tournaments"
+            destination="/valorant/my-tournaments"
             buttonText="Back to My Tournaments"
           />
           <div className="loading-container">
@@ -210,7 +210,7 @@ const TournamentAccessControl = ({ children }) => {
         <Navbar />
         <div className="tournament-room-page">
           <BackButton
-            destination="/my-tournaments"
+            destination="/valorant/my-tournaments"
             buttonText="Back to My Tournaments"
           />
           <div className="access-denied-container">
@@ -233,7 +233,7 @@ const TournamentAccessControl = ({ children }) => {
                 </Button>
                 <Button
                   variant="secondary"
-                  onClick={() => navigate("/my-tournaments")}
+                  onClick={() => navigate("/valorant/my-tournaments")}
                   className="my-tournaments-btn"
                 >
                   <span className="button-icon">🏆</span>
@@ -253,7 +253,7 @@ const TournamentAccessControl = ({ children }) => {
         <Navbar />
         <div className="tournament-room-page">
           <BackButton
-            destination="/my-tournaments"
+            destination="/valorant/my-tournaments"
             buttonText="Back to My Tournaments"
           />
           <div className="access-denied-container">
@@ -268,7 +268,7 @@ const TournamentAccessControl = ({ children }) => {
               <div className="access-denied-actions">
                 <Button
                   variant="primary"
-                  onClick={() => navigate("/browse-tournaments")}
+                  onClick={() => navigate("/valorant/browse-tournaments")}
                   className="browse-btn"
                 >
                   <span className="button-icon">🔍</span>
@@ -276,7 +276,7 @@ const TournamentAccessControl = ({ children }) => {
                 </Button>
                 <Button
                   variant="secondary"
-                  onClick={() => navigate("/my-tournaments")}
+                  onClick={() => navigate("/valorant/my-tournaments")}
                   className="my-tournaments-btn"
                 >
                   <span className="button-icon">🏆</span>
