@@ -35,6 +35,9 @@ const GameHostDashboard = () => {
   const [showLeaveConfirmation, setShowLeaveConfirmation] = useState(false);
   const [pendingTournamentId, setPendingTournamentId] = useState(null);
   const [pendingLeaveTournament, setPendingLeaveTournament] = useState(null);
+  const [cancellingTournament, setCancellingTournament] = useState(null);
+  const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
+  const [pendingCancelTournament, setPendingCancelTournament] = useState(null);
 
   const tabs = [
     { id: "my-tournaments", label: "My Created Tournaments", icon: "🏆" },
@@ -371,6 +374,36 @@ const GameHostDashboard = () => {
     setSelectedTournament(null);
   };
 
+  const handleCancelTournament = (tournament) => {
+    setPendingCancelTournament(tournament);
+    setShowCancelConfirmation(true);
+  };
+
+  const handleConfirmCancelTournament = async () => {
+    const tournament = pendingCancelTournament;
+    if (!tournament) return;
+
+    try {
+      setCancellingTournament(tournament.tournament_id);
+      const response = await api.cancelTournament(tournament.tournament_id);
+
+      if (response.success) {
+        alert(
+          `Tournament "${tournament.name}" has been cancelled successfully. ${response.data.participants_refunded} participants have been refunded.`
+        );
+        // Refresh the tournaments list
+        fetchHostTournaments();
+      } else {
+        alert(response.message || "Failed to cancel tournament");
+      }
+    } catch (error) {
+      console.error("Error cancelling tournament:", error);
+      alert(error.message || "Failed to cancel tournament");
+    } finally {
+      setCancellingTournament(null);
+    }
+  };
+
   // If still checking access, show loading
   if (checkingAccess) {
     return (
@@ -565,6 +598,37 @@ const GameHostDashboard = () => {
                               </Button>
                             );
                           }
+                        })()}
+                        {(() => {
+                          const now = new Date();
+                          const matchStartTime = new Date(
+                            tournament.match_start_time
+                          );
+                          const timeDiff =
+                            matchStartTime.getTime() - now.getTime();
+                          const minutesUntilStart = timeDiff / (1000 * 60);
+
+                          // Show cancel button only for upcoming tournaments more than 5 minutes away
+                          if (minutesUntilStart > 5) {
+                            return (
+                              <Button
+                                variant="danger"
+                                onClick={() =>
+                                  handleCancelTournament(tournament)
+                                }
+                                disabled={
+                                  cancellingTournament ===
+                                  tournament.tournament_id
+                                }
+                              >
+                                {cancellingTournament ===
+                                tournament.tournament_id
+                                  ? "Cancelling..."
+                                  : "Cancel Tournament"}
+                              </Button>
+                            );
+                          }
+                          return null;
                         })()}
                       </div>
                     </div>
@@ -859,6 +923,35 @@ Are you sure you want to proceed?`
         confirmText="Leave Tournament"
         cancelText="Stay in Tournament"
         confirmButtonClass="confirm-btn"
+        cancelButtonClass="cancel-btn"
+      />
+
+      {/* Cancel Tournament Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showCancelConfirmation}
+        onClose={() => setShowCancelConfirmation(false)}
+        onConfirm={handleConfirmCancelTournament}
+        title="⚠️ Confirm Tournament Cancellation"
+        message={
+          pendingCancelTournament
+            ? `Are you sure you want to cancel "${
+                pendingCancelTournament.name
+              }"?
+
+🚨 **WARNING**: This action cannot be undone!
+
+• All participants will be refunded their full joining fee
+• The tournament will be permanently deleted
+• All participant data will be removed
+
+This will affect ${pendingCancelTournament.current_players || 0} participants.
+
+Are you absolutely sure you want to proceed?`
+            : ""
+        }
+        confirmText="Cancel Tournament"
+        cancelText="Keep Tournament"
+        confirmButtonClass="confirm-btn danger"
         cancelButtonClass="cancel-btn"
       />
     </div>

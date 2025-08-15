@@ -323,6 +323,12 @@ export const api = {
   getUserRoles: (userId) => authenticatedApiCall(`/api/user-roles/${userId}`),
   getUserRolesDetailed: (userId) =>
     authenticatedApiCall(`/api/user-roles/${userId}/detailed`),
+
+  // Tournament management endpoints
+  cancelTournament: (tournamentId) =>
+    authenticatedApiCall(`/api/tournaments/cancel/${tournamentId}`, {
+      method: "POST",
+    }),
 };
 
 export default api;
