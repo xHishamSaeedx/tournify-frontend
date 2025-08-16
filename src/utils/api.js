@@ -1,7 +1,8 @@
 import supabase from "../supabaseClient";
 
 // Base API configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3001";
+const API_BASE_URL =
+  import.meta.env.VITE_BACKEND_URL || "http://localhost:3000";
 
 // Request deduplication cache
 const pendingRequests = new Map();
