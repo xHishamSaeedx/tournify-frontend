@@ -48,9 +48,9 @@ export const HERO_CONTENT = {
 };
 
 export const ABOUT_CONTENT = {
-  title: "Why Choose Tournify?",
+  title: "Our Features",
   subtitle:
-    "Built by gamers, for gamers. Our platform provides everything you need to create, manage, and participate in competitive Valorant tournaments.",
+    "Discover the powerful tools and features that make Tournify the ultimate platform for competitive gaming tournaments.",
 };
 
 export const CTA_CONTENT = {
@@ -72,4 +72,4 @@ export const NAVBAR_CONTENT = {
   logo: "TOURNIFY",
   signInButton: "Sign In",
   getStartedButton: "Get Started",
-}; 
+};

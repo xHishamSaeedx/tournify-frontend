@@ -12,6 +12,7 @@ import HeroSection from "./components/HeroSection";
 import AboutSection from "./components/AboutSection";
 import GamesSection from "./components/GamesSection";
 import InfoSection from "./components/InfoSection";
+import CompanySection from "./components/CompanySection";
 
 import RefreshScreen from "./components/RefreshScreen";
 import Login from "./components/Login";
@@ -181,6 +182,7 @@ const App = () => {
                     <GamesSection />
                     <AboutSection />
                     <InfoSection />
+                    <CompanySection />
                   </>
                 }
               />
