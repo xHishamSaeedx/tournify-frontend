@@ -1,85 +1,70 @@
-import supabase from '../supabaseClient';
+import api from './api';
 
-// Get user role from Supabase
+// Get user role from API
 export const getUserRole = async (userId) => {
   try {
-    const { data, error } = await supabase
-      .from('user_roles')
-      .select('user_role')
-      .eq('user_id', userId)
-      .single();
-
-    if (error && error.code !== 'PGRST116') {
-      console.error('Error fetching user role:', error);
-      return null;
+    const response = await api.getUserRoles(userId);
+    
+    if (response.roles && response.roles.length > 0) {
+      // Get the highest priority role (admin > host > player)
+      const roles = response.roles.map(r => r.role);
+      
+      if (roles.includes('admin')) {
+        return 'admin';
+      } else if (roles.includes('host')) {
+        return 'host';
+      } else {
+        return 'player';
+      }
     }
-
-    return data?.user_role || null;
+    
+    return null;
   } catch (error) {
     console.error('Error fetching user role:', error);
     return null;
   }
 };
 
-// Create or update user role
+// Create or update user role - This should be done through admin API
 export const setUserRole = async (userId, userEmail, userRole) => {
   try {
-    const { data, error } = await supabase
-      .from('user_roles')
-      .upsert({
-        user_id: userId,
-        user_email: userEmail,
-        user_role: userRole
-      }, {
-        onConflict: 'user_id'
-      });
+    // Note: This should be called from admin context only
+    const response = await api.authenticatedApiCall(`/api/user-roles/${userId}/roles`, {
+      method: 'POST',
+      body: JSON.stringify({
+        user_role: userRole,
+        user_email: userEmail
+      })
+    });
 
-    if (error) {
-      console.error('Error setting user role:', error);
-      return { success: false, error };
-    }
-
-    return { success: true, data };
+    return { success: true, data: response };
   } catch (error) {
     console.error('Error setting user role:', error);
     return { success: false, error };
   }
 };
 
-// Remove user role
-export const removeUserRole = async (userId) => {
+// Remove user role - This should be done through admin API
+export const removeUserRole = async (userId, roleName) => {
   try {
-    const { error } = await supabase
-      .from('user_roles')
-      .delete()
-      .eq('user_id', userId);
+    // Note: This should be called from admin context only
+    const response = await api.authenticatedApiCall(`/api/user-roles/${userId}/roles/${roleName}`, {
+      method: 'DELETE'
+    });
 
-    if (error) {
-      console.error('Error removing user role:', error);
-      return { success: false, error };
-    }
-
-    return { success: true };
+    return { success: true, data: response };
   } catch (error) {
     console.error('Error removing user role:', error);
     return { success: false, error };
   }
 };
 
-// Get all hosts (for admin dashboard)
+// Get all hosts (for admin dashboard) - This should be done through admin API
 export const getAllHosts = async () => {
   try {
-    const { data, error } = await supabase
-      .from('user_roles')
-      .select('*')
-      .in('user_role', ['host', 'admin']);
-
-    if (error) {
-      console.error('Error fetching hosts:', error);
-      return { success: false, error };
-    }
-
-    return { success: true, data };
+    // Note: This should be called from admin context only
+    const response = await api.authenticatedApiCall('/api/admin/hosts');
+    return { success: true, data: response };
   } catch (error) {
     console.error('Error fetching hosts:', error);
     return { success: false, error };
@@ -99,5 +84,16 @@ export const hasRole = (userRole, requiredRole) => {
       return userRole === 'player' || userRole === 'host' || userRole === 'admin';
     default:
       return false;
+  }
+};
+
+// Check if user is host for specific game
+export const isHostForGame = async (userId, game) => {
+  try {
+    const response = await api.checkHostForGame(userId, game);
+    return response.isHost;
+  } catch (error) {
+    console.error('Error checking host for game:', error);
+    return false;
   }
 };

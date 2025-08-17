@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import supabase from "../supabaseClient";
+import api from "../utils/api";
 import { useAuth } from "./AuthContext";
 
 const UserRolesContext = createContext({});
@@ -26,22 +26,30 @@ export const UserRolesProvider = ({ children }) => {
       }
 
       try {
-        const { data, error } = await supabase
-          .from("user_roles")
-          .select("user_role")
-          .eq("user_id", user.id)
-          .single();
-
-        if (error && error.code !== "PGRST116") {
-          console.error("Error fetching user role:", error);
+        const response = await api.getUserRoles(user.id);
+        
+        if (response.roles && response.roles.length > 0) {
+          // Get the highest priority role (admin > host > player)
+          const roles = response.roles.map(r => r.role);
+          let highestRole = 'player';
+          
+          if (roles.includes('admin')) {
+            highestRole = 'admin';
+          } else if (roles.includes('host')) {
+            highestRole = 'host';
+          }
+          
+          console.log("UserRolesContext: Fetched user role:", {
+            userId: user.id,
+            userRole: highestRole,
+            allRoles: roles,
+            isAdmin: highestRole === "admin",
+          });
+          setUserRole(highestRole);
+        } else {
+          console.log("UserRolesContext: No roles found for user:", user.id);
+          setUserRole(null);
         }
-
-        console.log("UserRolesContext: Fetched user role:", {
-          userId: user.id,
-          userRole: data?.user_role,
-          isAdmin: data?.user_role === "admin",
-        });
-        setUserRole(data?.user_role || null);
       } catch (error) {
         console.error("Error fetching user role:", error);
         setUserRole(null);
