@@ -110,6 +110,23 @@ p {
 }
 
 /* Hero Section Styles */
+.hero-spacer {
+  height: 80px; /* Same height as navbar */
+  width: 100%;
+  background: transparent;
+  display: flex;
+  justify-content: center;
+}
+
+.hero-spacer::before {
+  content: "";
+  width: 100%;
+  max-width: 1200px;
+  height: 100%;
+  margin: 0 2rem;
+  background: transparent;
+}
+
 .hero {
   min-height: 100vh;
   display: flex;
@@ -118,7 +135,7 @@ p {
   position: relative;
   overflow: hidden;
   padding: 2rem;
-  padding-top: calc(80px + 2rem); /* Account for fixed navbar */
+  padding-top: 4rem; /* Increased padding to push images down more */
 }
 
 /* Diagonal cut background */
@@ -210,7 +227,7 @@ p {
   width: 100%;
   height: 100%;
   background-size: cover;
-  background-position: 20% center !important;
+  background-position: 20% 15% !important; /* Adjusted to show more of the bottom part of the image */
   background-repeat: no-repeat;
   opacity: 0;
   transition: opacity 1s ease-in-out;
@@ -483,6 +500,7 @@ p {
 @media (max-width: 768px) {
   .hero {
     padding: 1rem;
+    padding-top: 3rem; /* Keep extra top padding on mobile */
   }
 
   /* Adjust diagonal cut for mobile - still corner to corner */

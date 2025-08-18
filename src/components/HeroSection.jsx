@@ -48,45 +48,49 @@ const HeroSection = () => {
   };
 
   return (
-    <section className="hero">
-      {/* Diagonal cut background */}
-      <div className="hero-background">
-        <div className="hero-left"></div>
-        <div className="hero-right">
-          <div className="slideshow-container">
-            {images.map((image, index) => (
-              <div
-                key={index}
-                className={`slideshow-image ${
-                  index === currentImageIndex ? "active" : ""
-                }`}
-                style={{ backgroundImage: `url(${image})` }}
-              />
+    <>
+      {/* Horizontal strip to prevent navbar overlap */}
+      <div className="hero-spacer"></div>
+      <section className="hero">
+        {/* Diagonal cut background */}
+        <div className="hero-background">
+          <div className="hero-left"></div>
+          <div className="hero-right">
+            <div className="slideshow-container">
+              {images.map((image, index) => (
+                <div
+                  key={index}
+                  className={`slideshow-image ${
+                    index === currentImageIndex ? "active" : ""
+                  }`}
+                  style={{ backgroundImage: `url(${image})` }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="hero-content">
+          <h1 className="hero-title">{HERO_CONTENT.title}</h1>
+          <p className="hero-subtitle">{HERO_CONTENT.subtitle}</p>
+
+          <div className="hero-buttons">
+            <Button variant="primary" onClick={handleBrowseGames}>
+              Browse Games
+            </Button>
+          </div>
+
+          <div className="hero-stats">
+            {HERO_STATS.map((stat, index) => (
+              <div key={index} className="stat-item">
+                <span className="stat-number">{stat.number}</span>
+                <span className="stat-label">{stat.label}</span>
+              </div>
             ))}
           </div>
         </div>
-      </div>
-
-      <div className="hero-content">
-        <h1 className="hero-title">{HERO_CONTENT.title}</h1>
-        <p className="hero-subtitle">{HERO_CONTENT.subtitle}</p>
-
-        <div className="hero-buttons">
-          <Button variant="primary" onClick={handleBrowseGames}>
-            Browse Games
-          </Button>
-        </div>
-
-        <div className="hero-stats">
-          {HERO_STATS.map((stat, index) => (
-            <div key={index} className="stat-item">
-              <span className="stat-number">{stat.number}</span>
-              <span className="stat-label">{stat.label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 };
 

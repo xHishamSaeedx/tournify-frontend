@@ -76,138 +76,142 @@ const ValorantHeroSection = ({ onShowCreateForm }) => {
   };
 
   return (
-    <section className="hero">
-      {/* Diagonal cut background */}
-      <div className="hero-background">
-        <div className="hero-left"></div>
-        <div className="hero-right">
-          <div className="slideshow-container">
-            {images.map((image, index) => (
-              <div
-                key={index}
-                className={`slideshow-image ${
-                  index === currentImageIndex ? "active" : ""
-                }`}
-                style={{ backgroundImage: `url(${image})` }}
-              />
+    <>
+      {/* Horizontal strip to prevent navbar overlap */}
+      <div className="hero-spacer"></div>
+      <section className="hero">
+        {/* Diagonal cut background */}
+        <div className="hero-background">
+          <div className="hero-left"></div>
+          <div className="hero-right">
+            <div className="slideshow-container">
+              {images.map((image, index) => (
+                <div
+                  key={index}
+                  className={`slideshow-image ${
+                    index === currentImageIndex ? "active" : ""
+                  }`}
+                  style={{ backgroundImage: `url(${image})` }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="hero-content">
+          <h1 className="hero-title">VALORANT</h1>
+          <p className="hero-subtitle">
+            The ultimate platform for organizing and participating in Valorant
+            tournaments. Create, join, and dominate the competition with
+            seamless tournament management.
+          </p>
+
+          {isPlayer && (
+            <div className="hero-actions animate-fade-in-up">
+              <Button
+                variant="primary"
+                onClick={handleBrowseTournaments}
+                className="hero-button primary animate-slide-in-left"
+              >
+                <span className="button-text">Browse Tournaments</span>
+                <span className="button-icon">🏆</span>
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={handleMyTournaments}
+                className="hero-button secondary animate-slide-in-right"
+              >
+                <span className="button-text">My Tournaments</span>
+                <span className="button-icon">🎮</span>
+              </Button>
+            </div>
+          )}
+
+          {isHost && (
+            <div className="hero-actions animate-fade-in-up">
+              <Button
+                variant="primary"
+                onClick={handleCreateTournament}
+                className="hero-button primary animate-slide-in-left"
+              >
+                <span className="button-text">Create Tournament</span>
+                <span className="button-icon">⚡</span>
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={handleMyCreatedTournaments}
+                className="hero-button secondary animate-slide-in-right"
+              >
+                <span className="button-text">My Created Tournaments</span>
+                <span className="button-icon">🏗️</span>
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleBrowseTournaments}
+                className="hero-button primary animate-slide-in-left"
+              >
+                <span className="button-text">Browse Tournaments</span>
+                <span className="button-icon">🏆</span>
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={handleMyTournaments}
+                className="hero-button secondary animate-slide-in-right"
+              >
+                <span className="button-text">My Tournaments</span>
+                <span className="button-icon">🎮</span>
+              </Button>
+            </div>
+          )}
+
+          {isAdmin && (
+            <div className="hero-actions animate-fade-in-up">
+              <Button
+                variant="primary"
+                onClick={handleCreateHosts}
+                className="hero-button primary animate-slide-in-left"
+              >
+                <span className="button-text">Create Hosts</span>
+                <span className="button-icon">👑</span>
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={handleBrowseAllTournaments}
+                className="hero-button secondary animate-slide-in-right"
+              >
+                <span className="button-text">Browse All Tournaments</span>
+                <span className="button-icon">📊</span>
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleBrowseTournaments}
+                className="hero-button primary animate-slide-in-left"
+              >
+                <span className="button-text">Browse Tournaments</span>
+                <span className="button-icon">🏆</span>
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={handleMyTournaments}
+                className="hero-button secondary animate-slide-in-right"
+              >
+                <span className="button-text">My Tournaments</span>
+                <span className="button-icon">🎮</span>
+              </Button>
+            </div>
+          )}
+
+          <div className="hero-stats">
+            {valorantStats.map((stat, index) => (
+              <div key={index} className="stat-item">
+                <span className="stat-number">{stat.number}</span>
+                <span className="stat-label">{stat.label}</span>
+              </div>
             ))}
           </div>
         </div>
-      </div>
-
-      <div className="hero-content">
-        <h1 className="hero-title">VALORANT</h1>
-        <p className="hero-subtitle">
-          The ultimate platform for organizing and participating in Valorant
-          tournaments. Create, join, and dominate the competition with seamless
-          tournament management.
-        </p>
-
-        {isPlayer && (
-          <div className="hero-actions animate-fade-in-up">
-            <Button
-              variant="primary"
-              onClick={handleBrowseTournaments}
-              className="hero-button primary animate-slide-in-left"
-            >
-              <span className="button-text">Browse Tournaments</span>
-              <span className="button-icon">🏆</span>
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={handleMyTournaments}
-              className="hero-button secondary animate-slide-in-right"
-            >
-              <span className="button-text">My Tournaments</span>
-              <span className="button-icon">🎮</span>
-            </Button>
-          </div>
-        )}
-
-        {isHost && (
-          <div className="hero-actions animate-fade-in-up">
-            <Button
-              variant="primary"
-              onClick={handleCreateTournament}
-              className="hero-button primary animate-slide-in-left"
-            >
-              <span className="button-text">Create Tournament</span>
-              <span className="button-icon">⚡</span>
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={handleMyCreatedTournaments}
-              className="hero-button secondary animate-slide-in-right"
-            >
-              <span className="button-text">My Created Tournaments</span>
-              <span className="button-icon">🏗️</span>
-            </Button>
-            <Button
-              variant="primary"
-              onClick={handleBrowseTournaments}
-              className="hero-button primary animate-slide-in-left"
-            >
-              <span className="button-text">Browse Tournaments</span>
-              <span className="button-icon">🏆</span>
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={handleMyTournaments}
-              className="hero-button secondary animate-slide-in-right"
-            >
-              <span className="button-text">My Tournaments</span>
-              <span className="button-icon">🎮</span>
-            </Button>
-          </div>
-        )}
-
-        {isAdmin && (
-          <div className="hero-actions animate-fade-in-up">
-            <Button
-              variant="primary"
-              onClick={handleCreateHosts}
-              className="hero-button primary animate-slide-in-left"
-            >
-              <span className="button-text">Create Hosts</span>
-              <span className="button-icon">👑</span>
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={handleBrowseAllTournaments}
-              className="hero-button secondary animate-slide-in-right"
-            >
-              <span className="button-text">Browse All Tournaments</span>
-              <span className="button-icon">📊</span>
-            </Button>
-            <Button
-              variant="primary"
-              onClick={handleBrowseTournaments}
-              className="hero-button primary animate-slide-in-left"
-            >
-              <span className="button-text">Browse Tournaments</span>
-              <span className="button-icon">🏆</span>
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={handleMyTournaments}
-              className="hero-button secondary animate-slide-in-right"
-            >
-              <span className="button-text">My Tournaments</span>
-              <span className="button-icon">🎮</span>
-            </Button>
-          </div>
-        )}
-
-        <div className="hero-stats">
-          {valorantStats.map((stat, index) => (
-            <div key={index} className="stat-item">
-              <span className="stat-number">{stat.number}</span>
-              <span className="stat-label">{stat.label}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 };
 
