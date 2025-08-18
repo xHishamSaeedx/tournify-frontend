@@ -3,14 +3,12 @@ import { HERO_STATS, HERO_CONTENT } from "../constants/data";
 import Button from "./Button";
 
 // Import images
-import valoweb from "/assets/valoweb.png";
 import valoweb1 from "/assets/valoweb1.png";
 import valoweb2 from "/assets/valoweb2.png";
 import valoweb3 from "/assets/valoweb3.png";
 import valoweb4 from "/assets/valoweb4.png";
 import valoweb5 from "/assets/valoweb5.png";
 import valoweb6 from "/assets/valoweb6.png";
-import valoweb7 from "/assets/valoweb7.png";
 import valoweb8 from "/assets/valoweb8.png";
 
 // Hero Section Component - Single Responsibility Principle
@@ -18,14 +16,12 @@ const HeroSection = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const images = [
-    valoweb,
     valoweb1,
     valoweb2,
     valoweb3,
     valoweb4,
     valoweb5,
     valoweb6,
-    valoweb7,
     valoweb8,
   ];
 
