@@ -40,7 +40,7 @@ function AuthHandler() {
           // Send token to backend for verification
           const res = await fetch(
             `${
-              import.meta.env.VITE_API_URL || "http://localhost:3001"
+              import.meta.env.VITE_BACKEND_URL || "http://localhost:3000"
             }/auth/verify`,
             {
               method: "POST",
