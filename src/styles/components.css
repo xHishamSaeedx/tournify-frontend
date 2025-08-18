@@ -959,6 +959,7 @@
   position: relative;
   width: 100%;
   height: 100%;
+  left: 0;
 }
 
 .slideshow-image {
@@ -968,7 +969,7 @@
   width: 100%;
   height: 100%;
   background-size: cover;
-  background-position: center;
+  background-position: 20% center !important;
   background-repeat: no-repeat;
   opacity: 0;
   transition: opacity 1s ease-in-out;

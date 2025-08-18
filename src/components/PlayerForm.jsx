@@ -1,11 +1,18 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import api from "../utils/api";
 import BackButton from "./BackButton";
 
 // Import images for background
-import jettImage from "/assets/jett.avif";
-import kjImage from "/assets/kj.png";
+import valoweb from "/assets/valoweb.png";
+import valoweb1 from "/assets/valoweb1.png";
+import valoweb2 from "/assets/valoweb2.png";
+import valoweb3 from "/assets/valoweb3.png";
+import valoweb4 from "/assets/valoweb4.png";
+import valoweb5 from "/assets/valoweb5.png";
+import valoweb6 from "/assets/valoweb6.png";
+import valoweb7 from "/assets/valoweb7.png";
+import valoweb8 from "/assets/valoweb8.png";
 
 // Global cache to prevent duplicate API calls across component instances
 const playerCheckCache = new Map();
@@ -29,7 +36,17 @@ const PlayerForm = () => {
     region: "",
   });
 
-  const backgroundImages = [jettImage, kjImage];
+  const backgroundImages = [
+    valoweb,
+    valoweb1,
+    valoweb2,
+    valoweb3,
+    valoweb4,
+    valoweb5,
+    valoweb6,
+    valoweb7,
+    valoweb8,
+  ];
 
   // Background image slideshow
   useEffect(() => {
@@ -59,10 +76,12 @@ const PlayerForm = () => {
             setExistingPlayer(cachedResult);
             if (cachedResult) {
               // Get Valorant data from the valorant_users array
-              const valorantData = cachedResult.valorant_users && cachedResult.valorant_users.length > 0 
-                ? cachedResult.valorant_users[0] 
-                : null;
-              
+              const valorantData =
+                cachedResult.valorant_users &&
+                cachedResult.valorant_users.length > 0
+                  ? cachedResult.valorant_users[0]
+                  : null;
+
               setFormData({
                 display_name: cachedResult.display_name || "",
                 username: cachedResult.username || "",
@@ -94,10 +113,12 @@ const PlayerForm = () => {
             playerCheckCache.set(userId, response.data);
             setExistingPlayer(response.data);
             // Get Valorant data from the valorant_users array
-            const valorantData = response.data.valorant_users && response.data.valorant_users.length > 0 
-              ? response.data.valorant_users[0] 
-              : null;
-            
+            const valorantData =
+              response.data.valorant_users &&
+              response.data.valorant_users.length > 0
+                ? response.data.valorant_users[0]
+                : null;
+
             setFormData({
               display_name: response.data.display_name || "",
               username: response.data.username || "",
@@ -212,10 +233,11 @@ const PlayerForm = () => {
       }
 
       // Get Valorant data from the valorant_users array
-      const valorantData = result.valorant_users && result.valorant_users.length > 0 
-        ? result.valorant_users[0] 
-        : null;
-      
+      const valorantData =
+        result.valorant_users && result.valorant_users.length > 0
+          ? result.valorant_users[0]
+          : null;
+
       // Update form data with the returned data
       setFormData({
         display_name: result.display_name,
@@ -379,7 +401,7 @@ const PlayerForm = () => {
                   <option value="valorant">Valorant</option>
                 </select>
                 <small className="form-hint">
-                  {existingPlayer 
+                  {existingPlayer
                     ? "You can add game information now or update it later to enhance your profile."
                     : "You can add game information now or later to enhance your profile."}
                 </small>
@@ -518,7 +540,8 @@ const PlayerForm = () => {
               <div className="notice-content">
                 <h3>Profile Found</h3>
                 <p>
-                  You already have a player profile. You can update your basic information and add game details to enhance your profile.
+                  You already have a player profile. You can update your basic
+                  information and add game details to enhance your profile.
                 </p>
               </div>
             </div>

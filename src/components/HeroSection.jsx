@@ -3,17 +3,31 @@ import { HERO_STATS, HERO_CONTENT } from "../constants/data";
 import Button from "./Button";
 
 // Import images
-import omenImage from "/assets/yoru.avif";
-import trioImage from "/assets/kj.png";
-import vyseImage from "/assets/img1.webp";
-import jettImage from "/assets/jett.png";
-import jettImage2 from "/assets/jett.avif";
+import valoweb from "/assets/valoweb.png";
+import valoweb1 from "/assets/valoweb1.png";
+import valoweb2 from "/assets/valoweb2.png";
+import valoweb3 from "/assets/valoweb3.png";
+import valoweb4 from "/assets/valoweb4.png";
+import valoweb5 from "/assets/valoweb5.png";
+import valoweb6 from "/assets/valoweb6.png";
+import valoweb7 from "/assets/valoweb7.png";
+import valoweb8 from "/assets/valoweb8.png";
 
 // Hero Section Component - Single Responsibility Principle
 const HeroSection = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const images = [omenImage, trioImage, vyseImage, jettImage, jettImage2];
+  const images = [
+    valoweb,
+    valoweb1,
+    valoweb2,
+    valoweb3,
+    valoweb4,
+    valoweb5,
+    valoweb6,
+    valoweb7,
+    valoweb8,
+  ];
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -24,11 +38,11 @@ const HeroSection = () => {
   }, [images.length]);
 
   const handleBrowseGames = () => {
-    const gamesSection = document.getElementById('games');
+    const gamesSection = document.getElementById("games");
     if (gamesSection) {
-      gamesSection.scrollIntoView({ 
-        behavior: 'smooth',
-        block: 'start'
+      gamesSection.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
       });
     }
   };
@@ -58,7 +72,9 @@ const HeroSection = () => {
         <p className="hero-subtitle">{HERO_CONTENT.subtitle}</p>
 
         <div className="hero-buttons">
-          <Button variant="primary" onClick={handleBrowseGames}>Browse Games</Button>
+          <Button variant="primary" onClick={handleBrowseGames}>
+            Browse Games
+          </Button>
         </div>
 
         <div className="hero-stats">
