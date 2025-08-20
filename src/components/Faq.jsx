@@ -135,6 +135,18 @@ const Faq = () => {
           ),
         },
         {
+          question: "Why did my prize pool change?",
+          answer: (
+            <p>
+              For tournaments with a joining fee, the final prize pool adjusts
+              based on how many players have joined
+              <strong> 5 minutes before the match starts</strong>. If players
+              join or leave before that cutoff, the displayed prize pool may
+              change to reflect the confirmed player count.
+            </p>
+          ),
+        },
+        {
           question:
             "What if outsiders (non-registered players) join the match?",
           answer: (
