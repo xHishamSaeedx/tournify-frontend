@@ -21,7 +21,6 @@ import UserProfile from "./components/UserProfile";
 import PlayerForm from "./components/PlayerForm";
 import ProfileForm from "./components/ProfileForm";
 import Settings from "./components/Settings";
-import BackButton from "./components/BackButton";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ValorantPage from "./components/ValorantPage";
 import TournamentBrowser from "./components/TournamentBrowser";
@@ -34,6 +33,7 @@ import AdminDashboard from "./components/AdminDashboard";
 import HostDashboard from "./components/HostDashboard";
 import GameHostDashboard from "./components/GameHostDashboard";
 import Wallet from "./components/Wallet";
+import Faq from "./components/Faq";
 import { AuthProvider } from "./contexts/AuthContext";
 import { UserRolesProvider } from "./contexts/UserRolesContext";
 
@@ -172,6 +172,7 @@ const App = () => {
                   </ProtectedRoute>
                 }
               />
+              <Route path="/faq" element={<Faq />} />
               <Route
                 path="/"
                 element={

@@ -71,6 +71,10 @@ const ValorantHeroSection = ({ onShowCreateForm }) => {
     navigate("/valorant/browse-tournaments");
   };
 
+  const handleFAQ = () => {
+    navigate("/faq");
+  };
+
   return (
     <>
       {/* Horizontal strip to prevent navbar overlap */}
@@ -120,6 +124,14 @@ const ValorantHeroSection = ({ onShowCreateForm }) => {
                 <span className="button-text">My Tournaments</span>
                 <span className="button-icon">🎮</span>
               </Button>
+              <Button
+                variant="secondary"
+                onClick={handleFAQ}
+                className="hero-button secondary animate-slide-in-left"
+              >
+                <span className="button-text">FAQ</span>
+                <span className="button-icon">❓</span>
+              </Button>
             </div>
           )}
 
@@ -157,6 +169,14 @@ const ValorantHeroSection = ({ onShowCreateForm }) => {
                 <span className="button-text">My Tournaments</span>
                 <span className="button-icon">🎮</span>
               </Button>
+              <Button
+                variant="secondary"
+                onClick={handleFAQ}
+                className="hero-button secondary animate-slide-in-left"
+              >
+                <span className="button-text">FAQ</span>
+                <span className="button-icon">❓</span>
+              </Button>
             </div>
           )}
 
@@ -193,6 +213,14 @@ const ValorantHeroSection = ({ onShowCreateForm }) => {
               >
                 <span className="button-text">My Tournaments</span>
                 <span className="button-icon">🎮</span>
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={handleFAQ}
+                className="hero-button secondary animate-slide-in-left"
+              >
+                <span className="button-text">FAQ</span>
+                <span className="button-icon">❓</span>
               </Button>
             </div>
           )}
