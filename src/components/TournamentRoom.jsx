@@ -157,37 +157,39 @@ const TournamentRoom = () => {
     }
   };
 
+  const formatRemainingTime = (milliseconds) => {
+    const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+
+    if (days > 0) {
+      return `${days}d ${hours}h`;
+    }
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    }
+    if (minutes > 0) {
+      return `${minutes}m ${seconds.toString().padStart(2, "0")}s`;
+    }
+    return `${seconds}s`;
+  };
+
   const checkPartyCodeTime = () => {
     if (!tournament?.party_join_time) return;
 
     const now = new Date().getTime();
     const partyJoinTime = new Date(tournament.party_join_time).getTime();
     const difference = partyJoinTime - now;
-    const oneMinuteInMs = 60 * 1000; // 1 minute in milliseconds
 
     if (difference <= 0) {
-      // Party join time has passed - show party code
       setCanSeePartyCode(true);
       setPartyCodeTimeStatus("Party code is now available!");
-    } else if (difference <= oneMinuteInMs) {
-      // Within 1 minute of party join time - show countdown but don't reveal code yet
-      setCanSeePartyCode(false);
-      const minutes = Math.floor(difference / (1000 * 60));
-      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
-      setPartyCodeTimeStatus(
-        `Party code will be available in ${minutes}:${seconds
-          .toString()
-          .padStart(2, "0")}`
-      );
     } else {
-      // More than 1 minute away - show countdown
       setCanSeePartyCode(false);
-      const minutes = Math.floor(difference / (1000 * 60));
-      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
       setPartyCodeTimeStatus(
-        `Party code will be available in ${minutes}:${seconds
-          .toString()
-          .padStart(2, "0")}`
+        `Party code will be available in ${formatRemainingTime(difference)}`
       );
     }
   };
