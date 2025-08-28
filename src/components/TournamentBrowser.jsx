@@ -457,9 +457,8 @@ const TournamentBrowser = ({ game = "valorant", embedded = false }) => {
   };
 
   const handleViewDetails = (tournamentId) => {
-    // TODO: Navigate to tournament details page
-    console.log("View tournament details:", tournamentId);
-    alert("Tournament details page coming soon!");
+    // Navigate to tournament room page
+    window.location.href = `/tournament/${tournamentId}`;
   };
 
   if (loading) {
